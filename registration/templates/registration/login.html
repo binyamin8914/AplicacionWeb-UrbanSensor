@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+{% block content %}
+{% load static %}
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Proyecto Base</title>
+</head>
+<body>
+  <div>
+    <div>
+      <div>
+        <h4>Ingrese sus datos</h4>
+        {% if form.non_field_errors %}
+          <p style="color:red">Credenciales erroneas</p>
+        {% endif %}
+        <form class="login-form" action="" method="post">
+          {% csrf_token %}
+          <div>
+            <label>Usuario:</label>
+            <input type="text" name="username"/>
+          </div>
+          <div>
+            <label>Contraseña:</label>
+            <input type="password" name="password"/>
+          </div>         
+          <div>
+            <button type="submit">
+              <span>Iniciar Sesión</span>
+            </button>
+          </div>
+          <div>
+            <a href="{% url 'password_reset' %}">Olvidé mi contraseña</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+{% endblock %}

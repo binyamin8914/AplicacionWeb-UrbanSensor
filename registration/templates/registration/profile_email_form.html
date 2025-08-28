@@ -1,0 +1,29 @@
+
+{% load static %}
+{% block title %}Email{% endblock %}
+{% block content %}
+    <style>.errorlist{color:red;}label{display:none}</style>
+    <main>
+        <div>
+            <div>
+            <div>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <h3>Email</h3>
+                    {{form.as_p}}
+                    <div>
+                        <div>
+                            <p><input type="submit" value="Actualizar"></p>
+                        </div>
+                        <div>
+                            <a href="{% url 'check_profile' %}">
+                             Volver
+                            </a>
+                        </div> 
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}
