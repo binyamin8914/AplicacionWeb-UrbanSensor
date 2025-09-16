@@ -1,0 +1,7 @@
+<h4>Crear Nueva Habilidad</h4>
+<form method='post' action="{% url 'habilidad_guardar' %}"">
+    {% csrf_token %}
+    <p><input type='text' name='habilidad' placeholder='Ingrese la habilidad' required></p>
+    <p><textarea name='descripcion' placeholder='Descripción de la habilidad' required></textarea></p>
+    <p><input type='submit' value='Crear Habilidad'></p>
+</form>

@@ -14,6 +14,9 @@ class Profile(models.Model):
 
     class Meta:
         ordering = ['user__username']
+        permissions = [
+            ("can_block_user", "Puede bloquear usuarios"),
+        ]
         
     def __str__(self):
         return f"{self.user.username} - {self.group.name}"

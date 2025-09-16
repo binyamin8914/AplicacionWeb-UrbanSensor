@@ -1,3 +1,15 @@
 <h4>Gestión de Habilidades</h4>
 </hr>
-<a href="">Nueva Habilidad</a>
+<a href="{% url 'habilidad_crear' %}">Nueva Habilidad</a>
+<br/><br/>
+<hr/>
+<table>
+    <thead>
+        <th>Habilidad</th>
+    </thead>
+    {% for h in habilidad_listado %}
+        <tr>
+            <td>{{ h.habilidad }}</td>
+        </tr>
+    {% endfor %}
+</table>
