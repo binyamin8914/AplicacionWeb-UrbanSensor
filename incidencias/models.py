@@ -1,5 +1,5 @@
 from django.db import models
-from administracion.models import Direccion, Departamento, Cuadrilla
+from administracion.models import Departamento, Cuadrilla
 from django.contrib.auth.models import User
 
 class TipoIncidencia(models.Model):

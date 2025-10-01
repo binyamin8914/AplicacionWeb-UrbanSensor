@@ -1,0 +1,46 @@
+<h4>{% if usuario %}Editar Usuario{% else %}Crear Usuario{% endif %}</h4>
+<form method="POST" action="">
+    {% csrf_token %}
+    {% if usuario %}
+        <input type="hidden" name="user_id" value="{{ usuario.id }}">
+    {% endif %}
+    <p>
+        <input type="text" name="username" placeholder="Nombre de usuario" 
+               value="{% if usuario %}{{ usuario.username }}{% endif %}" {% if usuario %}readonly{% endif %} required>
+    </p>
+    <p>
+        <input type="text" name="first_name" placeholder="Nombre" 
+               value="{% if usuario %}{{ usuario.first_name }}{% endif %}">
+        <input type="text" name="last_name" placeholder="Apellido" 
+               value="{% if usuario %}{{ usuario.last_name }}{% endif %}">
+    </p>
+    <p>
+        <input type="email" name="email" placeholder="Correo" 
+               value="{% if usuario %}{{ usuario.email }}{% endif %}" required>
+    </p>
+    <p>
+        <input type="text" name="telefono" placeholder="Teléfono" 
+               value="{% if user_profile %}{{ user_profile.telefono }}{% endif %}">
+    </p>
+    <p>
+        <select name="group" required>
+            <option value="">Seleccione perfil</option>
+            {% for grupo in grupos %}
+                <option value="{{ grupo.name }}"
+                    {% if user_profile and grupo.name == user_profile.group.name %}selected{% endif %}>
+                    {{ grupo.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </p>
+    <p>
+        <input type="password" name="password" placeholder="Contraseña" {% if not usuario %}required{% endif %}>
+        {% if usuario %}
+        <small>Dejar vacío si no quieres cambiar la contraseña</small>
+        {% endif %}
+    </p>
+    <p>
+        <input type="submit" value="{% if usuario %}Actualizar{% else %}Crear{% endif %}">
+    </p>
+</form>
+<a href="{% url 'administracion:usuarios_listar' %}">Volver</a>

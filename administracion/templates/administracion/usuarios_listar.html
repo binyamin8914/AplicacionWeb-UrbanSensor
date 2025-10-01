@@ -1,0 +1,39 @@
+<h4>Gestión de Usuarios</h4>
+<a href="{% url 'administracion:usuario_actualizar' %}">Nuevo Usuario</a>
+<br><br>
+<table border="1">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Usuario</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Perfil</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for usuario in usuarios %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ usuario.username }}</td>
+            <td>{{ usuario.first_name }}</td>
+            <td>{{ usuario.last_name }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>{{ usuario.profile.telefono }}</td>
+            <td>{{ usuario.profile.group.name }}</td>
+            <td>{% if usuario.is_active %}Activo{% else %}Bloqueado{% endif %}</td>
+            <td>
+                <a href="{% url 'administracion:usuario_ver' usuario.id %}">Ver</a>
+                <a href="{% url 'administracion:usuario_actualizar' usuario.id %}">Editar</a>
+                <a href="{% url 'administracion:usuario_bloquear' usuario.id %}">
+                    {% if usuario.is_active %}Bloquear{% else %}Activar{% endif %}
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

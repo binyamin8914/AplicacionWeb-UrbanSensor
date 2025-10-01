@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt #decorador que nos permitir
 
 from registration.models import Profile #importa el modelo profile, el que usaremos para los perfiles de usuarios
 
-# Create your views here.
+
 def home(request):
     return redirect('login')
 
@@ -25,25 +25,20 @@ def pre_check_profile(request):
 @login_required
 def check_profile(request):  
     try:
-        profile = Profile.objects.filter(user_id=request.user.id).get()    
+        profile = Profile.objects.get(user=request.user)
     except:
-        messages.add_message(request, messages.INFO, 'Hubo un error con su usuario, por favor contactese con los administradores')              
+        messages.add_message(request, messages.INFO, 'Hubo un error con su usuario, por favor contactese con los administradores')
         return redirect('login')
-    if profile.group_id == 1:        
-        return redirect('main_admin')
-    else:
-        return redirect('logout')
+    # Para pruebas: deja pasar a cualquier usuario logueado
+    return redirect('main_admin')
 
-#funcion temporal
 @login_required
 def main_admin(request):  
     try:
-        profile = Profile.objects.filter(user_id=request.user.id).get()    
+        profile = Profile.objects.get(user=request.user)
     except:
-        messages.add_message(request, messages.INFO, 'Hubo un error con su usuario, por favor contactese con los administradores')              
+        messages.add_message(request, messages.INFO, 'Hubo un error con su usuario, por favor contactese con los administradores')
         return redirect('login')
-    if profile.group_id == 1:        
-        template_name = 'core/main_admin.html'
-        return render(request,template_name)
-    else:
-        return redirect('logout')
+    # Para pruebas: deja pasar a cualquier usuario logueado
+    template_name = 'core/main_admin.html'
+    return render(request, template_name)

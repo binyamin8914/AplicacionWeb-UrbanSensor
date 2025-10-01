@@ -1,7 +1,7 @@
 import django
 import os
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'UrbanSensor.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'UrbanSensor.settings') # Cambia por el nombre al de tu proyecto x.settings
 django.setup()
 
 from django.contrib.auth.models import Group, Permission
