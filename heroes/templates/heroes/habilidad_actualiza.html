@@ -1,8 +1,0 @@
-<h4>Editar Habilidad</h4>
-<form method="POST" action="{% url 'habilidad_actualiza' %}">
-    {% csrf_token %}
-    <input type="hidden" name="id_habilidad" value="{{habilidad_data.id}}">
-    <p><input type="text" name="habilidad" placeholder="Ingrese la habilidad" value="{{habilidad_data.habilidad}}"/></p>
-    <p><textarea name="descripcion" placeholder="Ingrese la descripción">{{habilidad_data.descripcion}}</textarea></p>
-    <p><input type="submit" value="Editar"/></p>
-</form>
