@@ -79,7 +79,7 @@ def usuario_actualizar(request, user_id=None):
         return redirect("administracion:usuarios_listar")
 
     grupos = Group.objects.all()
-    return render(request, "administracion/usuario_actualizar.html", {
+    return render(request, "administracion/usuarios_actualizar.html", {
         "usuario": user,
         "user_profile": user_profile,
         "grupos": grupos
