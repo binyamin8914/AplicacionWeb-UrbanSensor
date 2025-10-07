@@ -30,15 +30,19 @@ def check_profile(request):
         messages.add_message(request, messages.INFO, 'Hubo un error con su usuario, por favor contactese con los administradores')
         return redirect('login')
     # Para pruebas: deja pasar a cualquier usuario logueado
-    return redirect('main_admin')
+    return redirect('dashboard')
 
 @login_required
-def main_admin(request):  
+def dashboard(request):  
     try:
         profile = Profile.objects.get(user=request.user)
+        group_name = profile.group.name
     except:
         messages.add_message(request, messages.INFO, 'Hubo un error con su usuario, por favor contactese con los administradores')
         return redirect('login')
     # Para pruebas: deja pasar a cualquier usuario logueado
-    template_name = 'core/main_admin.html'
-    return render(request, template_name)
+    template_name = 'core/dashboard.html'
+    return render(request, template_name, {
+        "group_name": group_name,
+        "profile": profile,
+    })

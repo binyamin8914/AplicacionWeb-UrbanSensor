@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Panel de Administración{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'core/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <!-- Menú lateral persistente -->
+        <nav class="sidebar">
+            <h4>Menú Principal</h4>
+            <hr>
+            <ul>
+                {% if group_name == "SECPLA" %}
+                    <li><a href="{% url 'administracion:usuarios_listar' %}">Gestión de Usuarios</a></li>
+                    <li><a href="{% url 'administracion:direccion_listar' %}">Gestión de Direcciones</a></li>
+                    <li><a href="{% url 'administracion:departamento_listar' %}">Gestión de Departamentos</a></li>
+                    <li><a href="{% url 'administracion:cuadrilla_listar' %}">Gestión de Cuadrillas</a></li>
+                    <!-- Más opciones SECPLA -->
+                {% elif group_name == "TERRITORIAL" %}
+                    {# <li><a href="{% url 'encuestas:encuestas_listar' %}">Ver Encuestas</a></li> #}
+                    {# <li><a href="{% url 'incidencias:incidencias_listar' %}">Incidencias</a></li> #}
+                {% elif group_name == "CUADRILLA" %}
+                    {# <li><a href="{% url 'incidencias:incidencias_por_hacer' %}">Incidencias por Hacer</a></li> #}
+                    {# <li><a href="{% url 'incidencias:incidencias_realizadas' %}">Incidencias Realizadas</a></li> #}
+                {% elif group_name == "DIRECCION" %}
+                    {# <li><a href="{% url 'direccion:ver_incidencias' %}">Incidencias recibidas</a></li> #}
+                {% endif %}
+            </ul>
+            <a class="logout-link" href="{% url 'logout' %}">Cerrar sesión</a>
+        </nav>
+        <!-- Panel principal que cambia -->
+        <main class="main-panel">
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+    <footer>
+        <hr>
+        <small>&copy; 2025 Urban Sensor</small>
+    </footer>
+</body>
+</html>
