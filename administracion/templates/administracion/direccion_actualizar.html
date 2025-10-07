@@ -1,3 +1,6 @@
+{% extends "core/base.html" %}
+{% block title %}{% if direccion %}Editar Dirección{% else %}Crear Dirección{% endif %}{% endblock %}
+{% block content %}
 <h4>{% if direccion %}Editar Dirección{% else %}Crear Dirección{% endif %}</h4>
 <form method="POST" action="">
     {% csrf_token %}
@@ -28,3 +31,4 @@
     </p>
 </form>
 <a href="{% url 'administracion:direccion_listar' %}">Volver</a>
+{% endblock %}

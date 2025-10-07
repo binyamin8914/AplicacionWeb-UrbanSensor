@@ -1,3 +1,6 @@
+{% extends 'core/base.html' %}
+{% block title %}Ver Usuario{% endblock %}
+{% block content %}
 <h4>Ver Usuario</h4>
 <a href="{% url 'administracion:usuarios_listar' %}">Volver</a>
 <hr>
@@ -8,3 +11,4 @@
 <p><b>Teléfono:</b> {{ user_profile.telefono }}</p>
 <p><b>Perfil:</b> {{ user_profile.group.name }}</p>
 <p><b>Estado:</b> {% if usuario.is_active %}Activo{% else %}Bloqueado{% endif %}</p>
+{% endblock %}

@@ -1,3 +1,6 @@
+{% extends "core/base.html" %}
+{% block title %}{% if cuadrilla %}Editar Cuadrilla{% else %}Crear Cuadrilla{% endif %}{% endblock %}
+{% block content %}
 <h4>{% if cuadrilla %}Editar Cuadrilla{% else %}Crear Cuadrilla{% endif %}</h4>
 <form method="POST" action="">
     {% csrf_token %}
@@ -35,3 +38,4 @@
     </p>
 </form>
 <a href="{% url 'administracion:cuadrilla_listar' %}">Volver</a>
+{% endblock %}

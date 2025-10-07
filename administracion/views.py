@@ -18,7 +18,10 @@ def usuarios_listar(request):
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
     usuarios = User.objects.all().order_by('username')
-    return render(request, "administracion/usuarios_listar.html", {"usuarios": usuarios})
+    return render(request, "administracion/usuarios_listar.html", {
+        "usuarios": usuarios,
+        "group_name": profile.group.name   # <-- agrego group
+    })
 
 @login_required
 def usuario_actualizar(request, user_id=None):
@@ -82,7 +85,8 @@ def usuario_actualizar(request, user_id=None):
     return render(request, "administracion/usuarios_actualizar.html", {
         "usuario": user,
         "user_profile": user_profile,
-        "grupos": grupos
+        "grupos": grupos,
+        "group_name": profile.group.name
     })
 
 @login_required
@@ -122,7 +126,7 @@ def usuario_ver(request, user_id):
     except:
         messages.add_message(request, messages.INFO, "Usuario no encontrado.")
         return redirect("administracion:usuarios_listar")
-    return render(request, "administracion/usuarios_ver.html", {"usuario": user, "user_profile": user_profile})
+    return render(request, "administracion/usuarios_ver.html", {"usuario": user, "user_profile": user_profile, "group_name": profile.group.name})
 
 # --- CRUD Direccion ---
 
@@ -133,7 +137,7 @@ def direccion_listar(request):
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
     direcciones = Direccion.objects.all()
-    return render(request, "administracion/direccion_listar.html", {"direcciones": direcciones})
+    return render(request, "administracion/direccion_listar.html", {"direcciones": direcciones, "group_name": profile.group.name})
 
 @login_required
 def direccion_actualizar(request, direccion_id=None):
@@ -171,7 +175,8 @@ def direccion_actualizar(request, direccion_id=None):
     encargados = User.objects.all()
     return render(request, "administracion/direccion_actualizar.html", {
         "direccion": direccion,
-        "encargados": encargados
+        "encargados": encargados,
+        "group_name": profile.group.name
     })
 
 @login_required
@@ -181,7 +186,7 @@ def direccion_ver(request, direccion_id):
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
     direccion = get_object_or_404(Direccion, pk=direccion_id)
-    return render(request, "administracion/direccion_ver.html", {"direccion": direccion})
+    return render(request, "administracion/direccion_ver.html", {"direccion": direccion, "group_name": profile.group.name})
 
 @login_required
 def direccion_bloquear(request, direccion_id):
@@ -205,7 +210,7 @@ def departamento_listar(request):
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
     departamentos = Departamento.objects.all()
-    return render(request, "administracion/departamento_listar.html", {"departamentos": departamentos})
+    return render(request, "administracion/departamento_listar.html", {"departamentos": departamentos, "group_name": profile.group.name})
 
 @login_required
 def departamento_actualizar(request, departamento_id=None):
@@ -248,7 +253,8 @@ def departamento_actualizar(request, departamento_id=None):
     return render(request, "administracion/departamento_actualizar.html", {
         "departamento": departamento,
         "encargados": encargados,
-        "direcciones": direcciones
+        "direcciones": direcciones,
+        "group_name": profile.group.name
     })
 
 @login_required
@@ -258,7 +264,7 @@ def departamento_ver(request, departamento_id):
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
     departamento = get_object_or_404(Departamento, pk=departamento_id)
-    return render(request, "administracion/departamento_ver.html", {"departamento": departamento})
+    return render(request, "administracion/departamento_ver.html", {"departamento": departamento, "group_name": profile.group.name})
 
 @login_required
 def departamento_bloquear(request, departamento_id):
@@ -282,7 +288,7 @@ def cuadrilla_listar(request):
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
     cuadrillas = Cuadrilla.objects.all()
-    return render(request, "administracion/cuadrilla_listar.html", {"cuadrillas": cuadrillas})
+    return render(request, "administracion/cuadrilla_listar.html", {"cuadrillas": cuadrillas, "group_name": profile.group.name})
 
 @login_required
 def cuadrilla_actualizar(request, cuadrilla_id=None):
@@ -323,7 +329,8 @@ def cuadrilla_actualizar(request, cuadrilla_id=None):
     return render(request, "administracion/cuadrilla_actualizar.html", {
         "cuadrilla": cuadrilla,
         "encargados": encargados,
-        "departamentos": departamentos
+        "departamentos": departamentos, 
+        "group_name": profile.group.name
     })
 
 @login_required
@@ -333,7 +340,7 @@ def cuadrilla_ver(request, cuadrilla_id):
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
     cuadrilla = get_object_or_404(Cuadrilla, pk=cuadrilla_id)
-    return render(request, "administracion/cuadrilla_ver.html", {"cuadrilla": cuadrilla})
+    return render(request, "administracion/cuadrilla_ver.html", {"cuadrilla": cuadrilla, "group_name": profile.group.name})
 
 @login_required
 def cuadrilla_bloquear(request, cuadrilla_id):

@@ -1,3 +1,6 @@
+{% extends "core/base.html" %}
+{% block title %}Gestión de Departamentos{% endblock %}
+{% block content %}
 <h4>Gestión de Departamentos</h4>
 <a href="{% url 'administracion:departamento_actualizar' %}">Nuevo Departamento</a>
 <br><br>
@@ -33,4 +36,5 @@
     {% endfor %}
     </tbody>
 </table>
-<a href="{% url 'main_admin' %}">Volver al Menú Principal</a>
+<a href="{% url 'dashboard' %}">Volver al Menú Principal</a>
+{% endblock %}

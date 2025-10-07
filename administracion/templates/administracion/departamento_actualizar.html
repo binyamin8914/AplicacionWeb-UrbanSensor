@@ -1,3 +1,6 @@
+{% extends "core/base.html" %}
+{% block title %}{% if departamento %}Editar Departamento{% else %}Crear Departamento{% endif %}{% endblock %}
+{% block content %}
 <h4>{% if departamento %}Editar Departamento{% else %}Crear Departamento{% endif %}</h4>
 <form method="POST" action="">
     {% csrf_token %}
@@ -39,3 +42,4 @@
     </p>
 </form>
 <a href="{% url 'administracion:departamento_listar' %}">Volver</a>
+{% endblock %}
