@@ -2,7 +2,7 @@
 {% block title %}Ver Usuario{% endblock %}
 {% block content %}
 <h4>Ver Usuario</h4>
-<a href="{% url 'administracion:usuarios_listar' %}">Volver</a>
+<a href="{% url 'usuarios_listar' %}">Volver</a>
 <hr>
 <p><b>Usuario:</b> {{ usuario.username }}</p>
 <p><b>Nombre:</b> {{ usuario.first_name }}</p>

@@ -2,7 +2,7 @@
 {% block title %}Gestión de Usuarios{% endblock %}
 {% block content %}
 <h4>Gestión de Usuarios</h4>
-<a href="{% url 'administracion:usuario_actualizar' %}">Nuevo Usuario</a>
+<a href="{% url 'usuario_actualizar' %}">Nuevo Usuario</a>
 <br><br>
 <table border="1">
     <thead>
@@ -30,9 +30,9 @@
             <td>{{ usuario.profile.group.name }}</td>
             <td>{% if usuario.is_active %}Activo{% else %}Bloqueado{% endif %}</td>
             <td>
-                <a href="{% url 'administracion:usuario_ver' usuario.id %}">Ver</a>
-                <a href="{% url 'administracion:usuario_actualizar' usuario.id %}">Editar</a>
-                <a href="{% url 'administracion:usuario_bloquear' usuario.id %}">
+                <a href="{% url 'usuario_ver' usuario.id %}">Ver</a>
+                <a href="{% url 'usuario_actualizar' usuario.id %}">Editar</a>
+                <a href="{% url 'usuario_bloquear' usuario.id %}">
                     {% if usuario.is_active %}Bloquear{% else %}Activar{% endif %}
                 </a>
             </td>
