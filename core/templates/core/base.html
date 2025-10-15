@@ -13,6 +13,7 @@
             <h4>Menú Principal</h4>
             <hr>
             <ul>
+                <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
                 {% if group_name == "SECPLA" %}
                     <li><a href="{% url 'usuarios_listar' %}">Gestión de Usuarios</a></li>
                     <li><a href="{% url 'direccion_listar' %}">Gestión de Direcciones</a></li>
@@ -29,7 +30,7 @@
                     {# <li><a href="{% url 'direccion:ver_incidencias' %}">Incidencias recibidas</a></li> #}
                 {% endif %}
             </ul>
-            <a class="logout-link" href="{% url 'logout' %}">Cerrar sesión</a>
+            <a class="logout-link" href="{% url 'login' %}">Cerrar sesión</a>
         </nav>
         <!-- Panel principal que cambia -->
         <main class="main-panel">

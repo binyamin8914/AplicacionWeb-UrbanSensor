@@ -50,7 +50,7 @@ def direccion_actualizar(request, direccion_id=None):
             messages.add_message(request, messages.INFO, "Dirección creada correctamente.")
         return redirect("direccion_listar")
 
-    encargados = User.objects.all()
+    encargados = User.objects.filter(profile__group__name="Direccion")
     return render(request, "direcciones/direccion_actualizar.html", {
         "direccion": direccion,
         "encargados": encargados,

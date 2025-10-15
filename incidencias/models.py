@@ -42,3 +42,4 @@ class Evidencia(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.PROTECT)
     fecha_subida = models.DateTimeField(auto_now_add=True)
     archivo = models.FileField(upload_to='evidencias/')
+

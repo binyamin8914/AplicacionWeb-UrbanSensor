@@ -12,15 +12,19 @@
                value="{% if cuadrilla %}{{ cuadrilla.nombre }}{% endif %}" required>
     </p>
     <p>
-        <select name="encargado" required>
+        <select id="encargado" name="encargado" required>
             <option value="">Seleccione encargado</option>
             {% for encargado in encargados %}
-                <option value="{{ encargado.id }}"
+                <option value="{{ encargado.id }}" data-correo="{{ encargado.email }}"
                         {% if cuadrilla and cuadrilla.encargado.id == encargado.id %}selected{% endif %}>
                     {{ encargado.username }} ({{ encargado.first_name }} {{ encargado.last_name }})
                 </option>
             {% endfor %}
         </select>
+    </p>
+    <p>
+        <input type="email" name="correo_encargado" placeholder="Correo encargado" 
+               value="{% if cuadrilla %}{{ cuadrilla.correo_encargado }}{% endif %}" required>
     </p>
     <p>
         <select name="departamento" required>
@@ -38,4 +42,6 @@
     </p>
 </form>
 <a href="{% url 'cuadrilla_listar' %}">Volver</a>
+{% load static %}
+<script src="{% static 'js/autocompletar_correo.js' %}"></script>
 {% endblock %}

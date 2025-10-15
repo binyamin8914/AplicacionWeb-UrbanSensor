@@ -52,7 +52,7 @@ def departamento_actualizar(request, departamento_id=None):
             messages.add_message(request, messages.INFO, "Departamento creado correctamente.")
         return redirect("departamento_listar")
 
-    encargados = User.objects.all()
+    encargados = User.objects.filter(profile__group__name="Departamento")
     direcciones = Direccion.objects.filter(esta_activa=True)
     return render(request, "departamentos/departamento_actualizar.html", {
         "departamento": departamento,

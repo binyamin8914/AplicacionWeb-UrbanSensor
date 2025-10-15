@@ -50,7 +50,7 @@ def cuadrilla_actualizar(request, cuadrilla_id=None):
             messages.add_message(request, messages.INFO, "Cuadrilla creada correctamente.")
         return redirect("cuadrilla_listar")
 
-    encargados = User.objects.all()
+    encargados = User.objects.filter(profile__group__name="Cuadrilla")
     departamentos = Departamento.objects.filter(esta_activo=True)
     return render(request, "cuadrillas/cuadrilla_actualizar.html", {
         "cuadrilla": cuadrilla,

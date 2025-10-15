@@ -9,11 +9,11 @@ from registration.models import Profile
 
 def create_test_users():
     usuarios = [
-        {'username': 'secpla_user', 'password': 'pass_secpla123', 'email': 'secpla@mail.com', 'group': 'SECPLA', 'telefono': '1111-1111'},
-        {'username': 'territorial_user', 'password': 'pass_territorial123', 'email': 'territorial@mail.com', 'group': 'Territorial', 'telefono': '2222-2222'},
-        {'username': 'direccion_user', 'password': 'pass_direccion123', 'email': 'direccion@mail.com', 'group': 'Direccion', 'telefono': '3333-3333'},
-        {'username': 'departamento_user', 'password': 'pass_departamento123', 'email': 'departamento@mail.com', 'group': 'Departamento', 'telefono': '4444-4444'},
-        {'username': 'cuadrilla_user', 'password': 'pass_cuadrilla123', 'email': 'cuadrilla@mail.com', 'group': 'Cuadrilla', 'telefono': '5555-5555'}
+        {'username': 'secpla_user2', 'password': 'pass_secpla1234', 'email': 'secpla2@mail.com', 'group': 'SECPLA', 'telefono': '6666-6666'},
+        {'username': 'territorial_user2', 'password': 'pass_territorial1234', 'email': 'territorial2@mail.com', 'group': 'Territorial', 'telefono': '7777-7777'},
+        {'username': 'direccion_user2', 'password': 'pass_direccion1234', 'email': 'direccion2@mail.com', 'group': 'Direccion', 'telefono': '8888-8888'},
+        {'username': 'departamento_user2', 'password': 'pass_departamento1234', 'email': 'departamento2@mail.com', 'group': 'Departamento', 'telefono': '9999-9999'},
+        {'username': 'cuadrilla_user2', 'password': 'pass_cuadrilla1234', 'email': 'cuadrilla2@mail.com', 'group': 'Cuadrilla', 'telefono': '0000-0000'}
     ]
 
     for user_data in usuarios:
