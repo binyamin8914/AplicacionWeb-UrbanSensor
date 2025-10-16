@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+            <h3>Confirmar Eliminación</h3>
+        </div>
+        <div class="card-body">
+            <p>¿Estás seguro de que quieres eliminar la encuesta?</p>
+            <h4>"{{ encuesta.titulo }}"</h4>
+            <p class="text-muted">Esta acción no se puede deshacer.</p>
+            
+            <form method="post">
+                {% csrf_token %}
+                <a href="{% url 'gestion_encuestas' %}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white"><h3>Confirmar Eliminación</h3></div>
+        <div class="card-body">
+            <p>¿Estás seguro de que quieres eliminar este objeto: <strong>{{ titulo_objeto }}</strong>?</p>
+            <h4>"{{ objeto }}"</h4>
+            <form method="post">
+                {% csrf_token %}
+                <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

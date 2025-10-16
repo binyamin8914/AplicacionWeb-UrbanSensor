@@ -8,7 +8,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Menú lateral persistente -->
         <nav class="sidebar">
             <h4>Menú Principal</h4>
             <hr>
@@ -19,7 +18,9 @@
                     <li><a href="{% url 'direccion_listar' %}">Gestión de Direcciones</a></li>
                     <li><a href="{% url 'departamento_listar' %}">Gestión de Departamentos</a></li>
                     <li><a href="{% url 'cuadrilla_listar' %}">Gestión de Cuadrillas</a></li>
-                    <!-- Más opciones SECPLA -->
+                    <li><a href="{% url 'gestion_encuestas' %}">Gestión de Encuestas</a></li>
+                    <li><a href="{% url 'gestion_incidencias' %}">Gestión de Incidencias</a></li> 
+                  
                 {% elif group_name == "TERRITORIAL" %}
                     {# <li><a href="{% url 'encuestas:encuestas_listar' %}">Ver Encuestas</a></li> #}
                     {# <li><a href="{% url 'incidencias:incidencias_listar' %}">Incidencias</a></li> #}
@@ -32,7 +33,6 @@
             </ul>
             <a class="logout-link" href="{% url 'login' %}">Cerrar sesión</a>
         </nav>
-        <!-- Panel principal que cambia -->
         <main class="main-panel">
             {% block content %}
             {% endblock %}
