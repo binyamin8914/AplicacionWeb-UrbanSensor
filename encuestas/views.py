@@ -1,72 +1,107 @@
+# encuestas/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Encuesta, CamposAdicionales, EncuestaRespuesta
-from .forms import EncuestaForm # ¡Importante! El siguiente paso será crear este archivo
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
-# Vista principal para mostrar todas las encuestas
+from .models import Encuesta
+from .forms import EncuestaForm
+
+
+@login_required
 def gestion_encuestas(request):
     """
-    Muestra una lista de todas las encuestas. Es la página principal de gestión.
+    Lista de encuestas con carga eficiente y paginación.
+    Admite filtros opcionales por estado/prioridad vía querystring (?estado= / ?prioridad=).
     """
-    lista_encuestas = Encuesta.objects.all()
-    contexto = {
-        'encuestas': lista_encuestas
-    }
-    return render(request, 'encuestas/gestion_encuestas.html', contexto)
+    qs = (
+        Encuesta.objects
+        .select_related('departamento', 'tipo_incidencia')
+        .order_by('-id')
+    )
 
-# Vista para crear una nueva encuesta
+    # Filtros opcionales
+    estado = request.GET.get('estado')
+    prioridad = request.GET.get('prioridad')
+    if estado:
+        qs = qs.filter(estado=estado)
+    if prioridad:
+        qs = qs.filter(prioridad=prioridad)
+
+    page_obj = Paginator(qs, 10).get_page(request.GET.get('page'))
+    return render(request, 'encuestas/gestion_encuestas.html', {
+        'encuestas': page_obj,
+        'f_estado': estado or '',
+        'f_prioridad': prioridad or '',
+    })
+
+
+@login_required
 def crear_encuesta(request):
     """
-    Maneja la creación de una nueva encuesta a través de un formulario.
+    Crear una encuesta nueva.
     """
     if request.method == 'POST':
         form = EncuestaForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, '¡La encuesta ha sido creada exitosamente!')
-            return redirect('gestion_encuestas') # Redirige a la lista después de crear
+            return redirect('gestion_encuestas')
+        messages.error(request, 'Revisa los campos: hay errores en el formulario.')
+    # encuestas/views.py -> dentro de crear_encuesta (rama GET)
     else:
-        form = EncuestaForm() # Si es GET, crea un formulario vacío
+        form = EncuestaForm()
+        print('QS deps en form:', form.fields['departamento'].queryset.count())
 
-    contexto = {
+    return render(request, 'encuestas/formulario_encuesta.html', {
         'form': form,
-        'titulo_pagina': 'Crear Nueva Encuesta'
-    }
-    return render(request, 'encuestas/formulario_encuesta.html', contexto)
+        'titulo_pagina': 'Crear Nueva Encuesta',
+        'modo': 'crear',
+    })
 
-# Vista para editar una encuesta existente
-def editar_encuesta(request, encuesta_id):
+
+@login_required
+def editar_encuesta(request, encuesta_id: int):
     """
-    Busca una encuesta por su ID y maneja su edición.
+    Editar encuesta existente.
+    Requisito: solo se puede editar si la encuesta está en estado BLOQUEADO.
     """
-    encuesta_obj = get_object_or_404(Encuesta, id=encuesta_id) # Busca la encuesta o devuelve un error 404
+    encuesta_obj = get_object_or_404(Encuesta, id=encuesta_id)
+
+    if encuesta_obj.estado != 'bloqueado':
+        messages.warning(request, 'Solo puedes editar encuestas en estado BLOQUEADO.')
+        return redirect('gestion_encuestas')
+
     if request.method == 'POST':
         form = EncuestaForm(request.POST, instance=encuesta_obj)
         if form.is_valid():
             form.save()
             messages.success(request, '¡La encuesta ha sido actualizada exitosamente!')
             return redirect('gestion_encuestas')
+        messages.error(request, 'Revisa los campos: hay errores en el formulario.')
     else:
-        form = EncuestaForm(instance=encuesta_obj) # Rellena el formulario con los datos existentes
+        form = EncuestaForm(instance=encuesta_obj)
 
-    contexto = {
+    return render(request, 'encuestas/formulario_encuesta.html', {
         'form': form,
-        'titulo_pagina': 'Editar Encuesta'
-    }
-    return render(request, 'encuestas/formulario_encuesta.html', contexto)
+        'titulo_pagina': 'Editar Encuesta',
+        'modo': 'editar',
+        'encuesta': encuesta_obj,
+    })
 
-# Vista para eliminar una encuesta
-def eliminar_encuesta(request, encuesta_id):
+
+@login_required
+def eliminar_encuesta(request, encuesta_id: int):
     """
-    Busca una encuesta por su ID y la elimina después de una confirmación.
+    Confirmar y eliminar una encuesta.
     """
     encuesta_obj = get_object_or_404(Encuesta, id=encuesta_id)
+
     if request.method == 'POST':
         encuesta_obj.delete()
         messages.success(request, '¡La encuesta ha sido eliminada!')
         return redirect('gestion_encuestas')
 
-    contexto = {
+    return render(request, 'encuestas/confirmar_eliminar_encuesta.html', {
         'encuesta': encuesta_obj
-    }
-    return render(request, 'encuestas/confirmar_eliminar_encuesta.html', contexto)
+    })
