@@ -5,41 +5,92 @@
     <meta charset="UTF-8">
     <title>{% block title %}Panel de Administración{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'core/style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@v3.3.0/build/firacode-nerd-font.css">
 </head>
 <body>
     <div class="container">
         <!-- Menú lateral persistente -->
-        <nav class="sidebar">
-            <h4>Menú Principal</h4>
+        <input type="checkbox" id="toggle" hidden>
+        <div class="sidebar">
+            <div id="title_sidebar">
+                <label for="toggle" class="toggle_btn">󰮫</label>
+                <h3>User_name</h3>
+            </div>
             <hr>
             <ul>
                 {% if group_name == "SECPLA" %}
-                    <li><a href="{% url 'usuarios_listar' %}">Gestión de Usuarios</a></li>
-                    <li><a href="{% url 'direccion_listar' %}">Gestión de Direcciones</a></li>
-                    <li><a href="{% url 'departamento_listar' %}">Gestión de Departamentos</a></li>
-                    <li><a href="{% url 'cuadrilla_listar' %}">Gestión de Cuadrillas</a></li>
+                    <li>
+                        <a class="item_l" href="{% url 'usuarios_listar' %}">
+                            <span class="item_l_icon"></span>
+                            <span class="item_l_texto">Gestión de Usuarios</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="item_l" href="{% url 'direccion_listar' %}">
+                            <span class="item_l_icon"></span>
+                            <span class="item_l_texto">Gestión de Direcciones</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="item_l" href="{% url 'departamento_listar' %}">
+                            <span class="item_l_icon"></span>
+                            <span class="item_l_texto">Gestión de Departamentos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="item_l" href="{% url 'cuadrilla_listar' %}">
+                            <span class="item_l_icon"></span>
+                            <span class="item_l_texto">Gestión de Cuadrillas</span>
+                        </a>
+                    </li>
                     <!-- Más opciones SECPLA -->
                 {% elif group_name == "TERRITORIAL" %}
-                    {# <li><a href="{% url 'encuestas:encuestas_listar' %}">Ver Encuestas</a></li> #}
-                    {# <li><a href="{% url 'incidencias:incidencias_listar' %}">Incidencias</a></li> #}
+                    {# <li>
+                        <a class="item_l" href="{% url 'encuestas:encuestas_listar' %}">
+                            <span class="item_l_icon">Ic</span>
+                            <span class="item_l_texto">Ver Encuestas</span>
+                        </a>
+                    </li> #}
+                    {# <li>
+                        <a class="item_l" href="{% url 'incidencias:incidencias_listar' %}">
+                            <span class="item_l_icon">Ic</span>
+                            <span class="item_l_texto">Incidencias</span>
+                        </a>
+                    </li> #}
                 {% elif group_name == "CUADRILLA" %}
-                    {# <li><a href="{% url 'incidencias:incidencias_por_hacer' %}">Incidencias por Hacer</a></li> #}
-                    {# <li><a href="{% url 'incidencias:incidencias_realizadas' %}">Incidencias Realizadas</a></li> #}
+                    {# <li>
+                        <a class="item_l" href="{% url 'incidencias:incidencias_por_hacer' %}">
+                            <span class="item_l_icon">Ic</span>
+                            <span class="item_l_texto">Incidencias por Hacer</span>
+                        </a>
+                    </li> #}
+                    {# <li>
+                        <a class="item_l" href="{% url 'incidencias:incidencias_realizadas' %}">
+                            <span class="item_l_icon">Ic</span>
+                            <span class="item_l_texto">Incidencias Realizadas</span>
+                        </a>
+                    </li> #}
                 {% elif group_name == "DIRECCION" %}
-                    {# <li><a href="{% url 'direccion:ver_incidencias' %}">Incidencias recibidas</a></li> #}
+                    {# <li>
+                        <a class="item_l" href="{% url 'direccion:ver_incidencias' %}">
+                            <span class="item_l_icon">Ic</span>
+                            <span class="item_l_texto">Incidencias recibidas</span>
+                        </a>
+                    </li> #}
                 {% endif %}
             </ul>
             <a class="logout-link" href="{% url 'logout' %}">Cerrar sesión</a>
-        </nav>
+        </div>
         <!-- Panel principal que cambia -->
         <main class="main-panel">
             {% block content %}
             {% endblock %}
         </main>
     </div>
-    <footer>
+    <!-- <footer>
+        ----------------------------- Ver como poner el footer -----------------------
         <hr>
         <small>&copy; 2025 Urban Sensor</small>
-    </footer>
+    </footer> -->
 </body>
 </html>
