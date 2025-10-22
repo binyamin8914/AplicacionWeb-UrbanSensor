@@ -354,3 +354,4 @@ def cuadrilla_bloquear(request, cuadrilla_id):
     estado = "activada" if cuadrilla.esta_activa else "bloqueada"
     messages.success(request, f"Cuadrilla {estado} correctamente.")
     return redirect("administracion:cuadrilla_listar")
+# -- CRUD-Usuario Revisado --
