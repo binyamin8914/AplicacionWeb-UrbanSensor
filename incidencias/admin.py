@@ -8,7 +8,7 @@ class TipoIncidenciaAdmin(admin.ModelAdmin):
 
 @admin.register(Incidencia)
 class IncidenciaAdmin(admin.ModelAdmin):
-    list_display = ('id', 'encuesta', 'direccion', 'departamento', 'estado', 'created_at')
-    list_filter = ('estado', 'departamento')
+    list_display = ('id', 'encuesta', 'estado', 'created_at')
+    list_filter = ('estado',)
 
 admin.site.register(Evidencia)
