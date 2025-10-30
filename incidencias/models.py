@@ -23,7 +23,7 @@ class Incidencia(models.Model):
     encuesta = models.ForeignKey('encuestas.Encuesta', on_delete=models.PROTECT)
     vecino = models.ForeignKey('encuestas.Vecino', on_delete=models.PROTECT, null=True, blank=True) 
     territorial = models.ForeignKey(User, on_delete=models.PROTECT, related_name='incidencias_territorial')
-    cuadrilla = models.ForeignKey(Cuadrilla, on_delete=models.PROTECT)
+    cuadrilla = models.ForeignKey(Cuadrilla, on_delete=models.PROTECT, null=True, blank=True)
     descripcion = models.CharField(max_length=255)
     latitud = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     longitud = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
@@ -34,6 +34,11 @@ class Incidencia(models.Model):
 
     def __str__(self):
         return f"Incidencia #{self.id} - {self.descripcion[:20]}"
+    
+    @property
+    def departamento(self):
+        # Retorna el departamento asociado a través de la encuesta
+        return self.encuesta.departamento
 
 class Evidencia(models.Model):
     incidencia = models.ForeignKey(Incidencia, on_delete=models.CASCADE)

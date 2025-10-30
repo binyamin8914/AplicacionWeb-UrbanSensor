@@ -83,9 +83,9 @@ WSGI_APPLICATION = 'UrbanSensor.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'UrbanWeb',
+        'NAME': 'urban_sensor',
         'USER': 'postgres',
-        'PASSWORD': '12345678',
+        'PASSWORD': '8914',
         'HOST': 'localhost',
         'PORT': '5432',
     }

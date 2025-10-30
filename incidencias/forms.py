@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from departamentos.models import Departamento
 from cuadrillas.models import Cuadrilla
 from encuestas.models import Encuesta, Vecino
-from .models import Incidencia, TipoIncidencia
+from .models import Incidencia
 
 class TipoIncidenciaForm(forms.Form):
     """
@@ -42,7 +42,7 @@ class IncidenciaForm(forms.Form):
     )
     territorial = forms.ModelChoiceField(
         label="Agente Territorial",
-        queryset=User.objects.filter(groups__name='TERRITORIAL'), 
+        queryset=User.objects.filter(groups__name='Territorial'), 
         widget=forms.Select(attrs={'class': 'form-control'})
     )
     cuadrilla = forms.ModelChoiceField(
