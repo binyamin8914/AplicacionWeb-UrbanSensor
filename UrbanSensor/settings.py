@@ -83,9 +83,9 @@ WSGI_APPLICATION = 'UrbanSensor.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'urban_sensor',
+        'NAME': 'UrbanWeb',
         'USER': 'postgres',
-        'PASSWORD': '8914',
+        'PASSWORD': '12345678',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -128,6 +128,11 @@ LOGOUT_REDIRECT_URL = 'login'
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",   # Esto le dice a Django que busque archivos estáticos aquí
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

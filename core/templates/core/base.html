@@ -18,6 +18,8 @@
             </div>
             <hr>
             <ul>
+                <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+
                 {% if group_name == "SECPLA" %}
                     <li>
                         <a class="item_l" href="{% url 'usuarios_listar' %}">
@@ -43,6 +45,21 @@
                             <span class="item_l_texto">Gestión de Cuadrillas</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{% url 'gestion_encuestas' %}">
+                            <span class="item_l_icon">󰅍</span>
+                            <span class="item_l_texto">Gestión de Encuestas</span>
+                        </a>
+                    </li>
+
+
+                    {# AQUÍ ESTABA EL PROBLEMA #}
+                    <li>
+                        <a href="{% url 'incidencias:gestion_incidencias' %}">
+                            <span class="item_l_icon">󰒡</span>
+                            <span class="item_l_texto">Gestión de Incidencias</span>
+                        </a>
+                    </li>
                     <!-- Más opciones SECPLA -->
                 {% elif group_name == "TERRITORIAL" %}
                     {# <li>
@@ -52,7 +69,7 @@
                         </a>
                     </li> #}
                     {# <li>
-                        <a class="item_l" href="{% url 'incidencias:incidencias_listar' %}">
+                        <a class="item_l" href="{% url 'incidencias:gestion_incidencias' %}">
                             <span class="item_l_icon">Ic</span>
                             <span class="item_l_texto">Incidencias</span>
                         </a>
@@ -70,9 +87,15 @@
                             <span class="item_l_texto">Incidencias Realizadas</span>
                         </a>
                     </li> #}
+                    <li>
+                        <a href="{% url 'incidencias:gestion_incidencias' %}">
+                            <span class="item_l_icon">Ic</span>
+                            <span class="item_l_texto">Incidencias asignadas</span>
+                        </a>
+                    </li>
                 {% elif group_name == "DIRECCION" %}
                     {# <li>
-                        <a class="item_l" href="{% url 'direccion:ver_incidencias' %}">
+                        <a class="item_l" href="{% url 'incidencias:gestion_incidencias' %}">
                             <span class="item_l_icon">Ic</span>
                             <span class="item_l_texto">Incidencias recibidas</span>
                         </a>

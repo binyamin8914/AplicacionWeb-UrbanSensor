@@ -21,7 +21,7 @@ class Incidencia(models.Model):
         ('rechazada', 'Rechazada'),
     ]
     encuesta = models.ForeignKey('encuestas.Encuesta', on_delete=models.PROTECT)
-    vecino = models.ForeignKey('encuestas.Vecino', on_delete=models.PROTECT, null=True, blank=True) 
+    vecino = models.ForeignKey('encuestas.Vecino', on_delete=models.PROTECT, null=True, blank=True)
     territorial = models.ForeignKey(User, on_delete=models.PROTECT, related_name='incidencias_territorial')
     cuadrilla = models.ForeignKey(Cuadrilla, on_delete=models.PROTECT)
     descripcion = models.CharField(max_length=255)
@@ -42,3 +42,4 @@ class Evidencia(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.PROTECT)
     fecha_subida = models.DateTimeField(auto_now_add=True)
     archivo = models.FileField(upload_to='evidencias/')
+

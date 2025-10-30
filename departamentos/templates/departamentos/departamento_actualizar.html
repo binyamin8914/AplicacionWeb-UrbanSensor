@@ -12,10 +12,10 @@
                value="{% if departamento %}{{ departamento.nombre }}{% endif %}" required>
     </p>
     <p>
-        <select name="encargado" required>
+        <select id="encargado" name="encargado" required>
             <option value="">Seleccione encargado</option>
             {% for encargado in encargados %}
-                <option value="{{ encargado.id }}"
+                <option value="{{ encargado.id }}" data-correo="{{ encargado.email }}"
                         {% if departamento and departamento.encargado.id == encargado.id %}selected{% endif %}>
                     {{ encargado.username }} ({{ encargado.first_name }} {{ encargado.last_name }})
                 </option>
@@ -42,4 +42,6 @@
     </p>
 </form>
 <a href="{% url 'departamento_listar' %}">Volver</a>
+{% load static %}
+<script src="{% static 'js/autocompletar_correo.js' %}"></script>
 {% endblock %}
