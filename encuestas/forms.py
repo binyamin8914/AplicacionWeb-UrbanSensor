@@ -1,17 +1,11 @@
 from django import forms
 from .models import Encuesta
+from incidencias.models import TipoIncidencia
 
 class EncuestaForm(forms.ModelForm):
     class Meta:
         model = Encuesta
-        
-        # Incluye todos los campos de tu modelo en el formulario
-        fields = '__all__' 
-        
-        # O si prefieres, especifica solo los campos que quieres mostrar:
-        # fields = ['titulo', 'descripcion', 'tipo_incidencia', 'estado', 'prioridad', 'departamento']
-
-        # (Opcional) Puedes añadir widgets para personalizar cómo se ven los campos
+        fields = '__all__'
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
@@ -20,3 +14,7 @@ class EncuestaForm(forms.ModelForm):
             'prioridad': forms.Select(attrs={'class': 'form-control'}),
             'departamento': forms.Select(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tipo_incidencia'].queryset = TipoIncidencia.objects.all().order_by('nombre')

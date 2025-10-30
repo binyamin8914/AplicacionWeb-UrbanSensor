@@ -9,7 +9,7 @@ class Vecino(models.Model):
 
     def __str__(self):
         return f"{self.nombre} - {self.rut or self.email}"
-    
+
 class Encuesta(models.Model):
     ESTADO_CHOICES = [
         ('creado', 'Creado'),
@@ -21,8 +21,10 @@ class Encuesta(models.Model):
         ('normal', 'Normal'),
         ('baja', 'Baja'),
     ]
+
     titulo = models.CharField(max_length=255)
     descripcion = models.CharField(max_length=400)
+    # 👇 esto conecta la encuesta con lo que se crea en incidencia
     tipo_incidencia = models.ForeignKey('incidencias.TipoIncidencia', on_delete=models.PROTECT)
     estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='creado')
     prioridad = models.CharField(max_length=10, choices=PRIORIDAD_CHOICES, default='normal')
@@ -30,7 +32,7 @@ class Encuesta(models.Model):
 
     def __str__(self):
         return self.titulo
-    
+
 class CamposAdicionales(models.Model):
     titulo = models.CharField(max_length=255)
     encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE)
@@ -39,7 +41,7 @@ class CamposAdicionales(models.Model):
 
     def __str__(self):
         return self.titulo
-    
+
 class EncuestaRespuesta(models.Model):
     incidencia = models.ForeignKey('incidencias.Incidencia', on_delete=models.CASCADE)
     pregunta = models.ForeignKey(CamposAdicionales, on_delete=models.CASCADE)
