@@ -1,0 +1,142 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    /* background-image: url(https://lh3.googleusercontent.com/gps-cs-s/AC9h4nr504Ab677GqPuaad_7zrw56DjHvLArRyborxtcrls1802vPbWKQt_XLdHd3N8puND5LV8D3-tg7tI84N9LesFWrnDQvDIFRW6XbF8ucF4_LDI005crW3JK-wgfRYXLkcAXbtP9=s2048-v1); */
+    background-size:cover;
+    background-repeat: no-repeat;
+}
+
+#bg_sombra {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #00000020;
+}
+
+#logo_contenedor {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: flex-start;
+    width: 100%;
+    color: white;
+}
+
+#logo_contenedor p {
+    width: 300px;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+#logo_contenedor img {
+    align-self: center;
+}
+
+#form_contenedor{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 35%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+
+    background-color: white;
+}
+
+#form_contenedor p{
+    text-align: center;
+    color: #404040;
+}
+
+#form_titulo {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.form_texto {
+    font-size: 26px;
+    margin: 0px;
+}
+
+.form_input_cover {
+    width: auto;
+    padding: 20px;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+.form_input_cover p {
+    text-align: start !important;
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.form_input_div {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: flex-start;
+    align-items: center;
+
+    width: auto;
+    padding: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border: 2px solid #70b3ff;
+    border-radius: 50px;
+    background-color: #d8e9fc;
+}
+
+.form_input_div p {
+    margin: 0;
+    margin-right: 10px;
+    color: #70b3ff !important;
+}
+
+.form_input_div input {
+    border: 0;
+    width: 100%;
+    color: #70b3ff !important;
+    background-color: #d8e9fc;
+}
+
+.form_input_div input::placeholder {
+    color: #70b3ff !important;
+    opacity: 0.6;
+}
+
+#form_button_div {
+    width: auto;
+    padding: 20px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#form_button_div button {
+    padding: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
+    border: 2px solid #2BAA59;
+    border-radius: 50px;
+    background-color: #4FFF8F;
+    box-shadow: 3px 3px 10px gray;
+}
+
+#form_button_div button span {
+    color: #404040;
+    font-weight: bold;
+}

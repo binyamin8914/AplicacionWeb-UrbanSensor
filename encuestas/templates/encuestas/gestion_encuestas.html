@@ -1,0 +1,93 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container mt-4">
+
+  {# Mensajes con sus niveles reales #}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Gestión de Encuestas</h1>
+    <a href="{% url 'crear_encuesta' %}" class="btn btn-primary">
+      <i class="fas fa-plus"></i> Crear Nueva Encuesta
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>Título</th>
+          <th>Estado</th>
+          <th>Prioridad</th>
+          <th>Departamento</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for encuesta in encuestas %}
+          <tr>
+            <td class="fw-semibold">{{ encuesta.titulo }}</td>
+            <td>
+              <span class="badge bg-info text-dark">{{ encuesta.get_estado_display }}</span>
+            </td>
+            <td>
+              <span class="badge bg-warning text-dark">{{ encuesta.get_prioridad_display }}</span>
+            </td>
+            <td>{{ encuesta.departamento.nombre|default:"—" }}</td>
+            <td class="text-end">
+              <a href="{% url 'editar_encuesta' encuesta.id %}" class="btn btn-sm btn-outline-info" title="Editar">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a href="{% url 'eliminar_encuesta' encuesta.id %}" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                <i class="fas fa-trash-alt"></i>
+              </a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5" class="text-center text-muted py-4">
+              No hay encuestas registradas.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {# Paginación #}
+  {% if encuestas.paginator.num_pages > 1 %}
+    <nav aria-label="Paginación" class="d-flex justify-content-end">
+      <ul class="pagination mb-0">
+        {% if encuestas.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ encuestas.previous_page_number }}">Anterior</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+        {% endif %}
+
+        <li class="page-item disabled">
+          <span class="page-link">
+            Página {{ encuestas.number }} de {{ encuestas.paginator.num_pages }}
+          </span>
+        </li>
+
+        {% if encuestas.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ encuestas.next_page_number }}">Siguiente</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+
+</div>
+{% endblock %}
