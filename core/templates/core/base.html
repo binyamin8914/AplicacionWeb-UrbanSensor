@@ -19,13 +19,16 @@
                     <li><a href="{% url 'departamento_listar' %}">Gestión de Departamentos</a></li>
                     <li><a href="{% url 'cuadrilla_listar' %}">Gestión de Cuadrillas</a></li>
                     <li><a href="{% url 'gestion_encuestas' %}">Gestión de Encuestas</a></li>
-                    <li><a href="{% url 'gestion_incidencias' %}">Gestión de Incidencias</a></li> 
+                    
+                    <!-- 🚨 CAMBIO CRUCIAL AQUÍ: Ahora apunta al nuevo Dashboard SECPLA -->
+                    <li><a href="{% url 'secpla_dashboard' %}">Incidencias (Dashboard SECPLA)</a></li>
+                    
                     <li><a href="{% url 'listar_tipos_incidencia' %}">Gestión de Tipos de Incidencia</a></li>
 
                 {% elif group_name == "Departamento" %}
                     <li><a href="{% url 'departamento_dashboard' %}">Dashboard</a></li>
                     <li><a href="{% url 'incidencias_por_estado' %}">Incidencias</a></li>
-                  
+                    
                 {% elif group_name == "Territorial" %}
                     {# <li><a href="{% url 'encuestas:encuestas_listar' %}">Ver Encuestas</a></li> #}
                     {# <li><a href="{% url 'incidencias:incidencias_listar' %}">Incidencias</a></li> #}
@@ -48,4 +51,3 @@
         <small>&copy; 2025 Urban Sensor</small>
     </footer>
 </body>
-</html>

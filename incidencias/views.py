@@ -178,3 +178,65 @@ def eliminar_incidencia(request, incidencia_id):
         'titulo_objeto': 'Incidencia',
         'group_name': group_name
     })
+
+# NUEVAS VISTAS PARA EL DASHBOARD DE SECPLA
+
+@login_required
+def secpla_dashboard(request):
+    """
+    Dashboard para el perfil SECPLA: Muestra conteo de incidencias por estado.
+    """
+    profile = get_object_or_404(Profile, user=request.user)
+    group_name_upper = profile.group.name.upper()
+        
+    if group_name_upper != "SECPLA":
+        messages.error(request, "Acceso denegado: Solo SECPLA puede ver este dashboard.")
+        return redirect('gestion_incidencias') # Redirige al listado que le corresponda
+
+    # obtener los conteos (todas las incidencias)
+    all_incidencias = Incidencia.objects.all()
+    
+    context = {
+        'total_creadas': all_incidencias.count(),
+        
+        # conteo por estados específicos (los estados deben coincidir con Incidencia.ESTADO_CHOICES)
+        'count_derivadas': all_incidencias.filter(estado='derivada').count(),
+        'count_rechazadas': all_incidencias.filter(estado='rechazada').count(),
+        'count_finalizadas': all_incidencias.filter(estado='finalizada').count(),
+        
+        'group_name': profile.group.name, 
+    }
+    
+    return render(request, 'incidencias/secpla_dashboard.html', context)
+
+
+@login_required
+def incidencia_list_secpla(request, status=None):
+    """
+    Listado de incidencias para SECPLA, filtrado por estado.
+    """
+    profile = get_object_or_404(Profile, user=request.user)
+    group_name_upper = profile.group.name.upper()
+        
+    if group_name_upper != "SECPLA":
+        messages.error(request, "Acceso denegado: Solo SECPLA puede ver listados completos.")
+        return redirect('gestion_incidencias') # Redirige al listado que le corresponda
+
+    #filtrar las incidencias
+    if status and status != 'todas':
+        # Filtrar por el estado pasado en la URL
+        incidencias = Incidencia.objects.filter(estado=status).order_by('-id')
+        title = f"Listado: Incidencias '{status.capitalize()}'"
+    else:
+        # mostrar las incidencias (desde la card 'creadas')
+        incidencias = Incidencia.objects.all().order_by('-id')
+        title = "Listado: Todas las Incidencias Creadas"
+
+    # 3. preparar contexto
+    context = {
+        'incidencias': incidencias,
+        'title': title,
+        'group_name': profile.group.name,
+        'current_status': status or 'todas',
+    }
+    return render(request, 'incidencias/incidencia_list_secpla.html', context)

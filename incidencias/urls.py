@@ -13,4 +13,9 @@ urlpatterns = [
     path('tipos/crear/', views.crear_tipo_incidencia, name='crear_tipo_incidencia'),
     path('tipos/editar/<int:tipo_id>/', views.editar_tipo_incidencia, name='editar_tipo_incidencia'),
     path('tipos/eliminar/<int:tipo_id>/', views.eliminar_tipo_incidencia, name='eliminar_tipo_incidencia'),
+ 
+    # NUEVAS URLs PARA EL DASHBOARD Y LISTADO SECPLA
+    path('secpla/dashboard/', views.secpla_dashboard, name='secpla_dashboard'),
+    path('secpla/listado/', views.incidencia_list_secpla, name='secpla_listado_todas'),
+    path('secpla/listado/<str:status>/', views.incidencia_list_secpla, name='secpla_listado_filtrado'),
 ]
