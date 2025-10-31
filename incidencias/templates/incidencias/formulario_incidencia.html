@@ -6,6 +6,7 @@
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
+
     <button type="submit">Guardar</button>
     <a href="{% url 'incidencias:gestion_incidencias' %}">Cancelar</a>
 </form>

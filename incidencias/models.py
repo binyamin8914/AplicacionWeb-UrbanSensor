@@ -43,3 +43,10 @@ class Evidencia(models.Model):
     fecha_subida = models.DateTimeField(auto_now_add=True)
     archivo = models.FileField(upload_to='evidencias/')
 
+class CampoExtra(models.Model):
+    incidencia = models.ForeignKey(Incidencia, on_delete=models.CASCADE, related_name="campos_extra")
+    nombre = models.CharField(max_length=255)
+    valor = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.nombre}: {self.valor}"

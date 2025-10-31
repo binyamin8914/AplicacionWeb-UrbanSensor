@@ -12,31 +12,28 @@
             <h4>Menú Principal</h4>
             <hr>
             <ul>
-                <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-
                 {% if group_name == "SECPLA" %}
+                    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
                     <li><a href="{% url 'usuarios_listar' %}">Gestión de Usuarios</a></li>
                     <li><a href="{% url 'direccion_listar' %}">Gestión de Direcciones</a></li>
                     <li><a href="{% url 'departamento_listar' %}">Gestión de Departamentos</a></li>
                     <li><a href="{% url 'cuadrilla_listar' %}">Gestión de Cuadrillas</a></li>
                     <li><a href="{% url 'gestion_encuestas' %}">Gestión de Encuestas</a></li>
+                    <li><a href="{% url 'gestion_incidencias' %}">Gestión de Incidencias</a></li> 
+                    <li><a href="{% url 'listar_tipos_incidencia' %}">Gestión de Tipos de Incidencia</a></li>
 
-                    {# AQUÍ ESTABA EL PROBLEMA #}
-                    <li><a href="{% url 'incidencias:gestion_incidencias' %}">Gestión de Incidencias</a></li>
-
-                {% elif group_name == "TERRITORIAL" %}
-                    {# Ejemplos para territorial
-                    <li><a href="{% url 'encuestas:encuestas_listar' %}">Ver Encuestas</a></li>
-                    <li><a href="{% url 'incidencias:gestion_incidencias' %}">Incidencias</a></li>
-                    #}
-                {% elif group_name == "CUADRILLA" %}
-                    {# Ejemplos para cuadrilla
-                    <li><a href="{% url 'incidencias:gestion_incidencias' %}">Incidencias asignadas</a></li>
-                    #}
-                {% elif group_name == "DIRECCION" %}
-                    {# Ejemplos para dirección
-                    <li><a href="{% url 'incidencias:gestion_incidencias' %}">Incidencias recibidas</a></li>
-                    #}
+                {% elif group_name == "Departamento" %}
+                    <li><a href="{% url 'departamento_dashboard' %}">Dashboard</a></li>
+                    <li><a href="{% url 'incidencias_por_estado' %}">Incidencias</a></li>
+                  
+                {% elif group_name == "Territorial" %}
+                    {# <li><a href="{% url 'encuestas:encuestas_listar' %}">Ver Encuestas</a></li> #}
+                    {# <li><a href="{% url 'incidencias:incidencias_listar' %}">Incidencias</a></li> #}
+                {% elif group_name == "Cuadrilla" %}
+                    {# <li><a href="{% url 'incidencias:incidencias_por_hacer' %}">Incidencias por Hacer</a></li> #}
+                    {# <li><a href="{% url 'incidencias:incidencias_realizadas' %}">Incidencias Realizadas</a></li> #}
+                {% elif group_name == "Direccion" %}
+                    {# <li><a href="{% url 'direccion:ver_incidencias' %}">Incidencias recibidas</a></li> #}
                 {% endif %}
             </ul>
             <a class="logout-link" href="{% url 'login' %}">Cerrar sesión</a>

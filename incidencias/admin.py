@@ -12,3 +12,4 @@ class IncidenciaAdmin(admin.ModelAdmin):
     list_filter = ('estado',)
 
 admin.site.register(Evidencia)
+

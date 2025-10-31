@@ -1,96 +1,72 @@
 {% extends 'core/base.html' %}
 {% load static %}
 {% block content %}
-<div class="container mt-4">
 
-  {# Mensajes del sistema #}
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
+<h4>{{ titulo_pagina|default:"Encuesta" }}</h4>
 
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">{{ titulo_pagina|default:"Encuesta" }}</h1>
-    <a href="{% url 'gestion_encuestas' %}" class="btn btn-outline-secondary">
-      <i class="fas fa-arrow-left"></i> Volver
-    </a>
-  </div>
+<form method="post" novalidate>
+    {% csrf_token %}
 
-  <div class="card shadow-sm border-0">
-    <div class="card-body">
-      <form method="post" novalidate>
-        {% csrf_token %}
+    {# Errores no asociados a un campo concreto #}
+    {% if form.non_field_errors %}
+      <div style="color: red; margin-bottom: 10px;">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
 
-        {# Errores no asociados a un campo concreto #}
-        {% if form.non_field_errors %}
-          <div class="alert alert-danger">
-            {{ form.non_field_errors }}
-          </div>
-        {% endif %}
+    <p>
+        <label>Título:</label><br>
+        {{ form.titulo }}
+        {% if form.titulo.errors %}
+          <br><small style="color: red;">{{ form.titulo.errors|striptags }}</small>
+        {% endif %}
+    </p>
 
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">Título</label>
-            {{ form.titulo }}
-            {% if form.titulo.errors %}
-              <div class="text-danger small">{{ form.titulo.errors|striptags }}</div>
-            {% endif %}
-          </div>
+    <p>
+        <label>Tipo de incidencia:</label><br>
+        {{ form.tipo_incidencia }}
+        {% if form.tipo_incidencia.errors %}
+          <br><small style="color: red;">{{ form.tipo_incidencia.errors|striptags }}</small>
+        {% endif %}
+    </p>
 
-          <div class="col-md-6">
-            <label class="form-label">Tipo de incidencia</label>
-            {{ form.tipo_incidencia }}
-            {% if form.tipo_incidencia.errors %}
-              <div class="text-danger small">{{ form.tipo_incidencia.errors|striptags }}</div>
-            {% endif %}
-          </div>
+    <p>
+        <label>Descripción:</label><br>
+        {{ form.descripcion }}
+        {% if form.descripcion.errors %}
+          <br><small style="color: red;">{{ form.descripcion.errors|striptags }}</small>
+        {% endif %}
+    </p>
 
-          <div class="col-12">
-            <label class="form-label">Descripción</label>
-            {{ form.descripcion }}
-            {% if form.descripcion.errors %}
-              <div class="text-danger small">{{ form.descripcion.errors|striptags }}</div>
-            {% endif %}
-          </div>
+    <p>
+        <label>Estado:</label><br>
+        {{ form.estado }}
+        {% if form.estado.errors %}
+          <br><small style="color: red;">{{ form.estado.errors|striptags }}</small>
+        {% endif %}
+    </p>
 
-          <div class="col-md-4">
-            <label class="form-label">Estado</label>
-            {{ form.estado }}
-            {% if form.estado.errors %}
-              <div class="text-danger small">{{ form.estado.errors|striptags }}</div>
-            {% endif %}
-          </div>
+    <p>
+        <label>Prioridad:</label><br>
+        {{ form.prioridad }}
+        {% if form.prioridad.errors %}
+          <br><small style="color: red;">{{ form.prioridad.errors|striptags }}</small>
+        {% endif %}
+    </p>
 
-          <div class="col-md-4">
-            <label class="form-label">Prioridad</label>
-            {{ form.prioridad }}
-            {% if form.prioridad.errors %}
-              <div class="text-danger small">{{ form.prioridad.errors|striptags }}</div>
-            {% endif %}
-          </div>
+    <p>
+        <label>Departamento:</label><br>
+        {{ form.departamento }}
+        {% if form.departamento.errors %}
+          <br><small style="color: red;">{{ form.departamento.errors|striptags }}</small>
+        {% endif %}
+    </p>
 
-          <div class="col-md-4">
-            <label class="form-label">Departamento</label>
-            {{ form.departamento }}
-            {% if form.departamento.errors %}
-              <div class="text-danger small">{{ form.departamento.errors|striptags }}</div>
-            {% endif %}
-          </div>
-        </div>
+    <p>
+                <input type="submit" value="{% if modo == 'editar' %}Guardar cambios{% else %}Crear encuesta{% endif %}">
+    </p>
+</form>
 
-        <div class="d-flex justify-content-end gap-2 mt-4">
-          <a href="{% url 'gestion_encuestas' %}" class="btn btn-light">Cancelar</a>
-          <button type="submit" class="btn btn-primary">
-            {% if modo == 'editar' %}<i class="fas fa-save"></i> Guardar cambios
-            {% else %}<i class="fas fa-plus"></i> Crear encuesta{% endif %}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-</div>
+<br>
+<a href="{% url 'gestion_encuestas' %}">Volver</a>
 {% endblock %}
