@@ -46,7 +46,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'gestion_encuestas' %}">
+                        <a class="item_l" href="{% url 'gestion_encuestas' %}">
                             <span class="item_l_icon">󰅍</span>
                             <span class="item_l_texto">Gestión de Encuestas</span>
                         </a>
@@ -55,7 +55,7 @@
 
                     {# AQUÍ ESTABA EL PROBLEMA #}
                     <li>
-                        <a href="{% url 'incidencias:gestion_incidencias' %}">
+                        <a class="item_l" href="{% url 'incidencias:gestion_incidencias' %}">
                             <span class="item_l_icon">󰒡</span>
                             <span class="item_l_texto">Gestión de Incidencias</span>
                         </a>
@@ -88,18 +88,24 @@
                         </a>
                     </li> #}
                     <li>
-                        <a href="{% url 'incidencias:gestion_incidencias' %}">
+                        <a class="item_l" href="{% url 'incidencias:gestion_incidencias' %}">
                             <span class="item_l_icon">Ic</span>
                             <span class="item_l_texto">Incidencias asignadas</span>
                         </a>
                     </li>
-                {% elif group_name == "DIRECCION" %}
-                    {# <li>
+                {% elif group_name == "Direccion" %}
+                    <li>
                         <a class="item_l" href="{% url 'incidencias:gestion_incidencias' %}">
-                            <span class="item_l_icon">Ic</span>
+                            <span class="item_l_icon">󰒡</span>
                             <span class="item_l_texto">Incidencias recibidas</span>
                         </a>
-                    </li> #}
+                    </li>
+                    <li>
+                        <a class="item_l" href="{% url 'departamento_listar' %}">
+                            <span class="item_l_icon"></span>
+                            <span class="item_l_texto">Gestión de Departamentos</span>
+                        </a>
+                    </li>
                 {% endif %}
             </ul>
             <a class="logout-link" href="{% url 'logout' %}">Cerrar sesión</a>

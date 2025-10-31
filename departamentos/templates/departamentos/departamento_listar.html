@@ -2,8 +2,10 @@
 {% block title %}Gestión de Departamentos{% endblock %}
 {% block content %}
 <h4>Gestión de Departamentos</h4>
+{% if group_name == "SECPLA" %}
 <a href="{% url 'departamento_actualizar' %}">Nuevo Departamento</a>
 <br><br>
+{% endif %}
 <table border="1">
     <thead>
         <tr>
@@ -27,10 +29,12 @@
             <td>{% if departamento.esta_activo %}Activo{% else %}Bloqueado{% endif %}</td>
             <td>
                 <a href="{% url 'departamento_ver' departamento.id %}">Ver</a>
+                {% if group_name == "SECPLA" %}
                 <a href="{% url 'departamento_actualizar' departamento.id %}">Editar</a>
                 <a href="{% url 'departamento_bloquear' departamento.id %}">
                     {% if departamento.esta_activo %}Bloquear{% else %}Activar{% endif %}
                 </a>
+                {% endif %}
             </td>
         </tr>
     {% endfor %}

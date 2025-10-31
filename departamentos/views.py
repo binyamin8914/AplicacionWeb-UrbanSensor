@@ -10,10 +10,15 @@ from .models import Departamento, Direccion
 @login_required
 def departamento_listar(request):
     profile = Profile.objects.get(user=request.user)
-    if profile.group.name != "SECPLA":
+    if profile.group.name not in ["SECPLA", "Direccion"]:
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
-    departamentos = Departamento.objects.all()
+    if profile.group.name == "Direccion":
+        # Solo puede ver los departamentos que esten asignados a su direccion
+        direccion = Direccion.objects.get(encargado_id=profile.id)
+        departamentos = Departamento.objects.filter(direccion_id=direccion.id)
+    else:
+        departamentos = Departamento.objects.all()
     return render(request, "departamentos/departamento_listar.html", {"departamentos": departamentos, "group_name": profile.group.name})
 
 @login_required
@@ -64,10 +69,18 @@ def departamento_actualizar(request, departamento_id=None):
 @login_required
 def departamento_ver(request, departamento_id):
     profile = Profile.objects.get(user=request.user)
-    if profile.group.name != "SECPLA":
+    if profile.group.name not in ["SECPLA", "Direccion"]:
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
+
     departamento = get_object_or_404(Departamento, pk=departamento_id)
+
+    if profile.group.name == "Direccion":
+        direccion = Direccion.objects.get(encargado_id=profile.id) # direccion a la que es encargado
+        if departamento.direccion.id != direccion.id: # si esta consultando un departamento de otra direccion, no da permiso
+            messages.add_message(request, messages.INFO, "No tienes permisos.")
+            return redirect("logout")
+    
     return render(request, "departamentos/departamento_ver.html", {"departamento": departamento, "group_name": profile.group.name})
 
 @login_required
