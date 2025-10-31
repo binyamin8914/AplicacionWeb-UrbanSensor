@@ -1,3 +1,6 @@
+{% extends "core/base.html" %}
+{% block title %}{% if usuario %}Editar Usuario{% else %}Crear Usuario{% endif %}{% endblock %}
+{% block content %}
 <h4>{% if usuario %}Editar Usuario{% else %}Crear Usuario{% endif %}</h4>
 <form method="POST" action="">
     {% csrf_token %}
@@ -43,4 +46,5 @@
         <input type="submit" value="{% if usuario %}Actualizar{% else %}Crear{% endif %}">
     </p>
 </form>
-<a href="{% url 'administracion:usuarios_listar' %}">Volver</a>
+<a href="{% url 'usuarios_listar' %}">Volver</a>
+{% endblock %}

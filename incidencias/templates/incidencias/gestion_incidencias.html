@@ -1,0 +1,38 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Gestión de Incidencias</h1>
+        <a href="{% url 'crear_incidencia' %}" class="btn btn-primary">Crear Nueva Incidencia</a>
+    </div>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Descripción</th>
+                <th>Encuesta</th>
+                <th>Estado</th>
+                <th class="text-right">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for incidencia in incidencias %}
+            <tr>
+                <td>#{{ incidencia.id }}</td>
+                <td>{{ incidencia.descripcion|truncatewords:10 }}</td>
+                <td>{{ incidencia.encuesta.titulo }}</td>
+                <td><span class="badge bg-info">{{ incidencia.get_estado_display }}</span></td>
+                <td class="text-right">
+                    <a href="{% url 'editar_incidencia' incidencia.id %}" class="btn btn-info btn-sm">Editar</a>
+                    <a href="{% url 'eliminar_incidencia' incidencia.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center">No hay incidencias.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
