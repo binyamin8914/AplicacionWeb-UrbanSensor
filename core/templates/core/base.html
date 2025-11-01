@@ -19,7 +19,7 @@
                     <li><a href="{% url 'departamento_listar' %}">Gestión de Departamentos</a></li>
                     <li><a href="{% url 'cuadrilla_listar' %}">Gestión de Cuadrillas</a></li>
                     <li><a href="{% url 'gestion_encuestas' %}">Gestión de Encuestas</a></li>
-                    <li><a href="{% url 'gestion_incidencias' %}">Gestión de Incidencias</a></li> 
+                    <li><a href="{% url 'secpla_dashboard' %}">Incidencias</a></li> 
                     <li><a href="{% url 'listar_tipos_incidencia' %}">Gestión de Tipos de Incidencia</a></li>
 
                 {% elif group_name == "Departamento" %}
@@ -27,11 +27,11 @@
                     <li><a href="{% url 'incidencias_por_estado' %}">Incidencias</a></li>
                   
                 {% elif group_name == "Territorial" %}
-                    {# <li><a href="{% url 'encuestas:encuestas_listar' %}">Ver Encuestas</a></li> #}
-                    {# <li><a href="{% url 'incidencias:incidencias_listar' %}">Incidencias</a></li> #}
+                    <li><a href="{% url 'crear_incidencia' %}">Crear Incidencia</a></li>
+                    <li><a href="{% url 'gestion_incidencias' %}">Mis Incidencias</a></li>
                 {% elif group_name == "Cuadrilla" %}
-                    {# <li><a href="{% url 'incidencias:incidencias_por_hacer' %}">Incidencias por Hacer</a></li> #}
-                    {# <li><a href="{% url 'incidencias:incidencias_realizadas' %}">Incidencias Realizadas</a></li> #}
+                    {# <li><a href="{% url 'incidencias_por_hacer' %}">Incidencias por Hacer</a></li> #}
+                    {# <li><a href="{% url 'incidencias_realizadas' %}">Incidencias Realizadas</a></li> #}
                 {% elif group_name == "Direccion" %}
                     {# <li><a href="{% url 'direccion:ver_incidencias' %}">Incidencias recibidas</a></li> #}
                 {% endif %}

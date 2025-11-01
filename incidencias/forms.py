@@ -28,10 +28,11 @@ class TipoIncidenciaForm(forms.Form):
 class IncidenciaForm(forms.Form):
     """
     Formulario manual para gestionar las Incidencias.
+    Acepta parámetro 'user' en __init__ para filtrar choices y adaptar la UI.
     """
     encuesta = forms.ModelChoiceField(
         label="Encuesta Asociada",
-        queryset=Encuesta.objects.all(), 
+        queryset=Encuesta.objects.none(), 
         widget=forms.Select(attrs={'class': 'form-control'})
     )
     vecino = forms.ModelChoiceField(
@@ -43,11 +44,13 @@ class IncidenciaForm(forms.Form):
     territorial = forms.ModelChoiceField(
         label="Agente Territorial",
         queryset=User.objects.filter(groups__name='Territorial'), 
+        required=False,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
     cuadrilla = forms.ModelChoiceField(
         label="Cuadrilla Asignada",
-        queryset=Cuadrilla.objects.all(), 
+        queryset=Cuadrilla.objects.none(), 
+        required=False,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
     descripcion = forms.CharField(
@@ -72,5 +75,47 @@ class IncidenciaForm(forms.Form):
     estado = forms.ChoiceField(
         label="Estado Actual",
         choices=Incidencia.ESTADO_CHOICES, 
-        widget=forms.Select(attrs={'class': 'form-control'})
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False
     )
+
+    def __init__(self, *args, user=None, **kwargs):
+        """
+        Inicializa el formulario adaptando querysets y campos según el usuario.
+        - Si user pertenece al grupo 'Territorial' filtramos encuestas (ej. vigentes)
+          y ocultamos/inactivamos campos que no debe ver (cuadrilla, estado, territorial).
+        - Para otros roles mostramos valores por defecto.
+        """
+        super().__init__(*args, **kwargs)
+
+        # Por defecto mostrar todas las encuestas y cuadrillas activas
+        self.fields['encuesta'].queryset = Encuesta.objects.filter(estado='vigente')
+        self.fields['cuadrilla'].queryset = Cuadrilla.objects.filter(esta_activa=True)
+
+        if user is None:
+            return
+
+        # Obtener nombre del grupo si existe profile
+        group_name = None
+        try:
+            group_name = user.profile.group.name
+        except Exception:
+            group_name = None
+
+        if group_name == "Territorial":
+            # Territorial sólo debe elegir encuesta (vigentes) y no asignar cuadrilla/estado/territorial
+            self.fields['encuesta'].queryset = Encuesta.objects.filter(estado='vigente')
+            # Ocultar campos que el territorial no debe manipular
+            self.fields['cuadrilla'].widget = forms.HiddenInput()
+            self.fields['estado'].widget = forms.HiddenInput()
+            self.fields['territorial'].widget = forms.HiddenInput()
+
+            # Opcional: marcar como no requeridos
+            self.fields['cuadrilla'].required = False
+            self.fields['estado'].required = False
+            self.fields['territorial'].required = False
+        else:
+            # Para SECPLA u otros roles: mostrar todas las encuestas (no sólo vigentes)
+            self.fields['encuesta'].queryset = Encuesta.objects.all()
+            # cuadrillas activas
+            self.fields['cuadrilla'].queryset = Cuadrilla.objects.filter(esta_activa=True)
