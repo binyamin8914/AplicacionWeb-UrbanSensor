@@ -1,9 +1,9 @@
-# encuestas/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 
+from registration.models import Profile
 from .models import Encuesta
 from .forms import EncuestaForm
 
@@ -14,6 +14,8 @@ def gestion_encuestas(request):
     Lista de encuestas con carga eficiente y paginación.
     Admite filtros opcionales por estado/prioridad vía querystring (?estado= / ?prioridad=).
     """
+    profile = Profile.objects.get(user=request.user)
+
     qs = (
         Encuesta.objects
         .select_related('departamento', 'tipo_incidencia')
@@ -33,6 +35,7 @@ def gestion_encuestas(request):
         'encuestas': page_obj,
         'f_estado': estado or '',
         'f_prioridad': prioridad or '',
+        'group_name': profile.group.name,
     })
 
 
@@ -41,6 +44,8 @@ def crear_encuesta(request):
     """
     Crear una encuesta nueva.
     """
+    profile = Profile.objects.get(user=request.user)
+
     if request.method == 'POST':
         form = EncuestaForm(request.POST)
         if form.is_valid():
@@ -48,15 +53,14 @@ def crear_encuesta(request):
             messages.success(request, '¡La encuesta ha sido creada exitosamente!')
             return redirect('gestion_encuestas')
         messages.error(request, 'Revisa los campos: hay errores en el formulario.')
-    # encuestas/views.py -> dentro de crear_encuesta (rama GET)
     else:
         form = EncuestaForm()
-        print('QS deps en form:', form.fields['departamento'].queryset.count())
 
     return render(request, 'encuestas/formulario_encuesta.html', {
         'form': form,
         'titulo_pagina': 'Crear Nueva Encuesta',
         'modo': 'crear',
+        'group_name': profile.group.name,
     })
 
 
@@ -66,6 +70,7 @@ def editar_encuesta(request, encuesta_id: int):
     Editar encuesta existente.
     Requisito: solo se puede editar si la encuesta está en estado BLOQUEADO.
     """
+    profile = Profile.objects.get(user=request.user)
     encuesta_obj = get_object_or_404(Encuesta, id=encuesta_id)
 
     if encuesta_obj.estado != 'bloqueado':
@@ -87,6 +92,7 @@ def editar_encuesta(request, encuesta_id: int):
         'titulo_pagina': 'Editar Encuesta',
         'modo': 'editar',
         'encuesta': encuesta_obj,
+        'group_name': profile.group.name,
     })
 
 
@@ -95,6 +101,7 @@ def eliminar_encuesta(request, encuesta_id: int):
     """
     Confirmar y eliminar una encuesta.
     """
+    profile = Profile.objects.get(user=request.user)
     encuesta_obj = get_object_or_404(Encuesta, id=encuesta_id)
 
     if request.method == 'POST':
@@ -103,5 +110,6 @@ def eliminar_encuesta(request, encuesta_id: int):
         return redirect('gestion_encuestas')
 
     return render(request, 'encuestas/confirmar_eliminar_encuesta.html', {
-        'encuesta': encuesta_obj
+        'encuesta': encuesta_obj,
+        'group_name': profile.group.name,
     })

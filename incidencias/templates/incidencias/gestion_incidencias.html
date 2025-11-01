@@ -1,42 +1,63 @@
 {% extends "core/base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Gestión de Incidencias</h1>
-        <a href="{% url 'incidencias:crear_incidencia' %}">+ Nueva Incidencia</a>
-    </div>
+<h4>Gestión de Incidencias</h4>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Nombre incidencia</th>
-                <th>Dirección</th>
-                <th>Departamento</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for incidencia in incidencias %}
-            <tr>
-                <td>{{ incidencia.id }}</td>
-                <td>{{ incidencia.encuesta.tipo_incidencia.nombre }}</td>
-                <td>{{ incidencia.direccion }}</td>
-                <td>{{ incidencia.departamento }}</td>
-                <td>{{ incidencia.get_estado_display }}</td>
-                <td>
-                    {# las pondrás cuando hagas las views #}
-                    <a href="#">Ver</a> |
-                    <a href="#">Editar</a> |
-                    <a href="#">Bloquear</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="6">No hay incidencias.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+<a href="{% url 'crear_incidencia' %}">Nueva Incidencia</a>
+<br><br>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Nombre Incidencia</th>
+            <th>Dirección</th>
+            <th>Departamento</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for incidencia in incidencias %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+
+            <td>
+                {{ incidencia.encuesta.tipo_incidencia.nombre }}
+            </td>
+
+            <td>
+                {% if incidencia.direccion %}
+                    {{ incidencia.direccion }}
+                {% else %}
+                    Sin dirección
+                {% endif %}
+            </td>
+
+            <td>
+                {% if incidencia.departamento %}
+                    {{ incidencia.departamento.nombre }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
+            <td>{{ incidencia.get_estado_display }}</td>
+
+            <td>
+                <a href="#">Ver</a>
+                <a href="{% url 'editar_incidencia' incidencia.id %}">Editar</a>
+                <a href="{% url 'eliminar_incidencia' incidencia.id %}">Eliminar</a>
+            </td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="6">No hay incidencias.</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'dashboard' %}">Volver al Menú Principal</a>
 {% endblock %}

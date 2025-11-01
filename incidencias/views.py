@@ -6,35 +6,27 @@ from registration.models import Profile
 from django.contrib.auth.decorators import login_required
 
 # =======================================================
-# VISTAS PARA EL CRUD DE TIPO DE INCIDENCIA
+# CRUD TIPO DE INCIDENCIA
 # =======================================================
 
-# --- VERSIÓN CORREGIDA (CON EL MENÚ) ---
 @login_required
 def listar_tipos_incidencia(request):
-    # --- 1. AÑADE ESTE BLOQUE PARA EL MENÚ ---
-    try:
-        profile = Profile.objects.get(user=request.user)
-        group_name = profile.group.name
-    except Profile.DoesNotExist:
-        messages.add_message(request, messages.INFO, "Error obteniendo perfil.")
-        # Asegúrate de que el usuario esté logueado
-        # Si esta vista no requiere login, puedes manejar el error de otra forma
-        if not request.user.is_authenticated:
-             return redirect("login") # O a donde corresponda
-        group_name = None 
-    # --- FIN DEL BLOQUE ---
+    profile = Profile.objects.get(user=request.user)
+    group_name = profile.group.name
 
     tipos = TipoIncidencia.objects.all()
 
-    # --- 2. AÑADE 'group_name' AL CONTEXTO ---
-    contexto = {
+    return render(request, 'incidencias/listar_tipos_incidencia.html', {
         'tipos': tipos,
-        'group_name': group_name, # <--- ¡ESTO ARREGLA EL MENÚ!
-    }
-    return render(request, 'incidencias/listar_tipos_incidencia.html', contexto)
+        'group_name': group_name,
+    })
 
+
+@login_required
 def crear_tipo_incidencia(request):
+    profile = Profile.objects.get(user=request.user)
+    group_name = profile.group.name
+
     if request.method == 'POST':
         form = TipoIncidenciaForm(request.POST)
         if form.is_valid():
@@ -48,10 +40,21 @@ def crear_tipo_incidencia(request):
             return redirect('listar_tipos_incidencia')
     else:
         form = TipoIncidenciaForm()
-    return render(request, 'incidencias/crear_tipo_incidencia.html', {'form': form, 'titulo_pagina': 'Crear Tipo de Incidencia'})
 
+    return render(request, 'incidencias/crear_tipo_incidencia.html', {
+        'form': form,
+        'titulo_pagina': 'Crear Tipo de Incidencia',
+        'group_name': group_name,
+    })
+
+
+@login_required
 def editar_tipo_incidencia(request, tipo_id):
+    profile = Profile.objects.get(user=request.user)
+    group_name = profile.group.name
+
     tipo = get_object_or_404(TipoIncidencia, id=tipo_id)
+
     if request.method == 'POST':
         form = TipoIncidenciaForm(request.POST)
         if form.is_valid():
@@ -62,64 +65,110 @@ def editar_tipo_incidencia(request, tipo_id):
             tipo.save()
             messages.success(request, 'Tipo de incidencia actualizado.')
             return redirect('listar_tipos_incidencia')
-    else:
-        form = TipoIncidenciaForm(initial={'nombre': tipo.nombre, 'descripcion': tipo.descripcion, 'departamento': tipo.departamento})
-    return render(request, 'incidencias/crear_tipo_incidencia.html', {'form': form, 'titulo_pagina': 'Editar Tipo de Incidencia'})
 
+    else:
+        form = TipoIncidenciaForm(initial={
+            'nombre': tipo.nombre,
+            'descripcion': tipo.descripcion,
+            'departamento': tipo.departamento
+        })
+
+    return render(request, 'incidencias/crear_tipo_incidencia.html', {
+        'form': form,
+        'titulo_pagina': 'Editar Tipo de Incidencia',
+        'group_name': group_name,
+    })
+
+
+@login_required
 def eliminar_tipo_incidencia(request, tipo_id):
+    profile = Profile.objects.get(user=request.user)
+    group_name = profile.group.name
+
     tipo = get_object_or_404(TipoIncidencia, id=tipo_id)
+
     if request.method == 'POST':
         tipo.delete()
         messages.success(request, 'Tipo de incidencia eliminado.')
         return redirect('listar_tipos_incidencia')
-    return render(request, 'incidencias/confirmar_eliminar.html', {'objeto': tipo, 'titulo_objeto': 'Tipo de Incidencia'})
+
+    return render(request, 'incidencias/confirmar_eliminar.html', {
+        'objeto': tipo,
+        'titulo_objeto': 'Tipo de Incidencia',
+        'group_name': group_name
+    })
 
 
 # =======================================================
-# VISTAS PARA EL CRUD DE INCIDENCIA
+# CRUD INCIDENCIAS
 # =======================================================
 
 @login_required
 def gestion_incidencias(request):
-    """Lista de incidencias visible según el perfil del usuario."""
     profile = Profile.objects.get(user=request.user)
+    group_name = profile.group.name
 
-    if profile.group.name == "SECPLA":
+    if group_name == "SECPLA":
         incidencias = Incidencia.objects.all()
-    elif profile.group.name == "TERRITORIAL":
+    elif group_name == "TERRITORIAL":
         incidencias = Incidencia.objects.filter(territorial=request.user)
-    elif profile.group.name == "CUADRILLA":
+    elif group_name == "CUADRILLA":
         incidencias = Incidencia.objects.filter(cuadrilla__miembros=request.user)
     else:
         incidencias = Incidencia.objects.none()
 
     return render(request, 'incidencias/gestion_incidencias.html', {
         'incidencias': incidencias,
-        'group_name': profile.group.name
+        'group_name': group_name,
     })
+
 
 @login_required
 def crear_incidencia(request):
+    profile = Profile.objects.get(user=request.user)
+    group_name = profile.group.name
+
     if request.method == 'POST':
         form = IncidenciaForm(request.POST)
+
         if form.is_valid():
-            form.save()
+            datos = form.cleaned_data
+
+            Incidencia.objects.create(
+                encuesta=datos['encuesta'],
+                vecino=datos['vecino'],
+                territorial=datos['territorial'],
+                cuadrilla=datos['cuadrilla'],
+                descripcion=datos['descripcion'],
+                latitud=datos['latitud'],
+                longitud=datos['longitud'],
+                direccion_textual=datos['direccion_textual'],
+                estado=datos['estado'],
+            )
+
             messages.success(request, "Incidencia creada correctamente.")
-            return redirect('incidencias:gestion_incidencias')
+            return redirect('gestion_incidencias')
+
+        else:
+            messages.error(request, "Hay errores en el formulario.")
+
     else:
         form = IncidenciaForm()
-    return render(request, 'incidencias/formulario_incidencia.html', {'form': form})
+
+    return render(request, 'incidencias/formulario_incidencia.html', {
+        'form': form,
+        'titulo_pagina': 'Crear Incidencia',
+        'group_name': group_name,
+    })
 
 
 @login_required
 def editar_incidencia(request, incidencia_id):
-    """Permite editar incidencias según permisos del grupo."""
     profile = Profile.objects.get(user=request.user)
     group_name = profile.group.name
 
     incidencia = get_object_or_404(Incidencia, id=incidencia_id)
 
-    # Si el usuario es territorial, solo puede editar incidencias suyas
     if group_name == "Territorial" and incidencia.territorial != request.user:
         messages.error(request, "No tienes permisos para editar esta incidencia.")
         return redirect('gestion_incidencias')
@@ -131,9 +180,9 @@ def editar_incidencia(request, incidencia_id):
             for key, value in datos.items():
                 setattr(incidencia, key, value)
 
-            # El territorial no puede cambiar estado ni asignar cuadrillas
             if group_name == "Territorial":
                 incidencia.territorial = request.user
+
             incidencia.save()
             messages.success(request, 'Incidencia actualizada.')
             return redirect('gestion_incidencias')
@@ -155,18 +204,17 @@ def editar_incidencia(request, incidencia_id):
     return render(request, 'incidencias/formulario_incidencia.html', {
         'form': form,
         'titulo_pagina': 'Editar Incidencia',
-        'group_name': group_name
+        'group_name': group_name,
     })
+
 
 @login_required
 def eliminar_incidencia(request, incidencia_id):
-    """Permite eliminar incidencias, restringido según grupo."""
     profile = Profile.objects.get(user=request.user)
     group_name = profile.group.name
 
     incidencia = get_object_or_404(Incidencia, id=incidencia_id)
 
-    # El territorial solo puede borrar las suyas
     if group_name == "Territorial" and incidencia.territorial != request.user:
         messages.error(request, "No puedes eliminar una incidencia que no creaste.")
         return redirect('gestion_incidencias')
@@ -179,6 +227,5 @@ def eliminar_incidencia(request, incidencia_id):
     return render(request, 'incidencias/confirmar_eliminar.html', {
         'objeto': incidencia,
         'titulo_objeto': 'Incidencia',
-        'group_name': group_name
+        'group_name': group_name,
     })
-
