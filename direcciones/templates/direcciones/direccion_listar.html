@@ -1,7 +1,16 @@
 {% extends "core/base.html" %}
+{% load static %}
 {% block title %}Gestión de Direcciones{% endblock %}
+
+{% block css_adicional %}
+    <link rel="stylesheet" href="{% static 'includes/css/list.css' %}">
+{% endblock %}
+
 {% block content %}
-<h4>Gestión de Direcciones</h4>
+
+
+{% include "includes/list.html" with titulo=titulo url=url titulos=titulos filas=filas tieneAcciones=tieneAcciones%}
+<!-- <h4>Gestión de Direcciones</h4>
 <a href="{% url 'direccion_actualizar' %}">Nueva Dirección</a>
 <br><br>
 <table border="1">
@@ -34,5 +43,5 @@
     {% endfor %}
     </tbody>
 </table>
-<a href="{% url 'dashboard' %}">Volver al Menú Principal</a>
+<a href="{% url 'dashboard' %}">Volver al Menú Principal</a> -->
 {% endblock %}

@@ -16,11 +16,30 @@ def usuarios_listar(request):
     if profile.group.name != "SECPLA":
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
-    usuarios = User.objects.all().order_by('username')
-    return render(request, "administracion/usuarios_listar.html", {
-        "usuarios": usuarios,
-        "group_name": profile.group.name   # <-- agrego group
-    })
+    usuarios_db = User.objects.all().order_by('username')
+    datos = {
+        'titulo': "Gestión de Usuarios",
+        'url': {'name': 'usuario_actualizar', 'label': 'Nuevo Usuario'},
+        'titulos': ['Usuario', 'Nombre', 'Apellido', 'Correo', 'Teléfono', 'Perfil', 'Estado'],
+        'back': 'dashboard',
+        'filas': [{
+                "id": usuario.id,
+                'acciones': [{'url': 'usuario_ver', 'name': 'Ver', 'ic': ''},
+                    {'url': 'usuario_actualizar','name': 'Editar','ic': ''},
+                    {'url': 'usuario_bloquear', 'name': 'Bloquear' if usuario.is_active else 'Activar', 'ic': '' if usuario.is_active else ''}
+                ],
+                "columnas": [usuario.username, usuario.first_name, usuario.last_name,
+                    usuario.email, usuario.profile.telefono, usuario.profile.group.name,
+                    'Activo' if usuario.is_active else 'Bloqueado',   
+                ],
+                'clases': ['', '', '', '', '', '', 'Activo' if usuario.is_active else 'Inactivo']
+            }
+            for usuario in usuarios_db
+        ],
+        'tieneAcciones': True,
+        "group_name": profile.group.name
+    }
+    return render(request, "administracion/usuarios_listar.html", datos)
 
 @login_required
 def usuario_actualizar(request, user_id=None):
@@ -46,12 +65,16 @@ def usuario_actualizar(request, user_id=None):
 
     if request.method == "POST":
         username = request.POST.get("username")
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
         email = request.POST.get("email")
         password = request.POST.get("password")
         group_name = request.POST.get("group")
         telefono = request.POST.get("telefono")
 
         if user:  # Edición
+            user.first_name = first_name
+            user.last_name = last_name
             user.email = email
             if password:
                 user.set_password(password)
@@ -70,7 +93,7 @@ def usuario_actualizar(request, user_id=None):
             if User.objects.filter(username=username).exists():
                 messages.add_message(request, messages.INFO, "Usuario ya existe.")
                 return redirect("usuario_actualizar")
-            user = User.objects.create_user(username=username, email=email)
+            user = User.objects.create_user(username=username, email=email, first_name=first_name, last_name=last_name)
             user.set_password(password)
             user.is_active = True
             user.save()

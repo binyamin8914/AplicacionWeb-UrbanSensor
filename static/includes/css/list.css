@@ -1,0 +1,93 @@
+#contenido_pagina {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+#list_title {
+    margin-top: 0;
+}
+
+#list_desc {
+
+}
+
+#table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+#table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
+    min-width: min-content;
+}
+
+#table tr {
+    border-bottom: 1px solid #dbdbdb;
+}
+
+#table th {
+    background-color: #dbdbdb;
+}
+
+#table th, #table td {
+    padding: 10px 12px;
+    text-align: left;
+
+    /* max-width: 200px; */
+    min-width: 60px;
+
+    white-space: nowrap;
+    word-break: keep-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+#table td p{
+    margin: 0;
+    padding: 4px 10px;
+    max-width: min-content;
+}
+
+#table tbody td p.Activo{
+    margin: 0;
+    background-color: rgb(101, 234, 101);
+    border: 1px solid rgb(11, 72, 11);
+    color: rgb(11, 72, 11);
+    border-radius: 20px;
+
+    text-align: center;
+}
+
+#table tbody td p.Inactivo{
+    margin: 0;
+    background-color: rgb(255, 161, 161);
+    border: 1px solid rgb(94, 9, 9);
+    color: rgb(94, 9, 9);
+    border-radius: 20px;
+
+    text-align: center;
+}
+
+#table tbody td a {
+    color: inherit;
+    text-decoration: none;
+}
+
+#table tbody td a:hover {
+    color: rgb(138, 138, 138);
+    font-weight: bold;
+    text-decoration:underline;
+}
+
+#table #acciones {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+#table .accion_icon {
+    padding-right: 2px;
+}

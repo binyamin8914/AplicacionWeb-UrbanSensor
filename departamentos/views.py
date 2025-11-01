@@ -13,8 +13,30 @@ def departamento_listar(request):
     if profile.group.name != "SECPLA":
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
-    departamentos = Departamento.objects.all()
-    return render(request, "departamentos/departamento_listar.html", {"departamentos": departamentos, "group_name": profile.group.name})
+    departamentos = Departamento.objects.all().order_by('nombre')
+    datos = {
+        'titulo': "Gestión de Departamentos",
+        'url': {'name': 'departamento_actualizar', 'label': 'Nuevo Departamento'},
+        'titulos': ['Nombre Departamento', 'Encargado', 'Correo Encargado', 'Dirección', 'Estado'],
+        'filas': [{
+                "id": departamento.id,
+                'acciones': [{'url': 'departamento_ver', 'name': 'Ver', 'ic': ''},
+                    {'url': 'departamento_actualizar','name': 'Editar','ic': ''},
+                    {'url': 'departamento_bloquear', 'name': 'Bloquear' if departamento.esta_activo else 'Activar', 'ic': '' if departamento.esta_activo else ''}
+                ],
+                "columnas": [departamento.nombre, departamento.encargado.get_full_name(), departamento.correo_encargado,
+                    departamento.direccion.nombre,
+                    'Activo' if departamento.esta_activo else 'Bloqueado',
+                ],
+                'clases': ['', '', '', '', 'Activo' if departamento.esta_activo else 'Inactivo']
+            }
+            for departamento in departamentos
+        ],
+        'tieneAcciones': True,
+        "group_name": profile.group.name
+    }
+
+    return render(request, "departamentos/departamento_listar.html", datos)
 
 @login_required
 def departamento_actualizar(request, departamento_id=None):

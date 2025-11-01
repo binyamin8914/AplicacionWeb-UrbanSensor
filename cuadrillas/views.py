@@ -13,8 +13,28 @@ def cuadrilla_listar(request):
     if profile.group.name != "SECPLA":
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
-    cuadrillas = Cuadrilla.objects.all()
-    return render(request, "cuadrillas/cuadrilla_listar.html", {"cuadrillas": cuadrillas, "group_name": profile.group.name})
+    cuadrillas = Cuadrilla.objects.all().order_by('nombre')
+    datos = {
+        'titulo': "Gestión de Cuadrillas",
+        'url': {'name': 'cuadrilla_actualizar', 'label': 'Nueva Cuadrilla'},
+        'titulos': ['Nombre Cuadrilla', 'Encargado', 'Departamento', 'Estado'],
+        'filas': [{
+                "id": cuadrilla.id,
+                'acciones': [{'url': 'cuadrilla_ver', 'name': 'Ver', 'ic': ''},
+                    {'url': 'cuadrilla_actualizar','name': 'Editar','ic': ''},
+                    {'url': 'cuadrilla_bloquear', 'name': 'Bloquear' if cuadrilla.esta_activa else 'Activar', 'ic': '' if cuadrilla.esta_activa else ''}
+                ],
+                "columnas": [cuadrilla.nombre, cuadrilla.encargado.get_full_name(), cuadrilla.departamento.nombre,
+                    'Activo' if cuadrilla.esta_activa else 'Bloqueado',   
+                ],
+                'clases': ['', '', '', 'Activo' if cuadrilla.esta_activa else 'Inactivo']
+            }
+            for cuadrilla in cuadrillas
+        ],
+        'tieneAcciones': True,
+        "group_name": profile.group.name
+    }
+    return render(request, "cuadrillas/cuadrilla_listar.html", datos)
 
 @login_required
 def cuadrilla_actualizar(request, cuadrilla_id=None):

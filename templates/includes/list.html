@@ -1,0 +1,46 @@
+<div id="contenido_pagina">
+    <h4 id="list_title">{{ titulo }}</h4>
+    <p id="list_desc">Lorem ipsum dolor sit amet</p>
+    <a href="{% url url.name %}">{{ url.label }}</a>
+    <br><br>
+    <hr/>
+    <div id="table-container"> <table id="table">
+        <thead>
+            <tr>
+                <th style="min-width: auto;">#</th>
+                {% for titulo_t in titulos%}
+                    <th>{{ titulo_t }}</th>
+                {% endfor %}
+                {% if tieneAcciones %}
+                    <th>Acciones</th>
+                {% endif %}
+            </tr>
+        </thead>
+
+
+        <tbody>
+        {% for fila in filas %}
+            <tr>
+                <td style="min-width: auto;">{{ forloop.counter }}</td>
+                {% for columna in fila.columnas %}
+                    {% with clase=fila.clases|slice:forloop.counter|last %}
+                    <td title="{{ columna }}">
+                        <p class='{{ clase }}'>{{ columna }}</p>
+                    </td>
+                    {% endwith %}
+                {% endfor %}
+                {% if fila.acciones %}
+                <td id="acciones">
+                    {% for accion in fila.acciones %}
+                        <a href="{% url accion.url fila.id %}">
+                            <span class="icon accion_icon">{{ accion.ic }}</span>
+                            <span>{{ accion.name }}</span>
+                        </a>
+                    {% endfor %}
+                </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table> </div>
+</div>

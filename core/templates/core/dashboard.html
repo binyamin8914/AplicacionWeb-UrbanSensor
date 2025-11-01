@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Visual</title>
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+
+{% block css_adicional %}
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -194,8 +193,9 @@
       }
     }
   </style>
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
   <div class="container">
     <!-- Tarjetas -->
     <div class="cards">
@@ -280,5 +280,4 @@
       </table>
     </div>
   </div>
-</body>
-</html>
+{% endblock %}

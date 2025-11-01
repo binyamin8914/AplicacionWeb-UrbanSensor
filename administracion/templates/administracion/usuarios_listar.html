@@ -1,7 +1,19 @@
 {% extends 'core/base.html' %}
+{% load static %}
 {% block title %}Gestión de Usuarios{% endblock %}
+
+{% block css_adicional %}
+    <link rel="stylesheet" href="{% static 'includes/css/list.css' %}">
+{% endblock %}
+
 {% block content %}
-<h4>Gestión de Usuarios</h4>
+
+
+{% include "includes/list.html" with titulo=titulo url=url titulos=titulos filas=filas back=back tieneAcciones=tieneAcciones%}
+
+
+
+<!-- <h4>Gestión de Usuarios</h4>
 <a href="{% url 'usuario_actualizar' %}">Nuevo Usuario</a>
 <br><br>
 <table border="1">
@@ -41,5 +53,5 @@
     </tbody>
 </table>
 <br>
-<a href="{% url 'dashboard' %}">Volver al Menú Principal</a>
+<a href="{% url 'dashboard' %}">Volver al Menú Principal</a> -->
 {% endblock %}

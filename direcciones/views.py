@@ -14,8 +14,28 @@ def direccion_listar(request):
     if profile.group.name != "SECPLA":
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
-    direcciones = Direccion.objects.all()
-    return render(request, "direcciones/direccion_listar.html", {"direcciones": direcciones, "group_name": profile.group.name})
+    direcciones = Direccion.objects.all().order_by('nombre')
+    datos = {
+        'titulo': "Gestión de Direcciones",
+        'url': {'name': 'direccion_actualizar', 'label': 'Nueva Dirección'},
+        'titulos': ['Nombre Dirección', 'Encargado', 'Correo Encargado', 'Estado'],
+        'filas': [{
+                "id": direccion.id,
+                'acciones': [{'url': 'direccion_ver', 'name': 'Ver', 'ic': ''},
+                    {'url': 'direccion_actualizar','name': 'Editar','ic': ''},
+                    {'url': 'direccion_bloquear', 'name': 'Bloquear' if direccion.esta_activa else 'Activar', 'ic': '' if direccion.esta_activa else ''}
+                ],
+                "columnas": [direccion.nombre, direccion.encargado.get_full_name(), direccion.correo_encargado,
+                    'Activo' if direccion.esta_activa else 'Bloqueado',   
+                ],
+                'clases': ['', '', '', 'Activo' if direccion.esta_activa else 'Inactivo']
+            }
+            for direccion in direcciones
+        ],
+        'tieneAcciones': True,
+        "group_name": profile.group.name
+    }
+    return render(request, "direcciones/direccion_listar.html", datos)
 
 @login_required
 def direccion_actualizar(request, direccion_id=None):
