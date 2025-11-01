@@ -17,7 +17,8 @@ def direccion_listar(request):
     direcciones = Direccion.objects.all().order_by('nombre')
     datos = {
         'titulo': "Gestión de Direcciones",
-        'url': {'name': 'direccion_actualizar', 'label': 'Nueva Dirección'},
+        'descripcion': "Gestión de todas las direcciones",
+        'url': {'name': 'direccion_actualizar', 'label': 'Nueva Dirección', 'ic': ''},
         'titulos': ['Nombre Dirección', 'Encargado', 'Correo Encargado', 'Estado'],
         'filas': [{
                 "id": direccion.id,
@@ -32,6 +33,12 @@ def direccion_listar(request):
             }
             for direccion in direcciones
         ],
+        'filtros': [{
+            'nombre': 'Estado',
+            'nombre_corto': 'estado',
+            'ic': '󰣕',
+            'opciones': ["Activo", "Bloqueado"]
+        }],
         'tieneAcciones': True,
         "group_name": profile.group.name
     }

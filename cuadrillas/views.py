@@ -16,7 +16,8 @@ def cuadrilla_listar(request):
     cuadrillas = Cuadrilla.objects.all().order_by('nombre')
     datos = {
         'titulo': "Gestión de Cuadrillas",
-        'url': {'name': 'cuadrilla_actualizar', 'label': 'Nueva Cuadrilla'},
+        'descripcion': "Gestión de todas las cuadrillas",
+        'url': {'name': 'cuadrilla_actualizar', 'label': 'Nueva Cuadrilla', 'ic': ''},
         'titulos': ['Nombre Cuadrilla', 'Encargado', 'Departamento', 'Estado'],
         'filas': [{
                 "id": cuadrilla.id,
@@ -31,6 +32,18 @@ def cuadrilla_listar(request):
             }
             for cuadrilla in cuadrillas
         ],
+        'filtros': [{
+            'nombre': 'Estado',
+            'nombre_corto': 'estado',
+            'ic': '󰣕',
+            'opciones': ["Activo", "Bloqueado"]
+        },
+        {
+            'nombre': 'Departamento',
+            'nombre_corto': 'departamento',
+            'ic': '',
+            'opciones': [departamento.nombre for departamento in Departamento.objects.all()]
+        }],
         'tieneAcciones': True,
         "group_name": profile.group.name
     }

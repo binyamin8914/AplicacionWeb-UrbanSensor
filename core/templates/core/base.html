@@ -4,18 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Panel de Administración{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'core/style.css' %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@v3.3.0/build/firacode-nerd-font.css">
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@v3.3.0/build/firacode-nerd-font.css"> -->
     {% block css_adicional %}
     {% endblock %}
 </head>
 <body>
     <div class="container">
         <!-- Menú lateral persistente -->
-        <input type="checkbox" id="toggle" hidden>
-        <div class="sidebar">
+        <div id="sidebar" class="contraido">
             <div id="title_sidebar">
-                <label for="toggle" class="toggle_btn">󰮫</label>
+                <label id="toggle_btn">󰮫</label>
                 <h3>User_name</h3>
             </div>
             <hr>
@@ -100,5 +99,8 @@
         <hr>
         <small>&copy; 2025 Urban Sensor</small>
     </footer> -->
+
+    <!-- Codigo js frontend -->
+    <script src="{% static 'core/js/sidebar.js' %}"></script>
 </body>
 </html>

@@ -19,7 +19,8 @@ def usuarios_listar(request):
     usuarios_db = User.objects.all().order_by('username')
     datos = {
         'titulo': "Gestión de Usuarios",
-        'url': {'name': 'usuario_actualizar', 'label': 'Nuevo Usuario'},
+        'descripcion': "Gestión de todos los usuarios de la plataforma",
+        'url': {'name': 'usuario_actualizar', 'label': 'Nuevo Usuario', 'ic': ''},
         'titulos': ['Usuario', 'Nombre', 'Apellido', 'Correo', 'Teléfono', 'Perfil', 'Estado'],
         'back': 'dashboard',
         'filas': [{
@@ -36,6 +37,18 @@ def usuarios_listar(request):
             }
             for usuario in usuarios_db
         ],
+        'filtros': [{
+            'nombre': 'Estado',
+            'nombre_corto': 'estado',
+            'ic': '󰣕',
+            'opciones': ["Activo", "Bloqueado"]
+        },
+        {
+            'nombre': 'Perfil',
+            'nombre_corto': 'perfil',
+            'ic': '',
+            'opciones': [grupo.name for grupo in Group.objects.all()]
+        }],
         'tieneAcciones': True,
         "group_name": profile.group.name
     }

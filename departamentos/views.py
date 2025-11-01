@@ -16,7 +16,8 @@ def departamento_listar(request):
     departamentos = Departamento.objects.all().order_by('nombre')
     datos = {
         'titulo': "Gestión de Departamentos",
-        'url': {'name': 'departamento_actualizar', 'label': 'Nuevo Departamento'},
+        'descripcion': "Gestión de todos los departamentos",
+        'url': {'name': 'departamento_actualizar', 'label': 'Nuevo Departamento', 'ic': ''},
         'titulos': ['Nombre Departamento', 'Encargado', 'Correo Encargado', 'Dirección', 'Estado'],
         'filas': [{
                 "id": departamento.id,
@@ -32,6 +33,18 @@ def departamento_listar(request):
             }
             for departamento in departamentos
         ],
+        'filtros': [{
+            'nombre': 'Estado',
+            'nombre_corto': 'estado',
+            'ic': '󰣕',
+            'opciones': ["Activo", "Bloqueado"]
+        },
+        {
+            'nombre': 'Dirección',
+            'nombre_corto': 'direccion',
+            'ic': '',
+            'opciones': [direccion.nombre for direccion in Direccion.objects.all()]
+        }],
         'tieneAcciones': True,
         "group_name": profile.group.name
     }
