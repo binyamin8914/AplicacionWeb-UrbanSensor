@@ -88,6 +88,7 @@ def create_test_users():
             user.save()
             print(f"Usuario '{user.username}' creado.")
         else:
+<<<<<<< HEAD
             # Actualiza datos básicos si cambiaron
             updated = False
             if user.email != user_data['email']:
@@ -113,6 +114,12 @@ def create_test_users():
             group = Group.objects.create(name=user_data['group'])
             print(f"Grupo '{group.name}' creado automáticamente.")
 
+=======
+            print(f"Usuario '{user.username}' ya existe.")
+
+        # Asigna grupo
+        group = Group.objects.get(name=user_data['group'])
+>>>>>>> dd07e64c90885b997006adea9d8508f590459c99
         user.groups.clear()
         user.groups.add(group)
         user.save()
@@ -127,7 +134,11 @@ def create_test_users():
             profile.telefono = user_data['telefono']
             profile.save()
 
+<<<<<<< HEAD
         print(f"Usuario '{user.username}' asignado al grupo '{group.name}' con teléfono '{user_data['telefono']}'.")
+=======
+        print(f"Usuario '{user.username}' asignado al grupo '{group.name}'.")
+>>>>>>> dd07e64c90885b997006adea9d8508f590459c99
 
 if __name__ == "__main__":
     create_test_users()

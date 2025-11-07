@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 {% extends "core/base.html" %}
 {% block title %}{% if usuario %}Editar Usuario{% else %}Crear Usuario{% endif %}{% endblock %}
 {% block content %}
+=======
+>>>>>>> dd07e64c90885b997006adea9d8508f590459c99
 <h4>{% if usuario %}Editar Usuario{% else %}Crear Usuario{% endif %}</h4>
 <form method="POST" action="">
     {% csrf_token %}
@@ -46,5 +49,9 @@
         <input type="submit" value="{% if usuario %}Actualizar{% else %}Crear{% endif %}">
     </p>
 </form>
+<<<<<<< HEAD
 <a href="{% url 'usuarios_listar' %}">Volver</a>
 {% endblock %}
+=======
+<a href="{% url 'administracion:usuarios_listar' %}">Volver</a>
+>>>>>>> dd07e64c90885b997006adea9d8508f590459c99

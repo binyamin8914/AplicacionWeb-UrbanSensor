@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 {% extends 'core/base.html' %}
 {% block title %}Ver Usuario{% endblock %}
 {% block content %}
 <h4>Ver Usuario</h4>
 <a href="{% url 'usuarios_listar' %}">Volver</a>
+=======
+<h4>Ver Usuario</h4>
+<a href="{% url 'administracion:usuarios_listar' %}">Volver</a>
+>>>>>>> dd07e64c90885b997006adea9d8508f590459c99
 <hr>
 <p><b>Usuario:</b> {{ usuario.username }}</p>
 <p><b>Nombre:</b> {{ usuario.first_name }}</p>
@@ -10,5 +15,9 @@
 <p><b>Correo:</b> {{ usuario.email }}</p>
 <p><b>Teléfono:</b> {{ user_profile.telefono }}</p>
 <p><b>Perfil:</b> {{ user_profile.group.name }}</p>
+<<<<<<< HEAD
 <p><b>Estado:</b> {% if usuario.is_active %}Activo{% else %}Bloqueado{% endif %}</p>
 {% endblock %}
+=======
+<p><b>Estado:</b> {% if usuario.is_active %}Activo{% else %}Bloqueado{% endif %}</p>
+>>>>>>> dd07e64c90885b997006adea9d8508f590459c99
