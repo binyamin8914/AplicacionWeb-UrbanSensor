@@ -1,0 +1,27 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header"><h3>Derivar Incidencia #{{ incidencia.id }}</h3></div>
+    <div class="card-body">
+      <p><strong>Tipo:</strong> {{ incidencia.encuesta.tipo_incidencia.nombre }}</p>
+      <p><strong>Descripción:</strong> {{ incidencia.descripcion }}</p>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="cuadrilla" class="form-label">Seleccionar cuadrilla</label>
+          <select name="cuadrilla" id="cuadrilla" class="form-select">
+            <option value="">-- Seleccionar --</option>
+            {% for c in cuadrillas %}
+              <option value="{{ c.id }}">{{ c.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button class="btn btn-warning" type="submit">Derivar a cuadrilla</button>
+        <a href="{% url 'gestion_incidencias' %}" class="btn btn-secondary">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

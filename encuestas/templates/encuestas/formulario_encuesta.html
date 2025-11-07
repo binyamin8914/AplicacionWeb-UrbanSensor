@@ -1,0 +1,72 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+
+<h4>{{ titulo_pagina|default:"Encuesta" }}</h4>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {# Errores no asociados a un campo concreto #}
+    {% if form.non_field_errors %}
+      <div style="color: red; margin-bottom: 10px;">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <p>
+        <label>Título:</label><br>
+        {{ form.titulo }}
+        {% if form.titulo.errors %}
+          <br><small style="color: red;">{{ form.titulo.errors|striptags }}</small>
+        {% endif %}
+    </p>
+
+    <p>
+        <label>Tipo de incidencia:</label><br>
+        {{ form.tipo_incidencia }}
+        {% if form.tipo_incidencia.errors %}
+          <br><small style="color: red;">{{ form.tipo_incidencia.errors|striptags }}</small>
+        {% endif %}
+    </p>
+
+    <p>
+        <label>Descripción:</label><br>
+        {{ form.descripcion }}
+        {% if form.descripcion.errors %}
+          <br><small style="color: red;">{{ form.descripcion.errors|striptags }}</small>
+        {% endif %}
+    </p>
+
+    <p>
+        <label>Estado:</label><br>
+        {{ form.estado }}
+        {% if form.estado.errors %}
+          <br><small style="color: red;">{{ form.estado.errors|striptags }}</small>
+        {% endif %}
+    </p>
+
+    <p>
+        <label>Prioridad:</label><br>
+        {{ form.prioridad }}
+        {% if form.prioridad.errors %}
+          <br><small style="color: red;">{{ form.prioridad.errors|striptags }}</small>
+        {% endif %}
+    </p>
+
+    <p>
+        <label>Departamento:</label><br>
+        {{ form.departamento }}
+        {% if form.departamento.errors %}
+          <br><small style="color: red;">{{ form.departamento.errors|striptags }}</small>
+        {% endif %}
+    </p>
+
+    <p>
+                <input type="submit" value="{% if modo == 'editar' %}Guardar cambios{% else %}Crear encuesta{% endif %}">
+    </p>
+</form>
+
+<br>
+<a href="{% url 'gestion_encuestas' %}">Volver</a>
+{% endblock %}

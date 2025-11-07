@@ -1,0 +1,80 @@
+{% extends "core/base.html" %}
+{% block content %}
+<h1>Gestión de Incidencias</h1>
+
+{% if group_name == "Territorial" %}
+  <a href="{% url 'crear_incidencia' %}" class="btn btn-primary">Crear Nueva Incidencia</a>
+{% endif %}
+
+{% if group_name == "SECPLA" %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  <div class="bg-white p-6 rounded-xl shadow-md border-b-4 border-blue-500">
+    <p class="text-sm text-blue-600 font-medium">Total Creadas</p>
+    <p class="text-4xl font-black text-gray-900">{{ total_creadas }}</p>
+  </div>
+  <div class="bg-white p-6 rounded-xl shadow-md border-b-4 border-yellow-500">
+    <p class="text-sm text-yellow-600 font-medium">Derivadas</p>
+    <p class="text-4xl font-black text-gray-900">{{ count_derivadas }}</p>
+  </div>
+  <div class="bg-white p-6 rounded-xl shadow-md border-b-4 border-red-500">
+    <p class="text-sm text-red-600 font-medium">Rechazadas</p>
+    <p class="text-4xl font-black text-gray-900">{{ count_rechazadas }}</p>
+  </div>
+  <div class="bg-white p-6 rounded-xl shadow-md border-b-4 border-green-500">
+    <p class="text-sm text-green-600 font-medium">Finalizadas</p>
+    <p class="text-4xl font-black text-gray-900">{{ count_finalizadas }}</p>
+  </div>
+</div>
+{% endif %}
+
+<table class="table">
+<thead>
+    <tr>
+        <th>#</th>
+        <th>Tipo</th>
+        <th>Dirección</th>
+        <th>Departamento</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+    </tr>
+</thead>
+<tbody>
+{% for inc in incidencias %}
+<tr>
+  <td>{{ inc.id }}</td>
+  <td>{{ inc.encuesta.tipo_incidencia.nombre }}</td>
+  <td>{{ inc.encuesta.departamento.direccion.nombre }}</td>
+  <td>{{ inc.encuesta.departamento.nombre }}</td>
+  <td>{{ inc.get_estado_display }}</td>
+  <td>
+    <a href="{% url 'editar_incidencia' inc.id %}" class="btn btn-sm btn-outline-secondary">Ver</a>
+
+    {# Territorial puede editar/eliminar sus propias incidencias #}
+    {% if group_name == "Territorial" and inc.territorial == request.user %}
+      <a href="{% url 'editar_incidencia' inc.id %}" class="btn btn-sm btn-info">Editar</a>
+      <a href="{% url 'eliminar_incidencia' inc.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+    {% endif %}
+
+    {# Departamento (encargado) puede derivar si corresponde #}
+    {% if group_name == "Departamento" %}
+      {# opcional: comprobar que el departamento del usuario coincide con inc.encuesta.departamento #}
+      <a href="{% url 'derivar_incidencia' inc.id %}" class="btn btn-sm btn-warning">Derivar</a>
+    {% endif %}
+
+    {# Cuadrilla (encargado) puede finalizar si es su cuadrilla #}
+    {% if group_name == "Cuadrilla" and inc.cuadrilla_id %}
+      {% if inc.cuadrilla.encargado_id == request.user.id %}
+        <form action="{% url 'finalizar_incidencia' inc.id %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button class="btn btn-sm btn-success" type="submit">Finalizar</button>
+        </form>
+      {% endif %}
+    {% endif %}
+  </td>
+</tr>
+{% empty %}
+<tr><td colspan="6">No hay incidencias.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

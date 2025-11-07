@@ -1,0 +1,144 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Panel de Administración{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@v3.3.0/build/firacode-nerd-font.css"> -->
+    {% block css_adicional %}
+    {% endblock %}
+</head>
+<body>
+    <div class="container">
+        <!-- Menú lateral persistente -->
+        <div id="sidebar" class="contraido">
+            <div id="title_sidebar">
+                <label id="toggle_btn">󰮫</label>
+                <h3>{{ request.user.get_full_name|default:request.user.username }}</h3>
+            </div>
+            <hr>
+            <ul>
+                <li>
+                    <a class="item_l" href="{% url 'dashboard' %}">
+                        <span class="item_l_icon icon">󰕮</span>
+                        <span class="item_l_texto">Dashboard</span>
+                    </a>
+                </li>
+                {% if group_name == "SECPLA" %}
+                    <li>
+                        <a class="item_l" href="{% url 'usuarios_listar' %}">
+                            <span class="item_l_icon icon"></span>
+                            <span class="item_l_texto">Gestión de Usuarios</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="item_l" href="{% url 'direccion_listar' %}">
+                            <span class="item_l_icon icon"></span>
+                            <span class="item_l_texto">Gestión de Direcciones</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="item_l" href="{% url 'departamento_listar' %}">
+                            <span class="item_l_icon icon"></span>
+                            <span class="item_l_texto">Gestión de Departamentos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="item_l" href="{% url 'cuadrilla_listar' %}">
+                            <span class="item_l_icon icon"></span>
+                            <span class="item_l_texto">Gestión de Cuadrillas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="item_l" href="{% url 'gestion_encuestas' %}">
+                            <span class="item_l_icon icon"></span>
+                            <span class="item_l_texto">Gestión de Encuestas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="item_l" href="{% url 'secpla_dashboard' %}">
+                            <span class="item_l_icon icon"></span>
+                            <span class="item_l_texto">Ver Incidencias</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="item_l" href="{% url 'listar_tipos_incidencia' %}">
+                            <span class="item_l_icon icon"></span>
+                            <span class="item_l_texto">Gestion Tipo de Incidencias</span>
+                        </a>
+                    </li>
+
+                    <!-- Más opciones SECPLA -->
+                {% elif group_name == "Territorial" %}
+                    {# <li>
+                        <a class="item_l" href="{% url 'gestion_encuestas' %}">
+                            <span class="item_l_icon icon">Ic</span>
+                            <span class="item_l_texto">Ver Encuestas</span>
+                        </a>
+                    </li> #}
+                    {# <li>
+                        <a class="item_l" href="{% url 'crear_incidencia' %}">
+                            <span class="item_l_icon icon">Ic</span>
+                            <span class="item_l_texto">Crear Incidencia</span>
+                        </a>
+                    </li> #}
+                    {# <li>
+                        <a class="item_l" href="{% url 'gestion_incidencias' %}">
+                            <span class="item_l_icon icon">Ic</span>
+                            <span class="item_l_texto">Mis Incidencias</span>
+                        </a>
+                    </li> #}
+                {% elif group_name == "CUADRILLA" %}
+                    {# <li>
+                        <a class="item_l" href="{% url 'incidencias:incidencias_por_hacer' %}">
+                            <span class="item_l_icon icon">Ic</span>
+                            <span class="item_l_texto">Incidencias por Hacer</span>
+                        </a>
+                    </li> #}
+                    {# <li>
+                        <a class="item_l" href="{% url 'incidencias:incidencias_realizadas' %}">
+                            <span class="item_l_icon icon">Ic</span>
+                            <span class="item_l_texto">Incidencias Realizadas</span>
+                        </a>
+                    </li> #}
+                {% elif group_name == "Direccion" %}
+                    {# <li>
+                        <a class="item_l" href="{% url 'gestion_incidencias' %}">
+                            <span class="item_l_icon icon">Ic</span>
+                            <span class="item_l_texto">Incidencias recibidas</span>
+                        </a>
+                    </li> #}
+                    <li>
+                        <a class="item_l" href="{% url 'departamento_listar' %}">
+                            <span class="item_l_icon"></span>
+                            <span class="item_l_texto">Gestión de Departamentos</span>
+                        </a>
+                    </li>
+                {% elif group_name == "Departamento" %}
+                    {# <li>
+                        <a class="item_l" href="{% url 'departamento_dashboard' %}">
+                            <span class="item_l_icon icon">Ic</span>
+                            <span class="item_l_texto">Incidencias recibidas</span>
+                        </a>
+                    </li> #}
+                {% endif %}
+            </ul>
+            <a class="logout-link" href="{% url 'login' %}">Cerrar sesión</a>
+        </div>
+        <!-- Panel principal que cambia -->
+        <main id="main-panel">
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+    <!-- <footer>
+        ----------------------------- Ver como poner el footer -----------------------
+        <hr>
+        <small>&copy; 2025 Urban Sensor</small>
+    </footer> -->
+
+    <!-- Codigo js frontend -->
+    <script src="{% static 'core/js/sidebar.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{% extends "core/base.html" %}
+{% block title %}Ver Cuadrilla{% endblock %}
+{% block content %}
+<h4>Ver Cuadrilla</h4>
+<a href="{% url 'cuadrilla_listar' %}">Volver</a>
+<hr>
+<p><b>Nombre Cuadrilla:</b> {{ cuadrilla.nombre }}</p>
+<p><b>Encargado:</b> {{ cuadrilla.encargado.get_full_name }}</p>
+<p><b>Departamento:</b> {{ cuadrilla.departamento.nombre }}</p>
+<p><b>Estado:</b> {% if cuadrilla.esta_activa %}Activa{% else %}Bloqueada{% endif %}</p>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Gestión de Tipos de Incidencia{% endblock %}
+
+{% block content %}
+<h4>Gestión de Tipos de Incidencia</h4>
+<a href="{% url 'crear_tipo_incidencia' %}">Crear Nuevo Tipo</a>
+<br><br>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Departamento</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tipo in tipos %}
+        <tr>
+            <td>{{ tipo.nombre }}</td>
+            <td>{{ tipo.departamento.nombre }}</td>
+            <td>
+                <a href="{% url 'editar_tipo_incidencia' tipo.id %}">Editar</a>
+                <a href="{% url 'eliminar_tipo_incidencia' tipo.id %}">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">No hay tipos de incidencia.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br>
+<a href="{% url 'dashboard' %}">Volver al Menú Principal</a>
+
+{% endblock %}

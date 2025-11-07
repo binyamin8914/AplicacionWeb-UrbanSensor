@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+{% block title %}Gestión de Encuestas{% endblock %}
+{% block content %}
+
+<h4>Gestión de Encuestas</h4>
+<a href="{% url 'crear_encuesta' %}">Crear Nueva Encuesta</a>
+<br><br>
+
+<table border="1">
+    <thead class="table-dark">
+        <tr>
+          <th>Título</th>
+          <th>Estado</th>
+          <th>Prioridad</th>
+          <th>Departamento</th>
+          <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for encuesta in encuestas %}
+          <tr>
+            <td>{{ encuesta.titulo }}</td>
+            <td>
+                            {{ encuesta.get_estado_display }}
+            </td>
+            <td>
+                            {{ encuesta.get_prioridad_display }}
+            </td>
+            <td>{{ encuesta.departamento.nombre|default:"—" }}</td>
+            <td>
+                            <a href="{% url 'editar_encuesta' encuesta.id %}">Editar</a>
+              <a href="{% url 'eliminar_encuesta' encuesta.id %}">Eliminar</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+                        <td colspan="5">
+              No hay encuestas registradas.
+            </td>
+          </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br>
+<a href="{% url 'dashboard' %}">Volver al Menú Principal</a>
+
+{% endblock %}

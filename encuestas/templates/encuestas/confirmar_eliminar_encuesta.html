@@ -1,0 +1,35 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+  {# Mensajes del sistema (simplificados) #}
+  {% if messages %}
+    {% for message in messages %}
+      <div style="font-weight: bold; color: #333; margin-bottom: 10px;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <h4>Confirmar eliminación</h4>
+  <hr>
+
+  <p>
+    ¿Estás seguro de que deseas eliminar la encuesta 
+    <strong>"{{ encuesta.titulo }}"</strong>?
+  </p>
+  <p>
+    Esta acción <strong>no se puede deshacer</strong>. 
+    Toda la información relacionada se eliminará de forma permanente.
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+    <p>
+      <input type="submit" value="Confirmar Eliminación">
+    </p>
+  </form>
+
+  <br>
+  <a href="{% url 'gestion_encuestas' %}">Cancelar</a>
+
+{% endblock %}

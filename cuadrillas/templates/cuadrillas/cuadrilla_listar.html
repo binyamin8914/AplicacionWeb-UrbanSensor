@@ -1,0 +1,50 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Gestión de Cuadrillas{% endblock %}
+{% block css_adicional %}
+    <link rel="stylesheet" href="{% static 'includes/css/list.css' %}">
+{% endblock %}
+
+{% block content %}
+
+
+{% include "includes/list.html" with titulo=titulo url=url titulos=titulos filas=filas tieneAcciones=tieneAcciones descripcion=descripcion filtros=filtros %}
+
+
+
+
+<!-- <h4>Gestión de Cuadrillas</h4>
+<a href="{% url 'cuadrilla_actualizar' %}">Nueva Cuadrilla</a>
+<br><br>
+<table border="1">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Nombre Cuadrilla</th>
+            <th>Encargado</th>
+            <th>Departamento</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for cuadrilla in cuadrillas %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ cuadrilla.nombre }}</td>
+            <td>{{ cuadrilla.encargado.get_full_name }}</td>
+            <td>{{ cuadrilla.departamento.nombre }}</td>
+            <td>{% if cuadrilla.esta_activa %}Activa{% else %}Bloqueada{% endif %}</td>
+            <td>
+                <a href="{% url 'cuadrilla_ver' cuadrilla.id %}">Ver</a>
+                <a href="{% url 'cuadrilla_actualizar' cuadrilla.id %}">Editar</a>
+                <a href="{% url 'cuadrilla_bloquear' cuadrilla.id %}">
+                    {% if cuadrilla.esta_activa %}Bloquear{% else %}Activar{% endif %}
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'dashboard' %}">Volver al Menú Principal</a> -->
+{% endblock %}
