@@ -1,48 +1,51 @@
-{% extends 'core/base.html' %}
+{% extends 'core/base.html' %} 
 {% block title %}Gestión de Encuestas{% endblock %}
+
 {% block content %}
+<div class="content-header">
+    <h1 class="mb-3">Gestión de Encuestas</h1>
+</div>
 
-<h4>Gestión de Encuestas</h4>
-<a href="{% url 'crear_encuesta' %}">Crear Nueva Encuesta</a>
-<br><br>
+<a href="{% url 'crear_encuesta' %}" class="btn btn-primary mb-3">
+    Crear Nueva Encuesta
+</a>
 
-<table border="1">
-    <thead class="table-dark">
-        <tr>
-          <th>Título</th>
-          <th>Estado</th>
-          <th>Prioridad</th>
-          <th>Departamento</th>
-          <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for encuesta in encuestas %}
-          <tr>
-            <td>{{ encuesta.titulo }}</td>
-            <td>
-                            {{ encuesta.get_estado_display }}
-            </td>
-            <td>
-                            {{ encuesta.get_prioridad_display }}
-            </td>
-            <td>{{ encuesta.departamento.nombre|default:"—" }}</td>
-            <td>
-                            <a href="{% url 'editar_encuesta' encuesta.id %}">Editar</a>
-              <a href="{% url 'eliminar_encuesta' encuesta.id %}">Eliminar</a>
-            </td>
-          </tr>
-        {% empty %}
-          <tr>
-                        <td colspan="5">
-              No hay encuestas registradas.
-            </td>
-          </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Título</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Prioridad</th>
+                    <th scope="col">Departamento</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for encuesta in encuestas %}
+                <tr>
+                    <td>{{ encuesta.titulo }}</td>
+                    <td>{{ encuesta.get_estado_display }}</td>
+                    <td>{{ encuesta.get_pritoridad_display }}</td> <td>{{ encuesta.departamento.nombre|default:"—" }}</td>
+                    <td>
+                        <a href="{% url 'editar_encuesta' encuesta.id %}" class="btn btn-sm btn-outline-primary">Editar</a>
+                        <a href="{% url 'eliminar_encuesta' encuesta.id %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted fst-italic p-4">
+                        No hay encuestas registradas.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-<br>
-<a href="{% url 'dashboard' %}">Volver al Menú Principal</a>
-
+<a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">
+    Volver al Menú Principal
+</a>
 {% endblock %}

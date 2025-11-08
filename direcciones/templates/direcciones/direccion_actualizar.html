@@ -1,36 +1,71 @@
 {% extends "core/base.html" %}
+
 {% block title %}{% if direccion %}Editar Dirección{% else %}Crear Dirección{% endif %}{% endblock %}
+
 {% block content %}
+
 <h4>{% if direccion %}Editar Dirección{% else %}Crear Dirección{% endif %}</h4>
+
 <form method="POST" action="">
+
     {% csrf_token %}
+
     {% if direccion %}
+
         <input type="hidden" name="direccion_id" value="{{ direccion.id }}">
+
     {% endif %}
+
     <p>
-        <input type="text" name="nombre" placeholder="Nombre Dirección" 
+
+        <input type="text" name="nombre" placeholder="Nombre Dirección"
+
                value="{% if direccion %}{{ direccion.nombre }}{% endif %}" required>
+
     </p>
+
     <p>
+
         <select id="encargado" name="encargado" required>
+
             <option value="">Seleccione encargado</option>
+
             {% for encargado in encargados %}
+
                 <option value="{{ encargado.id }}" data-correo="{{ encargado.email }}"
+
                     {% if direccion and direccion.encargado.id == encargado.id %}selected{% endif %}>
-                    {{ encargado.username }} ({{ encargado.first_name }} {{ encargado.last_name }}) 
+
+                    {{ encargado.username }} ({{ encargado.first_name }} {{ encargado.last_name }})
+
                 </option>
+
             {% endfor %}
+
         </select>
+
     </p>
+
     <p>
-        <input type="email" name="correo_encargado" placeholder="Correo encargado" 
+
+        <input type="email" name="correo_encargado" placeholder="Correo encargado"
+
                value="{% if direccion %}{{ direccion.correo_encargado }}{% endif %}" required>
+
     </p>
+
     <p>
+
         <input type="submit" value="{% if direccion %}Actualizar{% else %}Crear{% endif %}">
+
     </p>
+
 </form>
+
 <a href="{% url 'direccion_listar' %}">Volver</a>
+
 {% load static %}
+
 <script src="{% static 'includes/js/autocompletar_correo.js' %}"></script>
+
 {% endblock %}

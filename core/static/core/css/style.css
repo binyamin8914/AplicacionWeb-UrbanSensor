@@ -14,7 +14,13 @@
     font-display: swap;
 }
 
-body { margin: 0; padding: 0; height: 100vh; width: 100vw; font-family: Arial, sans-serif; }
+body { 
+    margin: 0; 
+    padding: 0; 
+    height: 100vh; 
+    width: 100vw; 
+    font-family: Arial, sans-serif; 
+}
 
 hr {
     border-color: #dbdbdb;
@@ -27,14 +33,18 @@ hr {
     text-align: center;
 }
 
-.container {
+/* * 1. CAMBIO IMPORTANTE: Renombramos ".container" a ".app-layout" 
+ * para que no choque con Bootstrap.
+ */
+.app-layout {
     display: flex;
     height: 100vh;
     width: 100vw;
 }
+
+/* --- Estilos del Sidebar (Esto se queda) --- */
 #sidebar {
     width: 300px;
-    /* background: #f7f7f7; */
     border-right: 1px solid #ccc;
     padding: 30px 18px 18px 18px;
     box-sizing: border-box;
@@ -61,12 +71,38 @@ hr {
     color: white;
 }
 
-#sidebar #title_sidebar h3 {
-    display: inline-block;
-    margin: 0;
-}
-#sidebar ul { list-style: none; padding: 0; }
+/* --- Estilos para el Perfil del Sidebar --- */
 
+.sidebar-user-profile {
+    padding: 10px 0;
+    /* El "text-center" lo pondremos en el HTML */
+}
+
+.sidebar-user-icon {
+    font-size: 3.5rem; /* Un ícono grande (56px) */
+    color: #6c757d; /* Un gris secundario de Bootstrap */
+}
+
+.sidebar-user-name {
+    display: block; /* Para que se ponga debajo del ícono */
+    font-size: 0.9rem; /* Texto más pequeño */
+    font-weight: bold;
+    color: #333;
+    margin-top: 5px; /* Espacio entre el ícono y el nombre */
+    word-break: break-all; /* Evita que nombres largos rompan el diseño */
+}
+
+/* --- Ocultar el perfil cuando el sidebar está contraído --- */
+
+#sidebar.contraido .sidebar-user-profile {
+    display: none; /* Oculta el perfil completo */
+}
+
+#sidebar.contraido #title_sidebar h3 {
+    display: none !important; /* Asegura que el nombre de usuario se oculte */
+}
+
+#sidebar ul { list-style: none; padding: 0; }
 #sidebar li {
     margin-bottom: 6px;
     height: 50px;
@@ -75,15 +111,12 @@ hr {
 #sidebar .item_l {
     width: auto;
     height: calc(100% - 2*12px);
-
     text-decoration: none;
     color: #222;
     padding: 12px;
     padding-left: 16px;
     padding-right: 16px;
-
     border-radius: 25px;
-
     display: flex;
     align-content: center;
     justify-content: flex-start;
@@ -107,6 +140,7 @@ hr {
 #sidebar .item_l:hover span{
     color: white;
 }
+
 .logout-link { display: block; margin-top: 32px; color: #0074d9; }
 
 #main-panel {
@@ -117,24 +151,7 @@ hr {
     min-width: 0;
 }
 
-/* sidebar contraida */
-/* #toggle:checked + #sidebar {
-    width: 84px;
-}
-
-#toggle:checked + #sidebar li {
-    width: 50px;
-}
-
-#toggle:checked + #sidebar .item_l_texto, #toggle:checked + #sidebar h3 {
-    /* OCULTATE!!!!! * /
-    opacity: 0;
-    width: 0;
-    overflow: hidden;
-    display: none;
-    visibility: hidden;
-} */
-
+/* --- Estilos del Sidebar contraido (Esto se queda) --- */
 #sidebar.contraido {
     width: 84px;
 }
@@ -144,7 +161,6 @@ hr {
 }
 
 #sidebar.contraido .item_l_texto, #sidebar.contraido h3 {
-    /* OCULTATE!!!!! */
     opacity: 0;
     width: 0;
     overflow: hidden !important;
@@ -155,3 +171,8 @@ hr {
 #sidebar.contraido .item_l {
     justify-content: center;
 }
+
+/* * 2. CAMBIO IMPORTANTE: Todo el CSS de ".tabla-bonita", ".form-contenedor",
+ * ".dashboard-contenedor" y ".boton" ha sido ELIMINADO.
+ * Bootstrap se encargará de eso ahora.
+ */

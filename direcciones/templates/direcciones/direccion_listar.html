@@ -1,47 +1,96 @@
 {% extends "core/base.html" %}
+
 {% load static %}
+
 {% block title %}Gestión de Direcciones{% endblock %}
 
+
+
 {% block css_adicional %}
+
     <link rel="stylesheet" href="{% static 'includes/css/list.css' %}">
+
 {% endblock %}
+
+
 
 {% block content %}
 
 
+
+
+
 {% include "includes/list.html" with titulo=titulo url=url titulos=titulos filas=filas tieneAcciones=tieneAcciones descripcion=descripcion filtros=filtros %}
+
 <!-- <h4>Gestión de Direcciones</h4>
+
 <a href="{% url 'direccion_actualizar' %}">Nueva Dirección</a>
+
 <br><br>
+
 <table border="1">
+
     <thead>
+
         <tr>
+
             <th>#</th>
+
             <th>Nombre Dirección</th>
+
             <th>Encargado</th>
+
             <th>Correo Encargado</th>
+
             <th>Estado</th>
+
             <th>Acciones</th>
+
         </tr>
+
     </thead>
+
     <tbody>
+
     {% for direccion in direcciones %}
+
         <tr>
+
             <td>{{ forloop.counter }}</td>
+
             <td>{{ direccion.nombre }}</td>
+
             <td>{{ direccion.encargado.get_full_name }}</td>
+
             <td>{{ direccion.correo_encargado }}</td>
+
             <td>{% if direccion.esta_activa %}Activa{% else %}Bloqueada{% endif %}</td>
+
             <td>
+
                 <a href="{% url 'direccion_ver' direccion.id %}">Ver</a>
+
                 <a href="{% url 'direccion_actualizar' direccion.id %}">Editar</a>
+
                 <a href="{% url 'direccion_bloquear' direccion.id %}">
+
                     {% if direccion.esta_activa %}Bloquear{% else %}Activar{% endif %}
+
                 </a>
+
             </td>
+
         </tr>
+
     {% endfor %}
+
     </tbody>
+
 </table>
+
 <a href="{% url 'dashboard' %}">Volver al Menú Principal</a> -->
+
 {% endblock %}
+
+
+
