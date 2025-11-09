@@ -1,96 +1,78 @@
-{% extends "core/base.html" %}
-
-{% load static %}
-
-{% block title %}Gestión de Direcciones{% endblock %}
-
-
-
-{% block css_adicional %}
-
-    <link rel="stylesheet" href="{% static 'includes/css/list.css' %}">
-
-{% endblock %}
-
-
+{% extends 'core/base.html' %}
+{% block title %}{{ titulo }}{% endblock %}
 
 {% block content %}
+<div class="content-header">
+    <h1 class="mb-3">{{ titulo }}</h1>
+</div>
 
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="dropdown me-2">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-filter-left me-1"></i>
+            {% if current_filtro_estado %}{{ current_filtro_estado }}{% else %}Estado{% endif %}
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'direccion_listar' %}?estado=Activo">Activo</a></li>
+            <li><a class="dropdown-item" href="{% url 'direccion_listar' %}?estado=Inactivo">Inactivo</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'direccion_listar' %}">Todos los Estados</a></li>
+        </ul>
+    </div>
+    
+    <a href="{% url 'direccion_crear' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle-fill me-2"></i>
+        Nueva Dirección
+    </a>
+</div>
 
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Encargado</th>
+                    <th scope="col">Correo Encargado</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dir in direcciones %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ dir.nombre }}</td>
+                    <td>{{ dir.encargado.get_full_name|default:dir.encargado.username|default:"N/A" }}</td>
+                    <td>{{ dir.correo_encargado|default:"N/A" }}</td>
+                    <td>
+                        {% if dir.esta_activa %}
+                        <span class="badge bg-success">Activo</span>
+                        {% else %}
+                        <span class="badge bg-danger">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-nowrap">
+                        <a href="{% url 'direccion_actualizar' dir.id %}" class="btn btn-sm btn-secondary">Editar</a>
+                        <a href="{% url 'direccion_bloquear' dir.id %}" class="btn btn-sm {% if dir.esta_activa %}btn-danger{% else %}btn-success{% endif %}">
+                            {% if dir.esta_activa %}Desactivar{% else %}Activar{% endif %}
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted fst-italic p-4">
+                        No hay direcciones registradas.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-
-
-{% include "includes/list.html" with titulo=titulo url=url titulos=titulos filas=filas tieneAcciones=tieneAcciones descripcion=descripcion filtros=filtros %}
-
-<!-- <h4>Gestión de Direcciones</h4>
-
-<a href="{% url 'direccion_actualizar' %}">Nueva Dirección</a>
-
-<br><br>
-
-<table border="1">
-
-    <thead>
-
-        <tr>
-
-            <th>#</th>
-
-            <th>Nombre Dirección</th>
-
-            <th>Encargado</th>
-
-            <th>Correo Encargado</th>
-
-            <th>Estado</th>
-
-            <th>Acciones</th>
-
-        </tr>
-
-    </thead>
-
-    <tbody>
-
-    {% for direccion in direcciones %}
-
-        <tr>
-
-            <td>{{ forloop.counter }}</td>
-
-            <td>{{ direccion.nombre }}</td>
-
-            <td>{{ direccion.encargado.get_full_name }}</td>
-
-            <td>{{ direccion.correo_encargado }}</td>
-
-            <td>{% if direccion.esta_activa %}Activa{% else %}Bloqueada{% endif %}</td>
-
-            <td>
-
-                <a href="{% url 'direccion_ver' direccion.id %}">Ver</a>
-
-                <a href="{% url 'direccion_actualizar' direccion.id %}">Editar</a>
-
-                <a href="{% url 'direccion_bloquear' direccion.id %}">
-
-                    {% if direccion.esta_activa %}Bloquear{% else %}Activar{% endif %}
-
-                </a>
-
-            </td>
-
-        </tr>
-
-    {% endfor %}
-
-    </tbody>
-
-</table>
-
-<a href="{% url 'dashboard' %}">Volver al Menú Principal</a> -->
-
+<a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">
+    Volver al Menú Principal
+</a>
 {% endblock %}
-
-
-

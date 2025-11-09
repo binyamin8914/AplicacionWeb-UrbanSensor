@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
+from django.db import IntegrityError # <-- ¡¡AQUÍ ESTÁ EL IMPORT CLAVE!!
 
 from registration.models import Profile
 # --- IMPORTANTE: Importamos los modelos que vamos a listar ---
@@ -16,6 +17,7 @@ from cuadrillas.models import Cuadrilla
 
 @login_required
 def usuarios_listar(request):
+    # (Tu vista de usuarios_listar... está perfecta)
     try:
         profile = Profile.objects.get(user=request.user)
     except:
@@ -25,7 +27,6 @@ def usuarios_listar(request):
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
 
-    # Lógica de Filtros
     filtro_estado = request.GET.get('estado')
     filtro_perfil = request.GET.get('perfil')
     usuarios_db = User.objects.all()
@@ -64,7 +65,7 @@ def usuarios_listar(request):
             "id": usuario.id,
             'acciones': [
                 {'url': 'usuario_ver', 'name': 'Ver', 'ic': ''},
-                {'url': 'usuario_actualizar_id', 'name': 'Editar', 'ic': ''}, # Nombre de URL corregido
+                {'url': 'usuario_actualizar_id', 'name': 'Editar', 'ic': ''}, 
                 {'url': 'usuario_bloquear', 'name': 'Bloquear' if usuario.is_active else 'Activar', 'ic': '' if usuario.is_active else ''}
             ],
             "columnas": [
@@ -83,6 +84,7 @@ def usuarios_listar(request):
 
 @login_required
 def usuario_actualizar(request, user_id=None):
+    # (Tu vista de usuario_actualizar... está perfecta)
     try:
         profile = Profile.objects.get(user=request.user)
     except:
@@ -153,6 +155,7 @@ def usuario_actualizar(request, user_id=None):
 
 @login_required
 def usuario_bloquear(request, user_id):
+    # (Tu vista de usuario_bloquear... está perfecta)
     try:
         profile = Profile.objects.get(user=request.user)
     except:
@@ -174,6 +177,7 @@ def usuario_bloquear(request, user_id):
 
 @login_required
 def usuario_ver(request, user_id):
+    # (Tu vista de usuario_ver... está perfecta)
     try:
         profile = Profile.objects.get(user=request.user)
     except:
@@ -197,6 +201,7 @@ def usuario_ver(request, user_id):
 
 @login_required
 def direccion_listar(request):
+    # (Tu vista de direccion_listar... está perfecta)
     filtro_estado = request.GET.get('estado')
     direcciones = Direccion.objects.all().order_by('nombre')
     
@@ -215,6 +220,7 @@ def direccion_listar(request):
 
 @login_required
 def departamento_listar(request):
+    # (Tu vista de departamento_listar... está perfecta)
     filtro_estado = request.GET.get('estado')
     departamentos = Departamento.objects.select_related('direccion').all().order_by('nombre')
     
@@ -233,6 +239,7 @@ def departamento_listar(request):
 
 @login_required
 def cuadrilla_listar(request):
+    # (Tu vista de cuadrilla_listar... está perfecta)
     filtro_estado = request.GET.get('estado')
     cuadrillas = Cuadrilla.objects.select_related('departamento').all().order_by('nombre')
     
@@ -256,6 +263,7 @@ def cuadrilla_listar(request):
 
 @login_required
 def direccion_actualizar(request, id=None):
+    # --- ¡¡AQUÍ ESTÁ LA VISTA CORREGIDA!! ---
     if id:
         direccion = get_object_or_404(Direccion, id=id)
         titulo_pagina = "Editar Dirección"
@@ -273,22 +281,31 @@ def direccion_actualizar(request, id=None):
         else:
             encargado = get_object_or_404(User, id=encargado_id)
             
-            if direccion:
-                direccion.nombre = nombre
-                direccion.encargado = encargado
-                direccion.correo_encargado = correo_encargado
-                direccion.save()
-                messages.success(request, "¡Dirección actualizada con éxito!")
-            else:
-                Direccion.objects.create(
-                    nombre=nombre,
-                    encargado=encargado,
-                    correo_encargado=correo_encargado,
-                    esta_activa=True 
-                )
-                messages.success(request, "¡Dirección creada con éxito!")
-            return redirect('direccion_listar')
+            try: # <-- ¡¡INICIO DEL BLOQUE TRY!!
+                if direccion:
+                    # Actualizar
+                    direccion.nombre = nombre
+                    direccion.encargado = encargado
+                    direccion.correo_encargado = correo_encargado
+                    direccion.save()
+                    messages.success(request, "¡Dirección actualizada con éxito!")
+                else:
+                    # Crear
+                    Direccion.objects.create(
+                        nombre=nombre,
+                        encargado=encargado,
+                        correo_encargado=correo_encargado,
+                        esta_activa=True 
+                    )
+                    messages.success(request, "¡Dirección creada con éxito!")
+                
+                return redirect('direccion_listar') # Solo redirige si todo salió bien
 
+            except IntegrityError: # <-- ¡¡AQUÍ ATRAPAMOS EL ERROR!!
+                messages.error(request, f"Error: El usuario '{encargado.username}' ya es encargado de otra dirección. Por favor, seleccione un usuario diferente.")
+                # No redirigimos, dejamos que la vista continúe
+            
+    # --- Lógica GET (o si el POST falló) ---
     try:
         grupo_direccion = Group.objects.get(name="Direccion")
         encargados = User.objects.filter(groups=grupo_direccion)
@@ -306,6 +323,7 @@ def direccion_actualizar(request, id=None):
 
 @login_required
 def direccion_bloquear(request, id):
+    # (Tu vista de direccion_bloquear... está perfecta)
     try:
         direccion = get_object_or_404(Direccion, id=id)
         direccion.esta_activa = not direccion.esta_activa 
@@ -319,24 +337,24 @@ def direccion_bloquear(request, id):
 
 @login_required
 def departamento_actualizar(request, id=None):
-    # TODO: Crear el formulario y la lógica para Departamento
+    # (Marcador de posición... lo arreglaremos después)
     messages.warning(request, "Función 'Actualizar Departamento' aún no implementada.")
     return redirect('departamento_listar')
 
 @login_required
 def departamento_bloquear(request, id):
-    # TODO: Crear la lógica para bloquear/activar Departamento
+    # (Marcador de posición... lo arreglaremos después)
     messages.warning(request, "Función 'Bloquear Departamento' aún no implementada.")
     return redirect('departamento_listar')
 
 @login_required
 def cuadrilla_actualizar(request, id=None):
-    # TODO: Crear el formulario y la lógica para Cuadrilla
+    # (Marcador de posición... lo arreglaremos después)
     messages.warning(request, "Función 'Actualizar Cuadrilla' aún no implementada.")
     return redirect('cuadrilla_listar')
 
 @login_required
 def cuadrilla_bloquear(request, id):
-    # TODO: Crear la lógica para bloquear/activar Cuadrilla
+    # (Marcador de posición... lo arreglaremos después)
     messages.warning(request, "Función 'Bloquear Cuadrilla' aún no implementada.")
     return redirect('cuadrilla_listar')

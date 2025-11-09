@@ -1,10 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User, Group # Añadimos Group
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.models import User
 from registration.models import Profile
 from .models import Direccion
+
+# --- ¡¡IMPORTANTE: Importa el manejador de errores!! ---
+from django.db import IntegrityError 
 
 # --- CRUD Direccion ---
 
@@ -14,78 +16,94 @@ def direccion_listar(request):
     if profile.group.name != "SECPLA":
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
-    direcciones = Direccion.objects.all().order_by('nombre')
-    datos = {
-        'titulo': "Gestión de Direcciones",
-        'descripcion': "Gestión de todas las direcciones",
-        'url': {'name': 'direccion_actualizar', 'label': 'Nueva Dirección', 'ic': ''},
-        'titulos': ['Nombre Dirección', 'Encargado', 'Correo Encargado', 'Estado'],
-        'filas': [{
-                "id": direccion.id,
-                'acciones': [{'url': 'direccion_ver', 'name': 'Ver', 'ic': ''},
-                    {'url': 'direccion_actualizar','name': 'Editar','ic': ''},
-                    {'url': 'direccion_bloquear', 'name': 'Bloquear' if direccion.esta_activa else 'Activar', 'ic': '' if direccion.esta_activa else ''}
-                ],
-                "columnas": [direccion.nombre, direccion.encargado.get_full_name(), direccion.correo_encargado,
-                    'Activo' if direccion.esta_activa else 'Bloqueado',   
-                ],
-                'clases': ['', '', '', 'Activo' if direccion.esta_activa else 'Inactivo']
-            }
-            for direccion in direcciones
-        ],
-        'filtros': [{
-            'nombre': 'Estado',
-            'nombre_corto': 'estado',
-            'ic': '󰣕',
-            'opciones': ["Activo", "Bloqueado"]
-        }],
-        'tieneAcciones': True,
-        "group_name": profile.group.name
+    
+    # --- Añadimos la lógica de FILTRO que faltaba ---
+    filtro_estado = request.GET.get('estado')
+    direcciones = Direccion.objects.all()
+
+    if filtro_estado == 'Activo':
+        direcciones = direcciones.filter(esta_activa=True)
+    elif filtro_estado == 'Inactivo':
+        direcciones = direcciones.filter(esta_activa=False)
+
+    direcciones = direcciones.order_by('nombre')
+    
+    # --- Reemplazamos 'datos' por 'context' para Bootstrap ---
+    context = {
+        'titulo': 'Gestión de Direcciones',
+        'direcciones': direcciones,
+        'current_filtro_estado': filtro_estado,
+        "group_name": profile.group.name,
     }
-    return render(request, "direcciones/direccion_listar.html", datos)
+    # Asegúrate de que esta plantilla exista y use Bootstrap
+    return render(request, "direcciones/direccion_listar.html", context)
 
 @login_required
-def direccion_actualizar(request, direccion_id=None):
-    profile = Profile.objects.get(user=request.user)
-    if profile.group.name != "SECPLA":
-        messages.add_message(request, messages.INFO, "No tienes permisos.")
-        return redirect("logout")
-
-    if direccion_id:
-        direccion = Direccion.objects.filter(pk=direccion_id).first()
-        if not direccion:
-            messages.add_message(request, messages.INFO, "Dirección no encontrada.")
-            return redirect("direccion_listar")
+def direccion_actualizar(request, id=None):
+    if id:
+        direccion = get_object_or_404(Direccion, id=id)
+        titulo_pagina = "Editar Dirección"
     else:
         direccion = None
+        titulo_pagina = "Crear Nueva Dirección"
 
     if request.method == "POST":
-        nombre = request.POST.get("nombre")
-        encargado_id = request.POST.get("encargado")
-        correo_encargado = request.POST.get("correo_encargado")
-        encargado = User.objects.get(pk=encargado_id)
-        if direccion:  # Edición
-            direccion.nombre = nombre
-            direccion.encargado = encargado
-            direccion.correo_encargado = correo_encargado
-            direccion.save()
-            messages.add_message(request, messages.INFO, "Dirección actualizada correctamente.")
-        else:  # Creación
-            Direccion.objects.create(
-                nombre=nombre, encargado=encargado, correo_encargado=correo_encargado
-            )
-            messages.add_message(request, messages.INFO, "Dirección creada correctamente.")
-        return redirect("direccion_listar")
+        nombre = request.POST.get('nombre')
+        encargado_id = request.POST.get('encargado')
+        correo_encargado = request.POST.get('correo_encargado')
+        
+        if not nombre or not encargado_id:
+            messages.error(request, "Nombre y Encargado son obligatorios.")
+        else:
+            encargado = get_object_or_404(User, id=encargado_id)
+            
+            # --- ¡¡AQUÍ ESTÁ EL CÓDIGO CLAVE!! ---
+            try: 
+                if direccion:
+                    # Actualizar
+                    direccion.nombre = nombre
+                    direccion.encargado = encargado
+                    direccion.correo_encargado = correo_encargado
+                    direccion.save()
+                    messages.success(request, "¡Dirección actualizada con éxito!")
+                else:
+                    # Crear
+                    Direccion.objects.create(
+                        nombre=nombre,
+                        encargado=encargado,
+                        correo_encargado=correo_encargado,
+                        esta_activa=True 
+                    )
+                    messages.success(request, "¡Dirección creada con éxito!")
+                
+                return redirect('direccion_listar') # Solo redirige si todo salió bien
 
-    encargados = User.objects.filter(profile__group__name="Direccion")
-    return render(request, "direcciones/direccion_actualizar.html", {
-        "direccion": direccion,
-        "encargados": encargados,
-        "group_name": profile.group.name
-    })
+            except IntegrityError: 
+                # ¡Atrapamos el error de llave duplicada!
+                messages.error(request, f"Error: El usuario '{encargado.username}' ya es encargado de otra dirección. Por favor, seleccione un usuario diferente.")
+                # No redirigimos, dejamos que la vista continúe para
+                # volver a mostrar el formulario con el mensaje de error.
+            # --- FIN DEL BLOQUE TRY/EXCEPT ---
+
+    # --- Lógica GET (o si el POST falló) ---
+    try:
+        grupo_direccion = Group.objects.get(name="Direccion")
+        encargados = User.objects.filter(groups=grupo_direccion)
+    except Group.DoesNotExist:
+        encargados = User.objects.filter(is_superuser=True) # Plan B
+
+    context = {
+        'titulo_pagina': titulo_pagina,
+        'direccion': direccion,
+        'encargados': encargados,
+        "group_name": request.user.profile.group.name,
+    }
+    # Esta es la plantilla que encontramos que sí funciona
+    return render(request, 'administracion/direccion_actualizar.html', context) 
 
 @login_required
 def direccion_ver(request, direccion_id):
+    # (Tu vista original está bien, la dejamos)
     profile = Profile.objects.get(user=request.user)
     if profile.group.name != "SECPLA":
         messages.add_message(request, messages.INFO, "No tienes permisos.")
@@ -93,8 +111,10 @@ def direccion_ver(request, direccion_id):
     direccion = get_object_or_404(Direccion, pk=direccion_id)
     return render(request, "direcciones/direccion_ver.html", {"direccion": direccion, "group_name": profile.group.name})
 
+
 @login_required
 def direccion_bloquear(request, direccion_id):
+    # (Tu vista original está bien, la dejamos)
     profile = Profile.objects.get(user=request.user)
     if profile.group.name != "SECPLA":
         messages.add_message(request, messages.INFO, "No tienes permisos.")
