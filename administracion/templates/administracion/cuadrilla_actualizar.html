@@ -1,37 +1,76 @@
-<h4>{% if cuadrilla %}Editar Cuadrilla{% else %}Crear Cuadrilla{% endif %}</h4>
-<form method="POST" action="">
-    {% csrf_token %}
-    {% if cuadrilla %}
-        <input type="hidden" name="cuadrilla_id" value="{{ cuadrilla.id }}">
-    {% endif %}
-    <p>
-        <input type="text" name="nombre" placeholder="Nombre Cuadrilla" 
-               value="{% if cuadrilla %}{{ cuadrilla.nombre }}{% endif %}" required>
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if cuadrilla %}Editar Cuadrilla{% else %}Crear Cuadrilla{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="content-header mb-4">
+    <h1 class="mb-1">
+        {% if cuadrilla %}Editar Cuadrilla{% else %}Crear Cuadrilla{% endif %}
+    </h1>
+    <p class="text-muted">
+        {% if cuadrilla %}Modifica la información de la cuadrilla.{% else %}Registra una nueva cuadrilla en la plataforma.{% endif %}
     </p>
-    <p>
-        <select name="encargado" required>
-            <option value="">Seleccione encargado</option>
-            {% for encargado in encargados %}
-                <option value="{{ encargado.id }}"
-                        {% if cuadrilla and cuadrilla.encargado.id == encargado.id %}selected{% endif %}>
-                    {{ encargado.username }} ({{ encargado.first_name }} {{ encargado.last_name }})
-                </option>
-            {% endfor %}
-        </select>
-    </p>
-    <p>
-        <select name="departamento" required>
-            <option value="">Seleccione departamento</option>
-            {% for depto in departamentos %}
-                <option value="{{ depto.id }}"
-                        {% if cuadrilla and cuadrilla.departamento.id == depto.id %}selected{% endif %}>
-                    {{ depto.nombre }}
-                </option>
-            {% endfor %}
-        </select>
-    </p>
-    <p>
-        <input type="submit" value="{% if cuadrilla %}Actualizar{% else %}Crear{% endif %}">
-    </p>
-</form>
-<a href="{% url 'administracion:cuadrilla_listar' %}">Volver</a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7"> 
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Datos de la Cuadrilla</h5>
+            </div>
+            <div class="card-body">
+                
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre de la Cuadrilla</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" 
+                               value="{% if cuadrilla %}{{ cuadrilla.nombre }}{% endif %}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="departamento" class="form-label">Departamento (Padre)</label>
+                        <select class="form-select" id="departamento" name="departamento" required>
+                            <option value="">Seleccione un departamento...</option>
+                            {% for depto in departamentos %}
+                                <option value="{{ depto.id }}"
+                                        {% if cuadrilla and cuadrilla.departamento.id == depto.id %}selected{% endif %}>
+                                    {{ depto.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="encargado" class="form-label">Encargado</loabel>
+                        <select class="form-select" id="encargado" name="encargado" required>
+                            <option value="">Seleccione un encargado...</option>
+                            {% for encargado in encargados %}
+                                <option value="{{ encargado.id }}"
+                                        data-correo="{{ encargado.email }}"
+                                        {% if cuadrilla and cuadrilla.encargado.id == encargado.id %}selected{% endif %}>
+                                    {{ encargado.username }} ({{ encargado.first_name }} {{ encargado.last_name }}) 
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            {% if cuadrilla %}Actualizar{% else %}Crear{% endif %}
+                        </button>
+                        <a href="{% url 'cuadrilla_listar' %}" class="btn btn-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

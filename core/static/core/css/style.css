@@ -176,3 +176,15 @@ hr {
  * ".dashboard-contenedor" y ".boton" ha sido ELIMINADO.
  * Bootstrap se encargará de eso ahora.
  */
+
+ /* --- Estilos para el Formset Dinámico --- */
+.campo-adicional-form {
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 15px;
+}
+
+/* Oculta la plantilla de clonación */
+.hidden {
+    display: none;
+}

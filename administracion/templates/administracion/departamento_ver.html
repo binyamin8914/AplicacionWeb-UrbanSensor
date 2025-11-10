@@ -1,8 +1,39 @@
-<h4>Ver Departamento</h4>
-<a href="{% url 'administracion:departamento_listar' %}">Volver</a>
-<hr>
-<p><b>Nombre Departamento:</b> {{ departamento.nombre }}</p>
-<p><b>Encargado:</b> {{ departamento.encargado.get_full_name }}</p>
-<p><b>Correo Encargado:</b> {{ departamento.correo_encargado }}</p>
-<p><b>Dirección:</b> {{ departamento.direccion.nombre }}</p>
-<p><b>Estado:</b> {% if departamento.esta_activo %}Activo{% else %}Bloqueado{% endif %}</p>
+{% extends 'core/base.html' %}
+{% block title %}Ver Departamento: {{ departamento.nombre }}{% endblock %}
+
+{% block content %}
+<div class="content-header mb-4">
+    <h1 class="mb-1">Ver Departamento</h1>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0">{{ departamento.nombre }}</h5>
+    </div>
+    <div class="card-body">
+        <p>
+            <strong>Encargado:</strong> 
+            {{ departamento.encargado.get_full_name|default:departamento.encargado.username }}
+        </p>
+        <p>
+            <strong>Correo Encargado:</strong> 
+            {{ departamento.correo_encargado|default:"N/A" }}
+        </p>
+        <p>
+            <strong>Dirección (Padre):</strong> 
+            {{ departamento.direccion.nombre|default:"N/A" }}
+        </p>
+        <p>
+            <strong>Estado:</strong> 
+            {% if departamento.esta_activo %}
+                <span class="badge bg-success">Activo</span>
+            {% else %}
+                <span class="badge bg-danger">Inactivo</span>
+            {% endif %}
+        </p>
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'departamento_listar' %}" class="btn btn-secondary">Volver a la Lista</a>
+    </div>
+</div>
+{% endblock %}
