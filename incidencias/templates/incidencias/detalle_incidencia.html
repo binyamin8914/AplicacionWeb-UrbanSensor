@@ -1,24 +1,25 @@
 {% extends "core/base.html" %}
-{% block title %}Incidencia {{ incidencia.id }}{% endblock %}
-{% block content %}
-<h1>Incidencia #{{ incidencia.id }}</h1>
-<p><strong>Tipo:</strong> {{ incidencia.encuesta.tipo_incidencia.nombre }}</p>
-<p><strong>Descripción:</strong> {{ incidencia.descripcion }}</p>
-<p><strong>Dirección:</strong> {{ incidencia.encuesta.departamento.direccion.nombre }}</p>
-<p><strong>Departamento:</strong> {{ incidencia.encuesta.departamento.nombre }}</p>
-<p><strong>Estado:</strong> {{ incidencia.estado }}</p>
+{% block title %}Incidencia #{{ incidencia.id }}{% endblock %}
 
-<hr>
-<h3>Derivar a cuadrilla</h3>
-<form method="post">
-    {% csrf_token %}
-    <label for="cuadrilla">Seleccionar cuadrilla</label>
-    <select name="cuadrilla" id="cuadrilla">
-    <option value="">-- Seleccionar --</option>
-        {% for c in cuadrillas %}
-            <option value="{{ c.id }}" {% if incidencia.cuadrilla_id == c.id %}selected{% endif %}>{{ c.nombre }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit">Derivar</button>
-</form>
+{% block content %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h3>Incidencia #{{ incidencia.id }}</h3>
+    </div>
+    <div class="card-body">
+      <p><strong>Tipo:</strong> {{ incidencia.encuesta.tipo_incidencia.nombre }}</p>
+      <p><strong>Descripción:</strong> {{ incidencia.descripcion }}</p>
+      <p><strong>Dirección:</strong> {{ incidencia.encuesta.departamento.direccion.nombre }}</p>
+      <p><strong>Departamento:</strong> {{ incidencia.encuesta.departamento.nombre }}</p>
+      <p><strong>Estado:</strong> {{ incidencia.get_estado_display }}</p>
+
+      {# Aquí SOLO se ve el detalle, sin formulario de derivar #}
+
+      <a href="{% url 'gestion_incidencias' %}" class="btn btn-secondary mt-3">
+        Volver a incidencias
+      </a>
+    </div>
+  </div>
+</div>
 {% endblock %}

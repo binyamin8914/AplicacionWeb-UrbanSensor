@@ -31,7 +31,7 @@
             <hr> 
             
             <ul>
-                <!-- Opción común para todos los perfiles -->
+                {# Opción común para todos los perfiles: Dashboard #}
                 <li>
                     <a class="item_l" href="{% url 'dashboard' %}">
                         <span class="item_l_icon icon">󰕮</span>
@@ -39,6 +39,7 @@
                     </a>
                 </li>
                 
+                {# ================== SECPLA ================== #}
                 {% if group_name == "SECPLA" %}
                 <li>
                     <a class="item_l" href="{% url 'usuarios_listar' %}">
@@ -79,30 +80,24 @@
                 <li>
                     <a class="item_l" href="{% url 'listar_tipos_incidencia' %}">
                         <span class="item_l_icon icon"></span>
-                        <span class="item_l_texto">Gestion Tipo de Incidencias</span>
+                        <span class="item_l_texto">Gestión Tipo de Incidencias</span>
                     </a>
                 </li>
 
+                {# ================== TERRITORIAL ================== #}
                 {% elif group_name == "Territorial" %}
-                <!-- ===== MENÚ ESPECÍFICO PARA TERRITORIAL ===== -->
-
-                <!-- 1) Gestión / visualización de encuestas -->
                 <li>
                     <a class="item_l" href="{% url 'gestion_encuestas' %}">
                         <span class="item_l_icon icon"></span>
                         <span class="item_l_texto">Encuestas</span>
                     </a>
                 </li>
-
-                <!-- 2) Crear nueva solicitud / incidencia -->
                 <li>
                     <a class="item_l" href="{% url 'crear_incidencia' %}">
                         <span class="item_l_icon icon"></span>
                         <span class="item_l_texto">Crear solicitud / incidencia</span>
                     </a>
                 </li>
-
-                <!-- 3) Listado de incidencias del territorial -->
                 <li>
                     <a class="item_l" href="{% url 'gestion_incidencias' %}">
                         <span class="item_l_icon icon"></span>
@@ -110,8 +105,32 @@
                     </a>
                 </li>
 
+                {# ================== DIRECCIÓN ================== #}
+                {% elif group_name == "Direccion" %}
+                <li>
+                    <a class="item_l" href="{% url 'gestion_incidencias' %}">
+                        <span class="item_l_icon icon"></span>
+                        <span class="item_l_texto">Incidencias recibidas</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="item_l" href="{% url 'departamento_listar' %}">
+                        <span class="item_l_icon icon"></span>
+                        <span class="item_l_texto">Gestión de Departamentos</span>
+                    </a>
+                </li>
+
+                {# ================== DEPARTAMENTO ================== #}
+                {% elif group_name == "Departamento" %}
+                <li>
+                    <a class="item_l" href="{% url 'gestion_incidencias' %}">
+                        <span class="item_l_icon icon"></span>
+                        <span class="item_l_texto">Incidencias recibidas</span>
+                    </a>
+                </li>
+
+                {# ================== CUADRILLA ================== #}
                 {% elif group_name == "Cuadrilla" %}
-                <!-- Ejemplo: menú para cuadrilla, si lo llegas a usar -->
                 <li>
                     <a class="item_l" href="{% url 'gestion_incidencias' %}">
                         <span class="item_l_icon icon"></span>
