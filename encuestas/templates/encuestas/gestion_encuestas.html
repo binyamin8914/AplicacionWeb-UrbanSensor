@@ -1,48 +1,120 @@
-{% extends 'core/base.html' %}
+{% extends 'core/base.html' %} 
 {% block title %}Gestión de Encuestas{% endblock %}
+
 {% block content %}
+<div class="content-header">
+    <h1 class="mb-3">Gestión de Encuestas</h1>
+</div>
 
-<h4>Gestión de Encuestas</h4>
-<a href="{% url 'crear_encuesta' %}">Crear Nueva Encuesta</a>
-<br><br>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex">
+        
+        <div class="dropdown me-2">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-filter-left me-1"></i>
+                {% if f_estado %}{{ f_estado|capfirst }}{% else %}Estado{% endif %}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'gestion_encuestas' %}?estado=creado&prioridad={{ f_prioridad }}">Creado</a></li>
+                <li><a class="dropdown-item" href="{% url 'gestion_encuestas' %}?estado=vigente&prioridad={{ f_prioridad }}">Vigente</a></li>
+                <li><a class="dropdown-item" href="{% url 'gestion_encuestas' %}?estado=bloqueado&prioridad={{ f_prioridad }}">Bloqueado</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'gestion_encuestas' %}?prioridad={{ f_prioridad }}">Todos los Estados</a></li>
+            </ul>
+        </div>
+        
+        <div class="dropdown me-2">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                {% if f_prioridad %}{{ f_prioridad|capfirst }}{% else %}Prioridad{% endif %}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'gestion_encuestas' %}?estado={{ f_estado }}&prioridad=baja">Baja</a></li>
+                <li><a class="dropdown-item" href="{% url 'gestion_encuestas' %}?estado={{ f_estado }}&prioridad=normal">Normal</a></li>
+                <li><a class="dropdown-item" href="{% url 'gestion_encuestas' %}?estado={{ f_estado }}&prioridad=alta">Alta</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'gestion_encuestas' %}?estado={{ f_estado }}">Todas las Prioridades</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <a href="{% url 'crear_encuesta' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle-fill me-2"></i>
+        Crear Nueva Encuesta
+    </a>
+</div>
 
-<table border="1">
-    <thead class="table-dark">
-        <tr>
-          <th>Título</th>
-          <th>Estado</th>
-          <th>Prioridad</th>
-          <th>Departamento</th>
-          <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for encuesta in encuestas %}
-          <tr>
-            <td>{{ encuesta.titulo }}</td>
-            <td>
-                            {{ encuesta.get_estado_display }}
-            </td>
-            <td>
-                            {{ encuesta.get_prioridad_display }}
-            </td>
-            <td>{{ encuesta.departamento.nombre|default:"—" }}</td>
-            <td>
-                            <a href="{% url 'editar_encuesta' encuesta.id %}">Editar</a>
-              <a href="{% url 'eliminar_encuesta' encuesta.id %}">Eliminar</a>
-            </td>
-          </tr>
-        {% empty %}
-          <tr>
-                        <td colspan="5">
-              No hay encuestas registradas.
-            </td>
-          </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Título</th>
+                    <th scope="col">Tipo Incidencia</th>
+                    <th scope="col">Departamento</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Prioridad</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for encuesta in encuestas %}
+                <tr>
+                    <td>{{ encuesta.titulo }}</td>
+                    <td>{{ encuesta.tipo_incidencia.nombre|default:"N/A" }}</td>
+                    <td>{{ encuesta.departamento.nombre|default:"N/A" }}</td>
+                    <td>
+                        {% if encuesta.estado == 'vigente' %}
+                            <span class="badge bg-success">Vigente</span>
+                        {% elif encuesta.estado == 'bloqueado' %}
+                            <span class="badge bg-danger">Bloqueado</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Creado</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if encuesta.prioridad == 'alta' %}
+                            <span class="badge bg-danger">Alta</span>
+                        {% elif encuesta.prioridad == 'normal' %}
+                            <span class="badge bg-warning text-dark">Normal</span>
+                        {% else %}
+                            <span class="badge bg-info">Baja</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-nowrap">
+                        <a href="{% url 'editar_encuesta' encuesta.id %}" class="btn btn-sm btn-secondary">Editar</a>
+                        <a href="{% url 'eliminar_encuesta' encuesta.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted fst-italic p-4">
+                        No hay encuestas registradas. (Intenta limpiar los filtros)
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-<br>
-<a href="{% url 'dashboard' %}">Volver al Menú Principal</a>
-
+{% if encuestas.has_other_pages %}
+<nav aria-label="Navegación de páginas" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if encuestas.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1&estado={{ f_estado }}&prioridad={{ f_prioridad }}">&laquo; Primera</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ encuestas.previous_page_number }}&estado={{ f_estado }}&prioridad={{ f_prioridad }}">Anterior</a></li>
+        {% endif %}
+        
+        <li class="page-item active" aria-current="page">
+            <span class="page-link">Página {{ encuestas.number }} de {{ encuestas.paginator.num_pages }}</span>
+        </li>
+        
+        {% if encuestas.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ encuestas.next_page_number }}&estado={{ f_estado }}&prioridad={{ f_prioridad }}">Siguiente</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ encuestas.paginator.num_pages }}&estado={{ f_estado }}&prioridad={{ f_prioridad }}">Última &raquo;</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
 {% endblock %}

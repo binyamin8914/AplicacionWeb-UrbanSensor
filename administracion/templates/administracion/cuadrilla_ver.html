@@ -1,7 +1,35 @@
-<h4>Ver Cuadrilla</h4>
-<a href="{% url 'administracion:cuadrilla_listar' %}">Volver</a>
-<hr>
-<p><b>Nombre Cuadrilla:</b> {{ cuadrilla.nombre }}</p>
-<p><b>Encargado:</b> {{ cuadrilla.encargado.get_full_name }}</p>
-<p><b>Departamento:</b> {{ cuadrilla.departamento.nombre }}</p>
-<p><b>Estado:</b> {% if cuadrilla.esta_activa %}Activa{% else %}Bloqueada{% endif %}</p>
+{% extends 'core/base.html' %}
+{% block title %}Ver Cuadrilla: {{ cuadrilla.nombre }}{% endblock %}
+
+{% block content %}
+<div class="content-header mb-4">
+    <h1 class="mb-1">Ver Cuadrilla</h1>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0">{{ cuadrilla.nombre }}</h5>
+    </div>
+    <div class="card-body">
+        <p>
+            <strong>Encargado:</strong> 
+            {{ cuadrilla.encargado.get_full_name|default:cuadrilla.encargado.username }}
+        </p>
+        <p>
+            <strong>Departamento (Padre):</strong> 
+            {{ cuadrilla.departamento.nombre|default:"N/A" }}
+        </p>
+        <p>
+            <strong>Estado:</strong> 
+            {% if cuadrilla.esta_activa %}
+                <span class="badge bg-success">Activo</span>
+            {% else %}
+                <span class="badge bg-danger">Inactivo</span>
+            {% endif %}
+        </p>
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'cuadrilla_listar' %}" class="btn btn-secondary">Volver a la Lista</a>
+    </div>
+</div>
+{% endblock %}
