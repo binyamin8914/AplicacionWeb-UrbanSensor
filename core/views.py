@@ -46,3 +46,7 @@ def dashboard(request):
         "group_name": group_name,
         "profile": profile,
     })
+
+def territorial_crear_incidencia(request):
+    # Redirige a la vista real de crear incidencia que ya tienes en la app incidencias
+    return redirect('crear_incidencia')

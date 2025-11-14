@@ -1,50 +1,100 @@
-{% extends "core/base.html" %}
-{% load static %}
-{% block title %}Gestión de Departamentos{% endblock %}
-{% block css_adicional %}
-    <link rel="stylesheet" href="{% static 'includes/css/list.css' %}">
-{% endblock %}
+{% extends 'core/base.html' %}
+{% block title %}{{ titulo }}{% endblock %}
 
 {% block content %}
+<div class="content-header">
+    <h1 class="mb-3">{{ titulo }}</h1>
+</div>
 
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex">
+        <div class="dropdown me-2">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-filter-left me-1"></i>
+                {% if current_filtro_estado %}{{ current_filtro_estado }}{% else %}Estado{% endif %}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'departamento_listar' %}?estado=Activo&direccion={{ current_filtro_direccion|default:'' }}">Activo</a></li>
+                <li><a class="dropdown-item" href="{% url 'departamento_listar' %}?estado=Inactivo&direccion={{ current_filtro_direccion|default:'' }}">Inactivo</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'departamento_listar' %}?direccion={{ current_filtro_direccion|default:'' }}">Todos los Estados</a></li>
+            </ul>
+        </div>
+        
+        <div class="dropdown me-2">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-building me-1"></i>
+                {% if current_filtro_direccion %}
+                    {{ departamentos.0.direccion.nombre }} {% else %}
+                    Dirección
+                {% endif %}
+            </button>
+            <ul class="dropdown-menu">
+                {% for dir in direcciones_filtro %}
+                <li><a class="dropdown-item" href="{% url 'departamento_listar' %}?estado={{ current_filtro_estado|default:'' }}&direccion={{ dir.id }}">{{ dir.nombre }}</a></li>
+                {% endfor %}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'departamento_listar' %}?estado={{ current_filtro_estado|default:'' }}">Todas las Direcciones</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <a href="{% url 'departamento_crear' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle-fill me-2"></i>
+        Nuevo Departamento
+    </a>
+</div>
 
-{% include "includes/list.html" with titulo=titulo url=url titulos=titulos filas=filas tieneAcciones=tieneAcciones descripcion=descripcion filtros=filtros %}
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nombre Departamento</th>
+                    <th scope="col">Encargado</th>
+                    <th scope="col">Correo Encargado</th>
+                    <th scope="col">Dirección (Padre)</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for depto in departamentos %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ depto.nombre }}</td>
+                    <td>{{ depto.encargado.get_full_name|default:depto.encargado.username|default:"N/A" }}</td>
+                    <td>{{ depto.correo_encargado|default:"N/A" }}</td>
+                    <td>{{ depto.direccion.nombre|default:"N/A" }}</td>
+                    <td>
+                        {% if depto.esta_activo %}
+                        <span class="badge bg-success">Activo</span>
+                        {% else %}
+                        <span class="badge bg-danger">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-nowrap">
+                        <a href="{% url 'departamento_ver' depto.id %}" class="btn btn-sm btn-secondary">Ver</a>
+                        <a href="{% url 'departamento_actualizar' depto.id %}" class="btn btn-sm btn-secondary">Editar</a>
+                        <a href="{% url 'departamento_bloquear' depto.id %}" class="btn btn-sm {% if depto.esta_activo %}btn-danger{% else %}btn-success{% endif %}">
+                            {% if depto.esta_activo %}Desactivar{% else %}Activar{% endif %}
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted fst-italic p-4">
+                        No hay departamentos registrados. (Intenta limpiar los filtros)
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-
-<!-- <h4>Gestión de Departamentos</h4>
-<a href="{% url 'departamento_actualizar' %}">Nuevo Departamento</a>
-<br><br>
-<table border="1">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Nombre Departamento</th>
-            <th>Encargado</th>
-            <th>Correo Encargado</th>
-            <th>Dirección</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for departamento in departamentos %}
-        <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ departamento.nombre }}</td>
-            <td>{{ departamento.encargado.get_full_name }}</td>
-            <td>{{ departamento.correo_encargado }}</td>
-            <td>{{ departamento.direccion.nombre }}</td>
-            <td>{% if departamento.esta_activo %}Activo{% else %}Bloqueado{% endif %}</td>
-            <td>
-                <a href="{% url 'departamento_ver' departamento.id %}">Ver</a>
-                <a href="{% url 'departamento_actualizar' departamento.id %}">Editar</a>
-                <a href="{% url 'departamento_bloquear' departamento.id %}">
-                    {% if departamento.esta_activo %}Bloquear{% else %}Activar{% endif %}
-                </a>
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-<a href="{% url 'dashboard' %}">Volver al Menú Principal</a> -->
+<a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">
+    Volver al Menú Principal
+</a>
 {% endblock %}
