@@ -30,8 +30,8 @@ urlpatterns = [
     path('cuadrillas/', include('cuadrillas.urls')),
 
     # Otras apps
-    path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('registration.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('encuestas/', include('encuestas.urls')),
-    path('incidencias/', include('incidencias.urls')),
+    path('incidencias/',include('incidencias.urls')),
 ]
