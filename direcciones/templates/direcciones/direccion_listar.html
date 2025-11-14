@@ -34,7 +34,6 @@
                     <th scope="col">#</th>
                     <th scope="col">Nombre</th>
                     <th scope="col">Encargado</th>
-                    <th scope="col">Correo Encargado</th>
                     <th scope="col">Estado</th>
                     <th scope="col">Acciones</th>
                 </tr>
@@ -45,7 +44,6 @@
                     <td>{{ forloop.counter }}</td>
                     <td>{{ dir.nombre }}</td>
                     <td>{{ dir.encargado.get_full_name|default:dir.encargado.username|default:"N/A" }}</td>
-                    <td>{{ dir.correo_encargado|default:"N/A" }}</td>
                     <td>
                         {% if dir.esta_activa %}
                         <span class="badge bg-success">Activo</span>

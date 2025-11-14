@@ -1,10 +1,7 @@
 from django import forms
-from .models import Encuesta, CamposAdicionales
+from .models import Encuesta, CamposAdicionales, TipoIncidencia
 from departamentos.models import Departamento
-from incidencias.models import TipoIncidencia
 from django.forms import inlineformset_factory
-
-print("¡¡CARGANDO FORMS.PY DE ENCUESTAS!! (Versión 4, 'orden' no obligatorio)")
 
 # --- FORMULARIO PRINCIPAL DE LA ENCUESTA ---
 class EncuestaForm(forms.ModelForm):
@@ -14,11 +11,6 @@ class EncuestaForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-select'}),
         empty_label="Seleccione un tipo de incidencia",
         label="Tipo de incidencia"
-    )
-    departamento = forms.ModelChoiceField(
-        queryset=Departamento.objects.all(), 
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        empty_label="Seleccione un departamento"
     )
     class Meta:
         model = Encuesta
@@ -31,8 +23,6 @@ class EncuestaForm(forms.ModelForm):
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        activos = Departamento.objects.filter(esta_activo=True).order_by('nombre')
-        self.fields['departamento'].queryset = activos if activos.exists() else Departamento.objects.all().order_by('nombre')
 
 
 # --- FORMULARIO PARA LOS CAMPOS ADICIONALES ---
@@ -59,6 +49,31 @@ class CampoAdicionalForm(forms.ModelForm):
             'titulo': 'Etiqueta del Campo',
             'es_obligatoria': '¿Es obligatorio?',
         }
+
+class TipoIncidenciaForm(forms.Form):
+    """
+    Formulario manual para gestionar los Tipos de Incidencia.
+    """
+    nombre = forms.CharField(
+        label="Nombre del Tipo de Incidencia",
+        max_length=255,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: Fuga de agua'
+            }
+        )
+    )
+    descripcion = forms.CharField(
+        label="Descripción Breve",
+        max_length=255,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    departamento = forms.ModelChoiceField(
+        label="Departamento Responsable",
+        queryset=Departamento.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
 
 
 # --- EL "CONJUNTO DE FORMULARIOS" (FORMSET) ---

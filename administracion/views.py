@@ -3,12 +3,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
-from direcciones.models import Direccion
 from registration.models import Profile
+from direcciones.models import Direccion
 
 
 # ===================================================================
-# --- CRUD DE USUARIOS 
+# --- VISTAS DE USUARIOS (ÚNICO QUE QUEDA EN ESTA APP) ---
 # ===================================================================
 @login_required
 def usuarios_listar(request):

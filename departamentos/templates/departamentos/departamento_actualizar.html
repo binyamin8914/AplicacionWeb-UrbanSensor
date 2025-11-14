@@ -58,13 +58,6 @@
                             {% endfor %}
                         </select>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="correo_encargado" class="form-label">Correo del Encargado</label>
-                        <input type="email" class="form-control" id="correo_encargado" name="correo_encargado" 
-                               value="{% if departamento %}{{ departamento.correo_encargado }}{% endif %}" required>
-                    </div>
-
                     <div class="d-flex justify-content-between mt-4">
                         <button type="submit" class="btn btn-primary">
                             {% if departamento %}Actualizar{% else %}Crear{% endif %}

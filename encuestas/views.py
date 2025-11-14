@@ -6,11 +6,121 @@ from django.db import transaction # <-- Importamos transaction
 from django.db import IntegrityError # <-- (Ya lo teníamos)
 
 from registration.models import Profile
-from .models import Encuesta
+from .models import Encuesta, TipoIncidencia
 # --- Importamos los forms y models necesarios ---
-from .forms import EncuestaForm, CamposAdicionalesFormSet
-from departamentos.models import Departamento
-from incidencias.models import TipoIncidencia
+from .forms import EncuestaForm, CamposAdicionalesFormSet, TipoIncidenciaForm
+
+# ---------------------------------------------------------------------
+# Helpers de rol / permiso
+# ---------------------------------------------------------------------
+def get_group_name(user):
+    try:
+        return user.profile.group.name
+    except Exception:
+        return None
+
+def is_secpla(user):
+    return get_group_name(user) == "SECPLA"
+
+def is_territorial(user):
+    return get_group_name(user) == "Territorial"
+
+def is_departamento(user):
+    return get_group_name(user) == "Departamento"
+
+def is_direccion(user):
+    return get_group_name(user) == "Direccion"
+
+def is_cuadrilla(user):
+    return get_group_name(user) == "Cuadrilla"
+
+# ---------------------------------------------------------------------
+# Tipos de Incidencia (SECPLA y Direccion pueden crear/editar/eliminar)
+# ---------------------------------------------------------------------
+@login_required
+def listar_tipos_incidencia(request):
+    tipos = TipoIncidencia.objects.select_related('departamento').all().order_by('nombre')
+    return render(request, 'encuestas/listar_tipos_incidencia.html', {
+        'tipos': tipos,
+        'group_name': get_group_name(request.user)
+    })
+
+
+@login_required
+def crear_tipo_incidencia(request):
+    if not (is_secpla(request.user) or is_direccion(request.user)):
+        messages.error(request, "No tienes permisos para crear tipos de incidencia.")
+        return redirect('listar_tipos_incidencia')
+
+    if request.method == 'POST':
+        form = TipoIncidenciaForm(request.POST)
+        if form.is_valid():
+            datos = form.cleaned_data
+            TipoIncidencia.objects.create(
+                nombre=datos['nombre'],
+                descripcion=datos['descripcion'],
+                departamento=datos['departamento']
+            )
+            messages.success(request, 'Tipo de incidencia creado exitosamente.')
+            return redirect('listar_tipos_incidencia')
+    else:
+        form = TipoIncidenciaForm()
+
+    return render(request, 'encuestas/crear_tipo_incidencia.html', {
+        'form': form,
+        'titulo_pagina': 'Crear Tipo de Incidencia',
+        'group_name': get_group_name(request.user)
+    })
+
+
+@login_required
+def editar_tipo_incidencia(request, tipo_id):
+    tipo = get_object_or_404(TipoIncidencia, id=tipo_id)
+    if not (is_secpla(request.user) or is_direccion(request.user)):
+        messages.error(request, "No tienes permisos para editar tipos de incidencia.")
+        return redirect('listar_tipos_incidencia')
+
+    if request.method == 'POST':
+        form = TipoIncidenciaForm(request.POST)
+        if form.is_valid():
+            datos = form.cleaned_data
+            tipo.nombre = datos['nombre']
+            tipo.descripcion = datos['descripcion']
+            tipo.departamento = datos['departamento']
+            tipo.save()
+            messages.success(request, 'Tipo de incidencia actualizado.')
+            return redirect('listar_tipos_incidencia')
+    else:
+        form = TipoIncidenciaForm(initial={
+            'nombre': tipo.nombre,
+            'descripcion': tipo.descripcion,
+            'departamento': tipo.departamento
+        })
+
+    return render(request, 'encuestas/crear_tipo_incidencia.html', {
+        'form': form,
+        'titulo_pagina': 'Editar Tipo de Incidencia',
+        'group_name': get_group_name(request.user)
+    })
+
+
+@login_required
+def eliminar_tipo_incidencia(request, tipo_id):
+    tipo = get_object_or_404(TipoIncidencia, id=tipo_id)
+    if not (is_secpla(request.user) or is_direccion(request.user)):
+        messages.error(request, "No tienes permisos para eliminar tipos de incidencia.")
+        return redirect('listar_tipos_incidencia')
+
+    if request.method == 'POST':
+        tipo.delete()
+        messages.success(request, 'Tipo de incidencia eliminado.')
+        return redirect('listar_tipos_incidencia')
+
+    return render(request, 'encuestas/confirmar_eliminar.html', {
+        'objeto': tipo,
+        'titulo_objeto': 'Tipo de Incidencia',
+        'group_name': get_group_name(request.user)
+    })
 
 
 @login_required
@@ -22,7 +132,7 @@ def gestion_encuestas(request):
     profile = Profile.objects.get(user=request.user)
     qs = (
         Encuesta.objects
-        .select_related('departamento', 'tipo_incidencia')
+        .select_related('tipo_incidencia')
         .order_by('-id')
     )
 

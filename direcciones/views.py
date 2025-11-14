@@ -59,7 +59,7 @@ def direccion_actualizar(request, direccion_id=None):
     if request.method == "POST":
         nombre = request.POST.get("nombre")
         encargado_id = request.POST.get("encargado")
-        correo_encargado = request.POST.get("correo_encargado")
+        # correo_encargado = request.POST.get("correo_encargado")
 
         if not nombre or not encargado_id:
             messages.error(request, "Nombre y Encargado son obligatorios.")
@@ -70,7 +70,7 @@ def direccion_actualizar(request, direccion_id=None):
                     # Actualizar
                     direccion.nombre = nombre
                     direccion.encargado = encargado
-                    direccion.correo_encargado = correo_encargado
+                    # direccion.correo_encargado = correo_encargado
                     direccion.save()
                     messages.success(request, "¡Dirección actualizada con éxito!")
                 else:
@@ -78,7 +78,7 @@ def direccion_actualizar(request, direccion_id=None):
                     Direccion.objects.create(
                         nombre=nombre,
                         encargado=encargado,
-                        correo_encargado=correo_encargado,
+                        # correo_encargado=correo_encargado,
                         esta_activa=True,
                     )
                     messages.success(request, "¡Dirección creada con éxito!")

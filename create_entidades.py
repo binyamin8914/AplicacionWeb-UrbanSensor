@@ -55,7 +55,6 @@ def create_direcciones(direcciones):
                 nombre=d['nombre'],
                 defaults={
                     'encargado': encargado,
-                    'correo_encargado': d.get('correo_encargado', ''),
                     'esta_activa': d.get('esta_activa', True)
                 }
             )
@@ -98,7 +97,6 @@ def create_departamentos(departamentos):
                 nombre=dep['nombre'],
                 defaults={
                     'encargado': encargado,
-                    'correo_encargado': dep.get('correo_encargado', ''),
                     'direccion': direccion,
                     'esta_activo': dep.get('esta_activo', True)
                 }
@@ -153,27 +151,27 @@ def create_cuadrillas(cuadrillas):
 def create_all():
     # Datos de ejemplo ampliados: adapta nombres/email/usuarios según necesites
     direcciones = [
-        {'nombre': 'Direccion de Obras', 'encargado_username': 'direccion_user1', 'correo_encargado': 'direccion1@mail.com', 'esta_activa': True},
-        {'nombre': 'Direccion de Medio Ambiente', 'encargado_username': 'direccion_user2', 'correo_encargado': 'direccion2@mail.com', 'esta_activa': True},
-        {'nombre': 'Direccion de Salud', 'encargado_username': 'direccion_user3', 'correo_encargado': 'direccion3@mail.com', 'esta_activa': True},
-        {'nombre': 'Direccion de Transporte', 'encargado_username': 'direccion_user4', 'correo_encargado': 'direccion4@mail.com', 'esta_activa': True},
-        {'nombre': 'Direccion de Cultura', 'encargado_username': 'direccion_user5', 'correo_encargado': 'direccion5@mail.com', 'esta_activa': True},
-        {'nombre': 'Direccion de Seguridad', 'encargado_username': 'direccion_user6', 'correo_encargado': 'direccion6@mail.com', 'esta_activa': True},
-        {'nombre': 'Direccion de Desarrollo Urbano', 'encargado_username': 'direccion_user7', 'correo_encargado': 'direccion7@mail.com', 'esta_activa': True},
-        {'nombre': 'Direccion de Parques y Jardines', 'encargado_username': 'direccion_user8', 'correo_encargado': 'direccion8@mail.com', 'esta_activa': True},
+        {'nombre': 'Direccion de Obras', 'encargado_username': 'direccion_user1', 'esta_activa': True},
+        {'nombre': 'Direccion de Medio Ambiente', 'encargado_username': 'direccion_user2', 'esta_activa': True},
+        {'nombre': 'Direccion de Salud', 'encargado_username': 'direccion_user3', 'esta_activa': True},
+        {'nombre': 'Direccion de Transporte', 'encargado_username': 'direccion_user4', 'esta_activa': True},
+        {'nombre': 'Direccion de Cultura', 'encargado_username': 'direccion_user5', 'esta_activa': True},
+        {'nombre': 'Direccion de Seguridad', 'encargado_username': 'direccion_user6', 'esta_activa': True},
+        {'nombre': 'Direccion de Desarrollo Urbano', 'encargado_username': 'direccion_user7', 'esta_activa': True},
+        {'nombre': 'Direccion de Parques y Jardines', 'encargado_username': 'direccion_user8', 'esta_activa': True},
     ]
 
     departamentos = [
-        {'nombre': 'Departamento de Vialidad', 'encargado_username': 'departamento_user1', 'correo_encargado': 'departamento1@mail.com', 'direccion_nombre': 'Direccion de Obras', 'esta_activo': True},
-        {'nombre': 'Departamento de Recoleccion', 'encargado_username': 'departamento_user2', 'correo_encargado': 'departamento2@mail.com', 'direccion_nombre': 'Direccion de Medio Ambiente', 'esta_activo': True},
-        {'nombre': 'Departamento de Epidemiologia', 'encargado_username': 'departamento_user3', 'correo_encargado': 'departamento3@mail.com', 'direccion_nombre': 'Direccion de Salud', 'esta_activo': True},
-        {'nombre': 'Departamento de Señalizacion', 'encargado_username': 'departamento_user4', 'correo_encargado': 'departamento4@mail.com', 'direccion_nombre': 'Direccion de Transporte', 'esta_activo': True},
-        {'nombre': 'Departamento de Patrimonio', 'encargado_username': 'departamento_user5', 'correo_encargado': 'departamento5@mail.com', 'direccion_nombre': 'Direccion de Cultura', 'esta_activo': True},
-        {'nombre': 'Departamento de Prevencion', 'encargado_username': 'departamento_user6', 'correo_encargado': 'departamento6@mail.com', 'direccion_nombre': 'Direccion de Seguridad', 'esta_activo': True},
-        {'nombre': 'Departamento de Planificacion', 'encargado_username': 'departamento_user7', 'correo_encargado': 'departamento7@mail.com', 'direccion_nombre': 'Direccion de Desarrollo Urbano', 'esta_activo': True},
-        {'nombre': 'Departamento de Mantenimiento de Parques', 'encargado_username': 'departamento_user8', 'correo_encargado': 'departamento8@mail.com', 'direccion_nombre': 'Direccion de Parques y Jardines', 'esta_activo': True},
-        {'nombre': 'Departamento de Alumbrado', 'encargado_username': 'departamento_user9', 'correo_encargado': 'departamento9@mail.com', 'direccion_nombre': 'Direccion de Obras', 'esta_activo': True},
-        {'nombre': 'Departamento de Limpieza', 'encargado_username': 'departamento_user10', 'correo_encargado': 'departamento10@mail.com', 'direccion_nombre': 'Direccion de Medio Ambiente', 'esta_activo': True},
+        {'nombre': 'Departamento de Vialidad', 'encargado_username': 'departamento_user1', 'direccion_nombre': 'Direccion de Obras', 'esta_activo': True},
+        {'nombre': 'Departamento de Recoleccion', 'encargado_username': 'departamento_user2', 'direccion_nombre': 'Direccion de Medio Ambiente', 'esta_activo': True},
+        {'nombre': 'Departamento de Epidemiologia', 'encargado_username': 'departamento_user3', 'direccion_nombre': 'Direccion de Salud', 'esta_activo': True},
+        {'nombre': 'Departamento de Señalizacion', 'encargado_username': 'departamento_user4', 'direccion_nombre': 'Direccion de Transporte', 'esta_activo': True},
+        {'nombre': 'Departamento de Patrimonio', 'encargado_username': 'departamento_user5', 'direccion_nombre': 'Direccion de Cultura', 'esta_activo': True},
+        {'nombre': 'Departamento de Prevencion', 'encargado_username': 'departamento_user6', 'direccion_nombre': 'Direccion de Seguridad', 'esta_activo': True},
+        {'nombre': 'Departamento de Planificacion', 'encargado_username': 'departamento_user7', 'direccion_nombre': 'Direccion de Desarrollo Urbano', 'esta_activo': True},
+        {'nombre': 'Departamento de Mantenimiento de Parques', 'encargado_username': 'departamento_user8', 'direccion_nombre': 'Direccion de Parques y Jardines', 'esta_activo': True},
+        {'nombre': 'Departamento de Alumbrado', 'encargado_username': 'departamento_user9', 'direccion_nombre': 'Direccion de Obras', 'esta_activo': True},
+        {'nombre': 'Departamento de Limpieza', 'encargado_username': 'departamento_user10', 'direccion_nombre': 'Direccion de Medio Ambiente', 'esta_activo': True},
     ]
 
     cuadrillas = [
