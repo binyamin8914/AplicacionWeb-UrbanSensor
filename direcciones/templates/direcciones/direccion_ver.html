@@ -6,6 +6,5 @@
 <hr>
 <p><b>Nombre Dirección:</b> {{ direccion.nombre }}</p>
 <p><b>Encargado:</b> {{ direccion.encargado.get_full_name }}</p>
-<p><b>Correo Encargado:</b> {{ direccion.correo_encargado }}</p>
 <p><b>Estado:</b> {% if direccion.esta_activa %}Activa{% else %}Bloqueada{% endif %}</p>
 {% endblock %}

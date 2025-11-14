@@ -1,36 +1,9 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from departamentos.models import Departamento
 from cuadrillas.models import Cuadrilla
-from encuestas.models import Encuesta, Vecino
-from .models import Incidencia
-
-
-class TipoIncidenciaForm(forms.Form):
-    """
-    Formulario manual para gestionar los Tipos de Incidencia.
-    """
-    nombre = forms.CharField(
-        label="Nombre del Tipo de Incidencia",
-        max_length=255,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'form-control',
-                'placeholder': 'Ej: Fuga de agua'
-            }
-        )
-    )
-    descripcion = forms.CharField(
-        label="Descripción Breve",
-        max_length=255,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    departamento = forms.ModelChoiceField(
-        label="Departamento Responsable",
-        queryset=Departamento.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
+from encuestas.models import Encuesta
+from .models import Incidencia, Vecino
 
 
 class IncidenciaForm(forms.Form):

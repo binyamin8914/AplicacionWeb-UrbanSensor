@@ -6,9 +6,8 @@ from django.http import JsonResponse
 from registration.models import Profile
 from cuadrillas.models import Cuadrilla
 from departamentos.models import Departamento
-from encuestas.models import Encuesta
-from .models import Incidencia, TipoIncidencia
-from .forms import IncidenciaForm, TipoIncidenciaForm
+from .models import Incidencia
+from .forms import IncidenciaForm
 from django.core.exceptions import ObjectDoesNotExist
 
 # ---------------------------------------------------------------------
@@ -35,94 +34,6 @@ def is_direccion(user):
 def is_cuadrilla(user):
     return get_group_name(user) == "Cuadrilla"
 
-# ---------------------------------------------------------------------
-# Tipos de Incidencia (SECPLA y Direccion pueden crear/editar/eliminar)
-# ---------------------------------------------------------------------
-@login_required
-def listar_tipos_incidencia(request):
-    tipos = TipoIncidencia.objects.select_related('departamento').all().order_by('nombre')
-    return render(request, 'incidencias/listar_tipos_incidencia.html', {
-        'tipos': tipos,
-        'group_name': get_group_name(request.user)
-    })
-
-
-@login_required
-def crear_tipo_incidencia(request):
-    if not (is_secpla(request.user) or is_direccion(request.user)):
-        messages.error(request, "No tienes permisos para crear tipos de incidencia.")
-        return redirect('listar_tipos_incidencia')
-
-    if request.method == 'POST':
-        form = TipoIncidenciaForm(request.POST)
-        if form.is_valid():
-            datos = form.cleaned_data
-            TipoIncidencia.objects.create(
-                nombre=datos['nombre'],
-                descripcion=datos['descripcion'],
-                departamento=datos['departamento']
-            )
-            messages.success(request, 'Tipo de incidencia creado exitosamente.')
-            return redirect('listar_tipos_incidencia')
-    else:
-        form = TipoIncidenciaForm()
-
-    return render(request, 'incidencias/crear_tipo_incidencia.html', {
-        'form': form,
-        'titulo_pagina': 'Crear Tipo de Incidencia',
-        'group_name': get_group_name(request.user)
-    })
-
-
-@login_required
-def editar_tipo_incidencia(request, tipo_id):
-    tipo = get_object_or_404(TipoIncidencia, id=tipo_id)
-    if not (is_secpla(request.user) or is_direccion(request.user)):
-        messages.error(request, "No tienes permisos para editar tipos de incidencia.")
-        return redirect('listar_tipos_incidencia')
-
-    if request.method == 'POST':
-        form = TipoIncidenciaForm(request.POST)
-        if form.is_valid():
-            datos = form.cleaned_data
-            tipo.nombre = datos['nombre']
-            tipo.descripcion = datos['descripcion']
-            tipo.departamento = datos['departamento']
-            tipo.save()
-            messages.success(request, 'Tipo de incidencia actualizado.')
-            return redirect('listar_tipos_incidencia')
-    else:
-        form = TipoIncidenciaForm(initial={
-            'nombre': tipo.nombre,
-            'descripcion': tipo.descripcion,
-            'departamento': tipo.departamento
-        })
-
-    return render(request, 'incidencias/crear_tipo_incidencia.html', {
-        'form': form,
-        'titulo_pagina': 'Editar Tipo de Incidencia',
-        'group_name': get_group_name(request.user)
-    })
-
-
-@login_required
-def eliminar_tipo_incidencia(request, tipo_id):
-    tipo = get_object_or_404(TipoIncidencia, id=tipo_id)
-    if not (is_secpla(request.user) or is_direccion(request.user)):
-        messages.error(request, "No tienes permisos para eliminar tipos de incidencia.")
-        return redirect('listar_tipos_incidencia')
-
-    if request.method == 'POST':
-        tipo.delete()
-        messages.success(request, 'Tipo de incidencia eliminado.')
-        return redirect('listar_tipos_incidencia')
-
-    return render(request, 'incidencias/confirmar_eliminar.html', {
-        'objeto': tipo,
-        'titulo_objeto': 'Tipo de Incidencia',
-        'group_name': get_group_name(request.user)
-    })
-
 
 # ---------------------------------------------------------------------
 # Gestión unificada de Incidencias (muestra y flags para template)
@@ -140,26 +51,26 @@ def gestion_incidencias(request):
     if group_name == "SECPLA":
         return redirect('secpla_dashboard')
     elif group_name == "Territorial":
-        incidencias = Incidencia.objects.select_related('encuesta__departamento__direccion').filter(territorial=request.user).order_by('-created_at')
+        incidencias = Incidencia.objects.select_related('encuesta__tipo_incidencia__departamento__direccion').filter(territorial=request.user).order_by('-created_at')
         context_counts = {}
     elif group_name == "Departamento":
         departamento = Departamento.objects.filter(encargado=request.user).first()
         if not departamento:
             incidencias = Incidencia.objects.none()
         else:
-            incidencias = Incidencia.objects.select_related('encuesta__departamento').filter(encuesta__departamento=departamento).order_by('-created_at')
+            incidencias = Incidencia.objects.select_related('encuesta__tipo_incidencia__departamento').filter(encuesta__tipo_incidencia__departamento=departamento).order_by('-created_at')
     elif group_name == "Direccion":
         direccion = getattr(request.user, 'direccion_encargada', None)
         if not direccion:
             incidencias = Incidencia.objects.none()
         else:
-            incidencias = Incidencia.objects.select_related('encuesta__departamento__direccion').filter(encuesta__departamento__direccion=direccion).order_by('-created_at')
+            incidencias = Incidencia.objects.select_related('encuesta__tipo_incidencia__departamento__direccion').filter(encuesta__tipo_incidencia__departamento__direccion=direccion).order_by('-created_at')
     elif group_name == "Cuadrilla":
         cuadrilla = Cuadrilla.objects.filter(encargado=request.user).first()
         if not cuadrilla:
             incidencias = Incidencia.objects.none()
         else:
-            incidencias = Incidencia.objects.select_related('encuesta__departamento__direccion', 'cuadrilla').filter(cuadrilla=cuadrilla).order_by('-created_at')
+            incidencias = Incidencia.objects.select_related('encuesta__tipo_incidencia__departamento__direccion', 'cuadrilla').filter(cuadrilla=cuadrilla).order_by('-created_at')
     else:
         incidencias = Incidencia.objects.none()
 

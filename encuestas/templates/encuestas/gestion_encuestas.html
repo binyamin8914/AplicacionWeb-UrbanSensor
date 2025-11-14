@@ -51,7 +51,6 @@
                 <tr>
                     <th scope="col">Título</th>
                     <th scope="col">Tipo Incidencia</th>
-                    <th scope="col">Departamento</th>
                     <th scope="col">Estado</th>
                     <th scope="col">Prioridad</th>
                     <th scope="col">Acciones</th>
@@ -62,7 +61,6 @@
                 <tr>
                     <td>{{ encuesta.titulo }}</td>
                     <td>{{ encuesta.tipo_incidencia.nombre|default:"N/A" }}</td>
-                    <td>{{ encuesta.departamento.nombre|default:"N/A" }}</td>
                     <td>
                         {% if encuesta.estado == 'vigente' %}
                             <span class="badge bg-success">Vigente</span>

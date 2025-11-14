@@ -2,12 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # CRUD Tipos de incidencia
-    path('tipos/', views.listar_tipos_incidencia, name='listar_tipos_incidencia'),
-    path('tipos/crear/', views.crear_tipo_incidencia, name='crear_tipo_incidencia'),
-    path('tipos/editar/<int:tipo_id>/', views.editar_tipo_incidencia, name='editar_tipo_incidencia'),
-    path('tipos/eliminar/<int:tipo_id>/', views.eliminar_tipo_incidencia, name='eliminar_tipo_incidencia'),
-
     # Gestión de incidencias (listado unificado según rol)
     path('gestion/', views.gestion_incidencias, name='gestion_incidencias'),
 

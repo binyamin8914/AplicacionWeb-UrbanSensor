@@ -1,16 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-# from departamentos.models import Departamento
 from encuestas.models import CamposAdicionales
 from cuadrillas.models import Cuadrilla
-
-# class TipoIncidencia(models.Model):
-#     nombre = models.CharField(max_length=255)
-#     descripcion = models.CharField(max_length=255)
-#     departamento = models.ForeignKey(Departamento, on_delete=models.PROTECT)
-
-#     def __str__(self):
-#         return self.nombre
 
 class Vecino(models.Model):
     nombre = models.CharField(max_length=255)
@@ -32,7 +23,6 @@ class Incidencia(models.Model):
     ]
     encuesta = models.ForeignKey('encuestas.Encuesta', on_delete=models.PROTECT)
     vecino = models.ForeignKey(Vecino, on_delete=models.PROTECT, null=True, blank=True)
-    # Ver la opcion de cambiar User a Profile, ya que Profile contiene el grupo del usuario
     territorial = models.ForeignKey(User, on_delete=models.PROTECT, related_name='incidencias_territorial')
     cuadrilla = models.ForeignKey(Cuadrilla, on_delete=models.PROTECT, null=True, blank=True)
     descripcion = models.CharField(max_length=255)
@@ -50,7 +40,6 @@ class Evidencia(models.Model):
     incidencia = models.ForeignKey(Incidencia, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=50)
     descripcion = models.CharField(max_length=255)
-    # usuario = models.ForeignKey(User, on_delete=models.PROTECT)
     fecha_subida = models.DateTimeField(auto_now_add=True)
     archivo = models.FileField(upload_to='evidencias/')
 

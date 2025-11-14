@@ -65,7 +65,7 @@ def departamento_actualizar(request, departamento_id=None):
     if request.method == "POST":
         nombre = request.POST.get("nombre")
         encargado_id = request.POST.get("encargado")
-        correo_encargado = request.POST.get("correo_encargado")
+        # correo_encargado = request.POST.get("correo_encargado")
         direccion_id = request.POST.get("direccion")
 
         if not all([nombre, encargado_id, direccion_id]):
@@ -79,7 +79,7 @@ def departamento_actualizar(request, departamento_id=None):
                 if departamento:  # Edición
                     departamento.nombre = nombre
                     departamento.encargado = encargado
-                    departamento.correo_encargado = correo_encargado
+                    # departamento.correo_encargado = correo_encargado
                     departamento.direccion = direccion
                     departamento.save()
                     messages.success(request, "Departamento actualizado correctamente.")
@@ -87,7 +87,7 @@ def departamento_actualizar(request, departamento_id=None):
                     Departamento.objects.create(
                         nombre=nombre, 
                         encargado=encargado, 
-                        correo_encargado=correo_encargado,
+                        # correo_encargado=correo_encargado,
                         direccion=direccion,
                         esta_activo=True
                     )
