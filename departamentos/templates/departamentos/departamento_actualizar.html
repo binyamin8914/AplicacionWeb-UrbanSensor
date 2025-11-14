@@ -1,0 +1,85 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if departamento %}Editar Departamento{% else %}Crear Departamento{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="content-header mb-4">
+    <h1 class="mb-1">
+        {% if departamento %}Editar Departamento{% else %}Crear Departamento{% endif %}
+    </h1>
+    <p class="text-muted">
+        {% if departamento %}Modifica la información del departamento.{% else %}Registra un nuevo departamento en la plataforma.{% endif %}
+    </p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7"> {# Mismo ancho que "Crear Usuario" #}
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Datos del Departamento</h5>
+            </div>
+            <div class="card-body">
+                
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre del Departamento</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" 
+                               value="{% if departamento %}{{ departamento.nombre }}{% endif %}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="direccion" class="form-label">Dirección (Padre)</label>
+                        <select class="form-select" id="direccion" name="direccion" required>
+                            <option value="">Seleccione una dirección...</option>
+                            {% for dir in direcciones %}
+                                <option value="{{ dir.id }}"
+                                        {% if departamento and departamento.direccion.id == dir.id %}selected{% endif %}>
+                                    {{ dir.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="encargado" class="form-label">Encargado</label>
+                        <select class="form-select" id="encargado" name="encargado" required>
+                            <option value="">Seleccione un encargado...</option>
+                            {% for encargado in encargados %}
+                                <option value="{{ encargado.id }}"
+                                        data-correo="{{ encargado.email }}"
+                                        {% if departamento and departamento.encargado.id == encargado.id %}selected{% endif %}>
+                                    {{ encargado.username }} ({{ encargado.first_name }} {{ encargado.last_name }}) 
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="correo_encargado" class="form-label">Correo del Encargado</label>
+                        <input type="email" class="form-control" id="correo_encargado" name="correo_encargado" 
+                               value="{% if departamento %}{{ departamento.correo_encargado }}{% endif %}" required>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            {% if departamento %}Actualizar{% else %}Crear{% endif %}
+                        </button>
+                        <a href="{% url 'departamento_listar' %}" class="btn btn-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% load static %}
+<script src="{% static 'includes/js/autocompletar_correo.js' %}"></script>
+{% endblock %}

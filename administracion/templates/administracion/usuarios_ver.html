@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+{% block title %}Ver Usuario{% endblock %}
+
+{% block content %}
+<h4>Ver Usuario</h4>
+<a href="{% url 'usuarios_listar' %}">Volver</a>
+<hr>
+
+<p><b>Usuario:</b> {{ usuario.username }}</p>
+<p><b>Nombre:</b> {{ usuario.first_name }}</p>
+<p><b>Apellido:</b> {{ usuario.last_name }}</p>
+<p><b>Correo:</b> {{ usuario.email }}</p>
+<p><b>Teléfono:</b> {{ user_profile.telefono }}</p>
+<p><b>Perfil:</b> {{ user_profile.group.name }}</p>
+
+{% if user_profile.group.name == "Territorial" %}
+    <p><b>Dirección a la que pertenece:</b> 
+        {% if user_profile.direccion %}
+            {{ user_profile.direccion.nombre }}
+        {% else %}
+            <span class="text-danger">SIN ASIGNAR</span>
+        {% endif %}
+    </p>
+{% endif %}
+
+<p><b>Estado:</b> 
+    {% if usuario.is_active %}Activo{% else %}Bloqueado{% endif %}
+</p>
+{% endblock %}

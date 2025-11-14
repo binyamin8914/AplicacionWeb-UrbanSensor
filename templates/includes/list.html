@@ -1,0 +1,68 @@
+<div id="contenido_pagina">
+    <h4 id="list_title">{{ titulo }}</h4>
+    <p id="list_desc">{{descripcion}}</p>
+
+    <br>
+    
+    <div id="table-filtro">
+        <div class="filtro-prop" id="filtro-busqueda">
+            <p class="filtro_texto icon"></p>
+            <input class="filtro_texto" type="text" name="busqueda" placeholder="Buscar"/>
+        </div>
+        {% for filtro in filtros %}
+        <div class="filtro-prop" id="filtro-prop-{{filtro.nombre_corto}}">
+            <p class="filtro_texto icon">{{filtro.ic }}</p>
+            <p class="filtro_texto">{{ filtro.nombre }}</p>
+            <p class="filtro_texto icon"></p>
+        </div>
+        {% endfor %}
+        <a id="filtro-link" class="filtro-prop" href="{% url url.name %}">
+            <p class="icon">{{url.ic}}</p>
+            <p>{{ url.label }}</p>
+        </a>
+    </div>
+
+    <br>
+    <hr/>
+    <br>
+
+    <div id="table-container"> <table id="table">
+        <thead>
+            <tr>
+                <th style="min-width: auto;">#</th>
+                {% for titulo_t in titulos%}
+                    <th>{{ titulo_t }}</th>
+                {% endfor %}
+                {% if tieneAcciones %}
+                    <th>Acciones</th>
+                {% endif %}
+            </tr>
+        </thead>
+
+
+        <tbody>
+        {% for fila in filas %}
+            <tr>
+                <td style="min-width: auto;">{{ forloop.counter }}</td>
+                {% for columna in fila.columnas %}
+                    {% with clase=fila.clases|slice:forloop.counter|last %}
+                    <td title="{{ columna }}">
+                        <p class='{{ clase }}'>{{ columna }}</p>
+                    </td>
+                    {% endwith %}
+                {% endfor %}
+                {% if fila.acciones %}
+                <td id="acciones">
+                    {% for accion in fila.acciones %}
+                        <a href="{% url accion.url fila.id %}">
+                            <span class="icon accion_icon">{{ accion.ic }}</span>
+                            <span>{{ accion.name }}</span>
+                        </a>
+                    {% endfor %}
+                </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table> </div>
+</div>
