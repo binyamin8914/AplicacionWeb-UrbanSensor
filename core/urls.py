@@ -1,5 +1,6 @@
-from django.urls import path #importa el metodo path
-from core import views #improta los metodos de que se implementan en el views,py de este directorio
+from django.urls import path  # importa el metodo path
+from core import views  # importa los metodos de que se implementan en el views.py de este directorio
+
 '''
 En esta sección configuramos las urls que nuestra aplicación usará, si necesitamos renderizar 
 una vista o debemos incluirla en el urlpatternes de la app la función path requiere de tres 
@@ -8,7 +9,14 @@ la pagina de inicio, el segundo parametro indica que función del views que impo
 usaremos para la url consultada, esta debe existir, el tercer parametro el nombre que le daremos
 '''
 core_urlpatterns = [
-    path('', views.home, name='home'),    
-    path('check_profile', views.check_profile, name='check_profile'), 
-    path('dashboard', views.dashboard, name='dashboard'),     
-    ]
+    path('', views.home, name='home'),
+    path('check_profile', views.check_profile, name='check_profile'),
+    path('dashboard', views.dashboard, name='dashboard'),
+
+    # === NUEVA RUTA PARA TERRITORIAL: CREAR SOLICITUD / INCIDENCIA ===
+    path(
+        'territorial/incidencias/nueva/',
+        views.territorial_crear_incidencia,
+        name='territorial_crear_incidencia'
+    ),
+]

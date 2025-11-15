@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+{% block title %}Dashboard Departamento{% endblock %}
+{% block content %}
+<h1>Dashboard - {{ departamento.nombre }}</h1>
+<hr>
+<ul>
+    <li>Abiertas: {{ counts.abierta|default:0 }}</li>
+    <li>Derivadas: {{ counts.derivada|default:0 }}</li>
+    <li>En Proceso: {{ counts.proceso|default:0 }}</li>
+    <li>Finalizadas: {{ counts.finalizada|default:0 }}</li>
+    <li>Cerradas: {{ counts.cerrada|default:0 }}</li>
+    <li>Rechazadas: {{ counts.rechazada|default:0 }}</li>
+</ul>
+
+<p>
+    <a href="{% url 'incidencias_por_estado' %}">Ver todas las incidencias</a> |
+    <a href="{% url 'incidencias_por_estado' 'abierta' %}">Ver abiertas</a> |
+    <a href="{% url 'incidencias_por_estado' 'derivada' %}">Ver derivadas</a>
+</p>
+{% endblock %}
