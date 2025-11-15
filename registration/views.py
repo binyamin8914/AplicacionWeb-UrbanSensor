@@ -6,8 +6,8 @@ from django.contrib.auth.models import User, Group
 from django.utils.decorators import method_decorator
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse_lazy
-from django.shortcuts import render
+from django.urls import reverse_lazy, reverse
+from django.shortcuts import render, redirect
 from django import forms
 from .models import Profile
 
@@ -69,6 +69,32 @@ def profile_edit(request):
     template_name = 'registration/profile_edit.html'
     return render(request,template_name,{'profile':profile})
 
+def reset_password_form(request):
+    template_name = "registration/reset_password_form.html"
+    if request.method == "POST":
+        email = request.POST.get("email")
+        user_with_email = User.objects.filter(email=email)
+        if user_with_email.count() > 1:
+            return render(request, template_name, {"mensaje": "Existen varios usuarios con ese correo. Contacta con un administrador"})
+        elif user_with_email.count() == 0:
+            return render(request, template_name, {"mensaje": "No existen usuarios con ese correo"})
+        url = reverse("reset_password_change")
+        return redirect(f"{url}?email={email}")
+    return render(request, template_name)
+
+def reset_password_change(request):
+    template_name = "registration/reset_password_change.html"
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("new_password1")
+        password2 = request.POST.get("new_password2")
+        if password != password2:
+            return render(request, template_name, {"email": request.GET.get("email"), "mensaje": "Las contraseñas no coinciden"})
+        user = User.objects.get(email=email)
+        user.set_password(password)
+        user.save()
+        return redirect("login")
+    return render(request, template_name, {"email": request.GET.get("email")})
 
 
 
