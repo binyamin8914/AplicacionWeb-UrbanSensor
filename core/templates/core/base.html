@@ -18,25 +18,25 @@
 <body>
   <div class="app-layout">
     <!-- SIDEBAR -->
-    <aside id="sidebar">
+    <aside id="sidebar" class="contraido">
       <div id="title_sidebar">
-        <label id="toggle_btn">󰮫</label>
+        <div><button id="toggle_btn">󰮫</button></div>
+        <div class="sidebar-user-profile text-center">
+          <i class="bi bi-person-circle sidebar-user-icon"></i>
+          <span class="sidebar-user-name">
+            {{ request.user.get_full_name|default:request.user.username }}
+          </span>
+        </div>
       </div>
 
-      <div class="sidebar-user-profile text-center">
-        <i class="bi bi-person-circle sidebar-user-icon"></i>
-        <span class="sidebar-user-name">
-          {{ request.user.get_full_name|default:request.user.username }}
-        </span>
-      </div>
 
       <hr>
 
-      <ul class="list-unstyled px-2">
+      <ul class="list-unstyled">
         <!-- Opción común -->
         <li class="mb-1">
           <a class="item_l d-flex align-items-center gap-2" href="{% url 'dashboard' %}">
-            <span class="item_l_icon icon">󰕮</span>
+            <span class="item_l_icon icon"></span>
             <span class="item_l_texto">Dashboard</span>
           </a>
         </li>
@@ -71,20 +71,20 @@
               </li>
               <li class="mb-1">
                 <a class="item_l d-flex align-items-center gap-2" href="{% url 'gestion_encuestas' %}">
-                  <span class="item_l_icon icon"></span>
+                  <span class="item_l_icon icon"></span>
                   <span class="item_l_texto">Gestión de Encuestas</span>
                 </a>
               </li>
               <li class="mb-1">
                 <a class="item_l d-flex align-items-center gap-2" href="{% url 'secpla_dashboard' %}">
-                  <span class="item_l_icon icon"></span>
+                  <span class="item_l_icon icon">󱉫</span>
                   <span class="item_l_texto">Ver Incidencias</span>
                 </a>
               </li>
               <li class="mb-1">
                 <a class="item_l d-flex align-items-center gap-2" href="{% url 'listar_tipos_incidencia' %}">
-                  <span class="item_l_icon icon"></span>
-                  <span class="item_l_texto">Gestión Tipo de Incidencias</span>
+                  <span class="item_l_icon icon">󰉺</span>
+                  <span class="item_l_texto">Tipo de Incidencias</span>
                 </a>
               </li>
 
@@ -104,7 +104,7 @@
               </li>
               <li class="mb-1">
                 <a class="item_l d-flex align-items-center gap-2" href="{% url 'gestion_incidencias' %}">
-                  <span class="item_l_icon icon"></span>
+                  <span class="item_l_icon icon">󱉫</span>
                   <span class="item_l_texto">Mis incidencias</span>
                 </a>
               </li>
@@ -113,7 +113,7 @@
             {% elif g == "Direccion" %}
               <li class="mb-1">
                 <a class="item_l d-flex align-items-center gap-2" href="{% url 'gestion_incidencias' %}">
-                  <span class="item_l_icon icon"></span>
+                  <span class="item_l_icon icon">󱉫</span>
                   <span class="item_l_texto">Incidencias recibidas</span>
                 </a>
               </li>
@@ -128,7 +128,7 @@
             {% elif g == "Departamento" %}
               <li class="mb-1">
                 <a class="item_l d-flex align-items-center gap-2" href="{% url 'gestion_incidencias' %}">
-                  <span class="item_l_icon icon"></span>
+                  <span class="item_l_icon icon">󱉫</span>
                   <span class="item_l_texto">Incidencias recibidas</span>
                 </a>
               </li>
@@ -137,7 +137,7 @@
             {% elif g == "Cuadrilla" %}
               <li class="mb-1">
                 <a class="item_l d-flex align-items-center gap-2" href="{% url 'gestion_incidencias' %}">
-                  <span class="item_l_icon icon"></span>
+                  <span class="item_l_icon icon">󱉫</span>
                   <span class="item_l_texto">Incidencias asignadas</span>
                 </a>
               </li>
@@ -147,9 +147,13 @@
       </ul>
 
       {# Cerrar sesión: usar POST para evitar 405 #}
-      <form method="post" action="{% url 'logout' %}" class="mt-4 w-100">
+      <form id="logout-form" method="post" action="{% url 'logout' %}" class="w-100">
         {% csrf_token %}
-        <button type="submit" class="btn btn-danger w-100">Cerrar sesión</button>
+        <button type="submit" class="btn btn-outline-danger w-100">
+          
+          <span class="icon">󰍃</span>
+          <span class="logout-text">Cerrar sesión</span>
+        </button>
       </form>
     </aside>
 
