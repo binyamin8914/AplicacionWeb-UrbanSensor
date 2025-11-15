@@ -123,7 +123,6 @@ def cuadrilla_ver(request, cuadrilla_id):
     cuadrilla = get_object_or_404(Cuadrilla, pk=cuadrilla_id)
     return render(request, "cuadrillas/cuadrilla_ver.html", {"cuadrilla": cuadrilla, "group_name": profile.group.name})
 
-
 @login_required
 def cuadrilla_bloquear(request, cuadrilla_id):
     profile = Profile.objects.get(user=request.user)

@@ -6,7 +6,6 @@
 <hr>
 <p><b>Nombre Departamento:</b> {{ departamento.nombre }}</p>
 <p><b>Encargado:</b> {{ departamento.encargado.get_full_name }}</p>
-<p><b>Correo Encargado:</b> {{ departamento.correo_encargado }}</p>
 <p><b>Dirección:</b> {{ departamento.direccion.nombre }}</p>
 <p><b>Estado:</b> {% if departamento.esta_activo %}Activo{% else %}Bloqueado{% endif %}</p>
 {% endblock %}

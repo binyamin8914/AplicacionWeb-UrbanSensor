@@ -49,32 +49,52 @@ hr {
     padding: 30px 18px 18px 18px;
     box-sizing: border-box;
     flex-shrink: 0;
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
 }
 
 #sidebar #title_sidebar {
-    padding: 12px;
-    padding-left: 16px;
-    padding-right: 16px;
+    padding: 0 4px;
+    display: flex;
 }
 
-#sidebar #title_sidebar label {
+#sidebar #title_sidebar button {
+    border: none;
+    border-radius: 20px;
+    width: 40px;
+    height: 40px;
+    background: inherit;
     display: inline-block;
     font-family: 'FiraCode Nerd Font', monospace;
     text-align: center;
     font-size: 24px;
-    margin-right: 15px;
     cursor: pointer;
 }
 
-#sidebar #title_sidebar label:hover {
+#sidebar #title_sidebar button:hover {
     background-color: #f55b45;
     color: white;
+}
+
+#logout-form {
+    margin-top: auto;
+}
+
+#sidebar.contraido #logout-form .logout-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden !important;
+    display: none !important;
+    visibility: hidden !important;
 }
 
 /* --- Estilos para el Perfil del Sidebar --- */
 
 .sidebar-user-profile {
-    padding: 10px 0;
+    margin-left: 15%;
+    /* padding: 10px 0; */
     /* El "text-center" lo pondremos en el HTML */
 }
 
@@ -110,10 +130,10 @@ hr {
 
 #sidebar .item_l {
     width: auto;
-    height: calc(100% - 2*12px);
+    /* height: calc(100% - 2*12px); */
     text-decoration: none;
     color: #222;
-    padding: 12px;
+    padding: 6px;
     padding-left: 16px;
     padding-right: 16px;
     border-radius: 25px;
@@ -129,7 +149,6 @@ hr {
 }
 
 #sidebar .item_l .item_l_texto {
-    margin-left: 15px;
     font-weight: bold;
 }
 
@@ -140,7 +159,6 @@ hr {
 #sidebar .item_l:hover span{
     color: white;
 }
-
 .logout-link { display: block; margin-top: 32px; color: #0074d9; }
 
 #main-panel {

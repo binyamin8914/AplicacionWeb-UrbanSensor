@@ -8,9 +8,7 @@ from direcciones.models import Direccion # <-- ¡Cambiado!
 from incidencias.models import Incidencia
 from cuadrillas.models import Cuadrilla
 from django.db.models import Count
-
-# --- ¡¡IMPORTANTE: Importa el manejador de errores!! ---
-from django.db import IntegrityError 
+from django.db import IntegrityError # --- Importa el manejador de errores!! ---
 
 # --- CRUD Departamento ---
 
@@ -67,7 +65,7 @@ def departamento_actualizar(request, departamento_id=None):
     if request.method == "POST":
         nombre = request.POST.get("nombre")
         encargado_id = request.POST.get("encargado")
-        correo_encargado = request.POST.get("correo_encargado")
+        # correo_encargado = request.POST.get("correo_encargado")
         direccion_id = request.POST.get("direccion")
 
         if not all([nombre, encargado_id, direccion_id]):
@@ -81,7 +79,7 @@ def departamento_actualizar(request, departamento_id=None):
                 if departamento:  # Edición
                     departamento.nombre = nombre
                     departamento.encargado = encargado
-                    departamento.correo_encargado = correo_encargado
+                    # departamento.correo_encargado = correo_encargado
                     departamento.direccion = direccion
                     departamento.save()
                     messages.success(request, "Departamento actualizado correctamente.")
@@ -89,7 +87,7 @@ def departamento_actualizar(request, departamento_id=None):
                     Departamento.objects.create(
                         nombre=nombre, 
                         encargado=encargado, 
-                        correo_encargado=correo_encargado,
+                        # correo_encargado=correo_encargado,
                         direccion=direccion,
                         esta_activo=True
                     )
@@ -123,7 +121,6 @@ def departamento_actualizar(request, departamento_id=None):
 
 @login_required
 def departamento_ver(request, departamento_id):
-    # (Tu vista original está bien)
     profile = Profile.objects.get(user=request.user)
     if profile.group.name not in ["SECPLA", "Direccion"]:
         messages.add_message(request, messages.INFO, "No tienes permisos.")
@@ -138,7 +135,6 @@ def departamento_ver(request, departamento_id):
 
 @login_required
 def departamento_bloquear(request, departamento_id):
-    # (Tu vista original está bien)
     profile = Profile.objects.get(user=request.user)
     if profile.group.name not in ["SECPLA", "Direccion"]:
         messages.add_message(request, messages.INFO, "No tienes permisos.")
@@ -154,12 +150,11 @@ def departamento_bloquear(request, departamento_id):
 
 # =======================================================
 # VISTAS PARA EL DASHBOARD Y GESTIÓN DE INCIDENCIAS
-# (Dejamos estas tal como las tenías, están bien)
 # =======================================================
 
 @login_required
 def departamento_dashboard(request):
-    # ... (tu código original) ...
+
     try:
         profile = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
@@ -181,7 +176,6 @@ def departamento_dashboard(request):
 
 @login_required
 def incidencias_por_estado(request, estado=None):
-    # ... (tu código original) ...
     try:
         profile = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
@@ -205,7 +199,6 @@ def incidencias_por_estado(request, estado=None):
 
 @login_required
 def incidencia_ver_y_derivar(request, incidencia_id):
-    # ... (tu código original) ...
     try:
         profile = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
