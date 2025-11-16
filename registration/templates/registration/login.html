@@ -1,20 +1,6 @@
-<!DOCTYPE html>
-<html lang="es">
-{% block content %}
+{% extends "registration/base.html" %}
 {% load static %}
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>UrbanSensors</title>
-  <link href="{% static 'registration/css/login.css' %}" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@v3.3.0/build/firacode-nerd-font.css">
-</head>
-<body style="background-image: url({% static 'registration/img/unnamed.jpg' %});">
-  <div id="bg_sombra">
-    <div id="logo_contenedor">
-      <img alt="Logo" src="{% static 'registration/img/logo-blanco.png' %}" />
-      <p>Municipalidad de peñalolén</p>
-    </div>
+{% block content %}
     <form id="form_contenedor" action="" method="post">
       {% csrf_token %}
       <p id="form_titulo" class="form_texto">Iniciar sesión</p>
@@ -26,11 +12,17 @@
       <!-- --------------------------- -->
       <div class="form_input_cover">
         <p class="form_texto">Correo</p>
-        <div class="form_input_div"><p class="form_texto form_icon">󰇮</p><input class="form_texto" type="text" name="username" placeholder="Ingrese su correo"/></div>
+        <div class="form_input_div">
+          <p class="form_texto form_icon">󰇮</p>
+          <input class="form_texto" type="text" name="username" placeholder="Ingrese su correo"/>
+        </div>
       </div>
       <div class="form_input_cover">
         <p class="form_texto">Contraseña</p>
-        <div class="form_input_div"><p class="form_texto form_icon"></p><input class="form_texto" type="password" name="password" placeholder="Ingrese su contraseña"/></div>
+        <div class="form_input_div">
+          <p class="form_texto form_icon"></p>
+          <input class="form_texto" type="password" name="password" placeholder="Ingrese su contraseña"/>
+        </div>
       </div>
       <div id="form_button_div">
         <button type="submit"><span class="form_texto">Iniciar sesión</span></button>
@@ -40,7 +32,4 @@
         <a class="small" href="{% url 'reset_password_form' %}">¿Olvidaste tu Contraseña?</a>
       </div>
     </form>
-  </div>
-</body>
-</html>
 {% endblock %}
