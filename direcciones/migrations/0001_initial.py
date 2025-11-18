@@ -10,19 +10,17 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('departamentos', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Cuadrilla',
+            name='Direccion',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('nombre', models.CharField(max_length=255)),
+                ('nombre', models.CharField(max_length=100)),
                 ('esta_activa', models.BooleanField(default=True)),
-                ('departamento', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='departamentos.departamento')),
-                ('encargado', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, related_name='cuadrilla_encargada', to=settings.AUTH_USER_MODEL)),
+                ('encargado', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, related_name='direccion_encargada', to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]
