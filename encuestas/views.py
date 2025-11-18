@@ -214,13 +214,14 @@ def crear_encuesta(request):
 def editar_encuesta(request, encuesta_id: int):
     """
     Editar encuesta existente Y sus campos adicionales.
-    (VERSIÓN CORREGIDA con auto-orden)
+    Puede editarse si está en estado 'creado' o 'bloqueado'
     """
     profile = Profile.objects.get(user=request.user)
     encuesta_obj = get_object_or_404(Encuesta, id=encuesta_id)
 
-    if encuesta_obj.estado != 'bloqueado':
-        messages.warning(request, 'Solo puedes editar encuestas en estado BLOQUEADO.')
+    # Permitir edición solo si está creado o bloqueado
+    if encuesta_obj.estado not in ['creado', 'bloqueado']:
+        messages.warning(request, 'Solo puedes editar encuestas en estado CREADO o BLOQUEADO.')
         return redirect('gestion_encuestas')
 
     if request.method == 'POST':
@@ -228,33 +229,29 @@ def editar_encuesta(request, encuesta_id: int):
         formset = CamposAdicionalesFormSet(request.POST, instance=encuesta_obj, prefix='campos')
         
         if form.is_valid() and formset.is_valid():
-            
-            # --- ¡NUEVA LÓGICA DE ORDEN!! ---
-            form.save() # 1. Guardamos el padre
-            
-            campos = formset.save(commit=False) # 2. Obtenemos los hijos
+            form.save()
+            campos = formset.save(commit=False)
             
             orden_count = 1
             for campo in campos:
-                campo.orden = orden_count # 3. Asignamos el número
-                campo.save() # 4. Guardamos el hijo
+                campo.orden = orden_count
+                campo.save()
                 orden_count += 1
             
-            # 5. Guardamos los cambios del formset (ej. si se borró uno)
-            formset.save_m2m() 
+            formset.save_m2m()
             
             messages.success(request, '¡La encuesta ha sido actualizada exitosamente!')
             return redirect('gestion_encuestas')
         else:
             messages.error(request, 'Revisa los campos: hay errores en el formulario.')
     
-    else: # Método GET
+    else:
         form = EncuestaForm(instance=encuesta_obj)
-        formset = CamposAdicionalesFormSet(instance=encuesta_obj, prefix='campos') 
+        formset = CamposAdicionalesFormSet(instance=encuesta_obj, prefix='campos')
 
     return render(request, 'encuestas/formulario_encuesta.html', {
         'form': form,
-        'formset': formset, 
+        'formset': formset,
         'titulo_pagina': 'Editar Encuesta',
         'modo': 'editar',
         'encuesta': encuesta_obj,
@@ -277,6 +274,39 @@ def eliminar_encuesta(request, encuesta_id: int):
         return redirect('gestion_encuestas')
 
     return render(request, 'encuestas/confirmar_eliminar_encuesta.html', {
+        'encuesta': encuesta_obj,
+        'group_name': profile.group.name,
+    })
+
+@login_required
+def cambiar_estado_encuesta(request, encuesta_id: int):
+    """
+    Cambia el estado de una encuesta:
+    - creado → vigente (Activar)
+    - vigente → bloqueado (Bloquear para editar)
+    - bloqueado → vigente (Desbloquear)
+    """
+    profile = Profile.objects.get(user=request.user)
+    encuesta_obj = get_object_or_404(Encuesta, id=encuesta_id)
+
+    if request.method == 'POST':
+        if encuesta_obj.estado == 'creado':
+            # Activar la encuesta (creado → vigente)
+            encuesta_obj.estado = 'vigente'
+            messages.success(request, f'La encuesta "{encuesta_obj.titulo}" ha sido ACTIVADA y ya está disponible para usar.')
+        elif encuesta_obj.estado == 'vigente':
+            # Bloquear para editar (vigente → bloqueado)
+            encuesta_obj.estado = 'bloqueado'
+            messages.success(request, f'La encuesta "{encuesta_obj.titulo}" ha sido BLOQUEADA y ahora puede editarse.')
+        elif encuesta_obj.estado == 'bloqueado':
+            # Desbloquear (bloqueado → vigente)
+            encuesta_obj.estado = 'vigente'
+            messages.success(request, f'La encuesta "{encuesta_obj.titulo}" ha sido DESBLOQUEADA y está vigente nuevamente.')
+        
+        encuesta_obj.save()
+        return redirect('gestion_encuestas')
+
+    return render(request, 'encuestas/confirmar_cambio_estado.html', {
         'encuesta': encuesta_obj,
         'group_name': profile.group.name,
     })

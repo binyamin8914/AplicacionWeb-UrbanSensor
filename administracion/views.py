@@ -10,6 +10,8 @@ from registration.models import Profile
 # ===================================================================
 # --- VISTAS DE USUARIOS (ÚNICO QUE QUEDA EN ESTA APP) ---
 # ===================================================================
+from django.core.paginator import Paginator
+
 @login_required
 def usuarios_listar(request):
     # Lista de usuarios con filtros por estado y perfil (grupo)
@@ -37,12 +39,18 @@ def usuarios_listar(request):
         usuarios_db = usuarios_db.filter(groups__name=filtro_perfil)
 
     usuarios_db = usuarios_db.order_by('username')
+    
+    # PAGINACIÓN
+    paginator = Paginator(usuarios_db, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     grupos_para_filtro = Group.objects.all()
 
     datos = {
         'titulo': "Gestión de Usuarios",
         'descripcion': "Gestión de todos los usuarios de la plataforma",
-        'url': {'name': 'usuario_actualizar', 'label': 'Nuevo Usuario', 'ic': ''},
+        'url': {'name': 'usuario_actualizar', 'label': 'Nuevo Usuario', 'ic': ''},
         'titulos': ['Usuario', 'Nombre', 'Apellido', 'Correo', 'Teléfono', 'Perfil', 'Estado'],
         'back': 'dashboard',
         'filtros': [
@@ -51,18 +59,20 @@ def usuarios_listar(request):
         ],
         'tieneAcciones': True,
         "group_name": profile.group.name,
-        'current_filtro_estado': filtro_estado,
-        'current_filtro_perfil': filtro_perfil,
+        'current_filtro_estado': filtro_estado or '',
+        'current_filtro_perfil': filtro_perfil or '',
+        'usuarios': page_obj,  # ← AGREGADO
         'filas': []
     }
 
-    for usuario in usuarios_db:
+    # ← CAMBIAR usuarios_db por page_obj
+    for usuario in page_obj:
         datos['filas'].append({
             "id": usuario.id,
             'acciones': [
-                {'url': 'usuario_ver', 'name': 'Ver', 'ic': ''},
-                {'url': 'usuario_actualizar_id', 'name': 'Editar', 'ic': ''},
-                {'url': 'usuario_bloquear', 'name': 'Bloquear' if usuario.is_active else 'Activar', 'ic': '' if usuario.is_active else ''}
+                {'url': 'usuario_ver', 'name': 'Ver', 'ic': ''},
+                {'url': 'usuario_actualizar_id', 'name': 'Editar', 'ic': ''},
+                {'url': 'usuario_bloquear', 'name': 'Bloquear' if usuario.is_active else 'Activar', 'ic': '' if usuario.is_active else ''}
             ],
             "columnas": [
                 usuario.username, usuario.first_name, usuario.last_name,

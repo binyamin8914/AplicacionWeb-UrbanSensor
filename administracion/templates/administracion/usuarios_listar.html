@@ -107,4 +107,32 @@
         </table>
     </div>
 </div>
+<!-- PAGINACIÓN -->
+{% if usuarios.has_other_pages %}
+<nav aria-label="Navegación de páginas" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if usuarios.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1&estado={{ current_filtro_estado }}&perfil={{ current_filtro_perfil }}">&laquo; Primera</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ usuarios.previous_page_number }}&estado={{ current_filtro_estado }}&perfil={{ current_filtro_perfil }}">Anterior</a>
+            </li>
+        {% endif %}
+        
+        <li class="page-item active" aria-current="page">
+            <span class="page-link">Página {{ usuarios.number }} de {{ usuarios.paginator.num_pages }}</span>
+        </li>
+        
+        {% if usuarios.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ usuarios.next_page_number }}&estado={{ current_filtro_estado }}&perfil={{ current_filtro_perfil }}">Siguiente</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ usuarios.paginator.num_pages }}&estado={{ current_filtro_estado }}&perfil={{ current_filtro_perfil }}">Última &raquo;</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
 {% endblock %}

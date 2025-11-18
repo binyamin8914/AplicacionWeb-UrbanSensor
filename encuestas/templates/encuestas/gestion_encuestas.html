@@ -80,8 +80,37 @@
                         {% endif %}
                     </td>
                     <td class="text-nowrap">
-                        <a href="{% url 'editar_encuesta' encuesta.id %}" class="btn btn-sm btn-secondary">Editar</a>
-                        <a href="{% url 'eliminar_encuesta' encuesta.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                        <!-- Botones según el estado de la encuesta -->
+                        {% if encuesta.estado == 'creado' %}
+                            <!-- Encuesta recién creada: solo puede ACTIVARSE -->
+                            <a href="{% url 'cambiar_estado_encuesta' encuesta.id %}" class="btn btn-sm btn-success" title="Activar encuesta">
+                                <i class="bi bi-check-circle-fill"></i> Activar
+                            </a>
+                            <a href="{% url 'editar_encuesta' encuesta.id %}" class="btn btn-sm btn-secondary" title="Editar antes de activar">
+                                <i class="bi bi-pencil-fill"></i> Editar
+                            </a>
+                        {% elif encuesta.estado == 'vigente' %}
+                            <!-- Encuesta activa: solo puede BLOQUEARSE -->
+                            <a href="{% url 'cambiar_estado_encuesta' encuesta.id %}" class="btn btn-sm btn-warning" title="Bloquear para editar">
+                                <i class="bi bi-lock-fill"></i> Bloquear
+                            </a>
+                            <button class="btn btn-sm btn-secondary" disabled title="Debe bloquear primero para editar">
+                                <i class="bi bi-pencil-fill"></i> Editar
+                            </button>
+                        {% elif encuesta.estado == 'bloqueado' %}
+                            <!-- Encuesta bloqueada: puede DESBLOQUEARSE o EDITARSE -->
+                            <a href="{% url 'cambiar_estado_encuesta' encuesta.id %}" class="btn btn-sm btn-success" title="Desbloquear y activar">
+                                <i class="bi bi-unlock-fill"></i> Desbloquear
+                            </a>
+                            <a href="{% url 'editar_encuesta' encuesta.id %}" class="btn btn-sm btn-secondary" title="Editar encuesta">
+                                <i class="bi bi-pencil-fill"></i> Editar
+                            </a>
+                        {% endif %}
+                        
+                        <!-- Botón Eliminar (siempre disponible) -->
+                        <a href="{% url 'eliminar_encuesta' encuesta.id %}" class="btn btn-sm btn-danger" title="Eliminar encuesta">
+                            <i class="bi bi-trash-fill"></i> Eliminar
+                        </a>
                     </td>
                 </tr>
                 {% empty %}
