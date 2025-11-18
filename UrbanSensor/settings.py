@@ -83,9 +83,9 @@ WSGI_APPLICATION = 'UrbanSensor.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'urban_sensor',
+        'NAME': 'US_App',
         'USER': 'postgres',
-        'PASSWORD': '',
+        'PASSWORD': '101218CRIS',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -137,3 +137,5 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Configuración para que Django imprima los correos en la consola
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
