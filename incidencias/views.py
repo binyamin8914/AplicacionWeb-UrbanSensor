@@ -363,27 +363,28 @@ def secpla_dashboard(request):
 
 @login_required
 def secpla_incidencias_list(request, status=None):
-    """
-    Listado de incidencias para SECPLA, filtrado por estado.
-    """
     profile = get_object_or_404(Profile, user=request.user)
     group_name_upper = profile.group.name.upper()
         
     if group_name_upper != "SECPLA":
-        messages.error(request, "Acceso denegado: Solo SECPLA puede ver listados completos.")
-        return redirect('gestion_incidencias') # Redirige al listado que le corresponda
+        messages.error(request, "Acceso denegado.")
+        return redirect('gestion_incidencias') 
 
-    #filtrar las incidencias
+    # --- CORRECCIÓN AQUÍ: Usamos select_related para traer toda la cadena de padres ---
+    queryset = Incidencia.objects.select_related(
+        'encuesta',
+        'encuesta__tipo_incidencia',
+        'encuesta__tipo_incidencia__departamento',
+        'encuesta__tipo_incidencia__departamento__direccion'
+    ).order_by('-id')
+
     if status and status != 'todas':
-        # Filtrar por el estado pasado en la URL
-        incidencias = Incidencia.objects.filter(estado=status).order_by('-id')
+        incidencias = queryset.filter(estado=status)
         title = f"Listado: Incidencias '{status.capitalize()}'"
     else:
-        # mostrar las incidencias (desde la card 'creadas')
-        incidencias = Incidencia.objects.all().order_by('-id')
+        incidencias = queryset.all()
         title = "Listado: Todas las Incidencias Creadas"
 
-    # 3. preparar contexto
     context = {
         'incidencias': incidencias,
         'title': title,
@@ -391,7 +392,6 @@ def secpla_incidencias_list(request, status=None):
         'current_status': status or 'todas',
     }
     return render(request, 'incidencias/secpla_incidencias_list.html', context)
-
 @login_required
 def detalle_incidencia(request, incidencia_id):
     incidencia = get_object_or_404(Incidencia, id=incidencia_id)

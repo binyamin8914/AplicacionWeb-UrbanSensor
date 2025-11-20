@@ -4,151 +4,131 @@
 {% block content %}
 <div class="container mt-4">
 
-  {# Título adaptado al perfil #}
-  {% if group_name == "Territorial" %}
-    <h1 class="mb-3">Mis incidencias</h1>
-  {% else %}
-    <h1 class="mb-3">Gestión de Incidencias</h1>
-  {% endif %}
+    {# Título adaptado al perfil #}
+    {% if group_name == "Territorial" %}
+        <h1 class="mb-3">Mis incidencias</h1>
+    {% else %}
+        <h1 class="mb-3">Gestión de Incidencias</h1>
+    {% endif %}
 
-  {# Barra de acciones / filtros para TERRITORIAL #}
-  {% if group_name == "Territorial" %}
-    <div class="d-flex flex-wrap align-items-center mb-3 gap-2">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        
+        <div class="d-flex">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-filter-left me-1"></i>
+                    {% if request.GET.estado %}
+                        {{ request.GET.estado|capfirst }}
+                    {% else %}
+                        Estado
+                    {% endif %}
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item {% if not request.GET.estado %}active{% endif %}" href="{% url 'gestion_incidencias' %}">
+                            Todos los Estados
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    
+                    <li><a class="dropdown-item" href="?estado=abierta">Abierta</a></li>
+                    <li><a class="dropdown-item" href="?estado=derivada">Derivada</a></li>
+                    <li><a class="dropdown-item" href="?estado=proceso">En proceso</a></li>
+                    <li><a class="dropdown-item" href="?estado=finalizada">Finalizada</a></li>
+                    <li><a class="dropdown-item" href="?estado=rechazada">Rechazada</a></li>
+                </ul>
+            </div>
+        </div>
 
-      {# Botón Crear nueva incidencia #}
-      <a href="{% url 'crear_incidencia' %}" class="btn btn-primary me-auto">
-        Crear Nueva Incidencia
-      </a>
-
-      {# Filtros por estado (la vista ya soporta ?estado=...) #}
-      <a href="{% url 'gestion_incidencias' %}"
-         class="btn btn-sm btn-outline-secondary {% if not request.GET.estado %}active{% endif %}">
-        Todas
-      </a>
-      <a href="?estado=abierta"
-         class="btn btn-sm btn-outline-success {% if request.GET.estado == 'abierta' %}active{% endif %}">
-        Abiertas
-      </a>
-      <a href="?estado=derivada"
-         class="btn btn-sm btn-outline-primary {% if request.GET.estado == 'derivada' %}active{% endif %}">
-        Derivadas
-      </a>
-      <a href="?estado=proceso"
-         class="btn btn-sm btn-outline-warning {% if request.GET.estado == 'proceso' %}active{% endif %}">
-        En proceso
-      </a>
-      <a href="?estado=finalizada"
-         class="btn btn-sm btn-outline-dark {% if request.GET.estado == 'finalizada' %}active{% endif %}">
-        Finalizadas
-      </a>
-      <a href="?estado=rechazada"
-         class="btn btn-sm btn-outline-danger {% if request.GET.estado == 'rechazada' %}active{% endif %}">
-        Rechazadas
-      </a>
-    </div>
-  {% elif group_name == "SECPLA" %}
-    {# Tarjetas para SECPLA (si las sigues usando desde aquí) #}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
-      <div class="bg-white p-3 rounded-xl shadow-md border-b-4 border-blue-500">
-        <p class="text-sm text-blue-600 font-medium mb-0">Total Creadas</p>
-        <p class="h3 fw-bold mb-0">{{ total_creadas }}</p>
-      </div>
-      <div class="bg-white p-3 rounded-xl shadow-md border-b-4 border-yellow-500">
-        <p class="text-sm text-yellow-600 font-medium mb-0">Derivadas</p>
-        <p class="h3 fw-bold mb-0">{{ count_derivadas }}</p>
-      </div>
-      <div class="bg-white p-3 rounded-xl shadow-md border-b-4 border-red-500">
-        <p class="text-sm text-red-600 font-medium mb-0">Rechazadas</p>
-        <p class="h3 fw-bold mb-0">{{ count_rechazadas }}</p>
-      </div>
-      <div class="bg-white p-3 rounded-xl shadow-md border-b-4 border-green-500">
-        <p class="text-sm text-green-600 font-medium mb-0">Finalizadas</p>
-        <p class="h3 fw-bold mb-0">{{ count_finalizadas }}</p>
-      </div>
-    </div>
-  {% endif %}
-
-  <div class="table-responsive">
-    <table class="table table-striped align-middle">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Tipo</th>
-          <th>Dirección</th>
-          <th>Departamento</th>
-          <th>Estado</th>
-          <th style="width: 260px;">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for inc in incidencias %}
-        <tr>
-          <td>{{ inc.id }}</td>
-          <td>{{ inc.encuesta.tipo_incidencia.nombre }}</td>
-          <td>
-            {# Si tienes direccion_textual podrías mostrarla aquí; por ahora, la de encuesta #}
-            {{ inc.encuesta.tipo_incidencia.departamento.direccion.nombre }}
-          </td>
-          <td>{{ inc.encuesta.tipo_incidencia.departamento.nombre }}</td>
-          <td>
-            {# Badge de Bootstrap según estado interno #}
-            {% if inc.estado == "abierta" %}
-              <span class="badge bg-success">Abierta</span>
-            {% elif inc.estado == "derivada" %}
-              <span class="badge bg-primary">Derivada</span>
-            {% elif inc.estado == "proceso" %}
-              <span class="badge bg-warning text-dark">En proceso</span>
-            {% elif inc.estado == "finalizada" %}
-              <span class="badge bg-secondary">Finalizada</span>
-            {% elif inc.estado == "rechazada" %}
-              <span class="badge bg-danger">Rechazada</span>
-            {% else %}
-              {{ inc.get_estado_display }}
-            {% endif %}
-          </td>
-          <td>
-            {# Botón de ver siempre disponible #}
-            <a href="{% url 'incidencia_detalle' inc.id %}" class="btn btn-sm btn-outline-secondary">
-              Ver
+        {% if group_name == "Territorial" %}
+            <a href="{% url 'crear_incidencia' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle-fill me-2"></i>Crear Nueva Incidencia
             </a>
+        {% endif %}
+        
+    </div>
 
-            {# Territorial puede editar/eliminar sus propias incidencias #}
-            {% if group_name == "Territorial" and inc.territorial == request.user %}
-              <a href="{% url 'editar_incidencia' inc.id %}" class="btn btn-sm btn-info">
-                Editar
-              </a>
-              <a href="{% url 'eliminar_incidencia' inc.id %}" class="btn btn-sm btn-danger">
-                Eliminar
-              </a>
-            {% endif %}
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Tipo</th>
+                        <th>Dirección</th>
+                        <th>Departamento</th>
+                        <th>Estado</th>
+                        <th style="width: 260px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for inc in incidencias %}
+                    <tr>
+                        <td>{{ inc.id }}</td>
+                        <td>{{ inc.encuesta.tipo_incidencia.nombre }}</td>
+                        <td>
+                            {{ inc.encuesta.tipo_incidencia.departamento.direccion.nombre|default:"-" }}
+                        </td>
+                        <td>{{ inc.encuesta.tipo_incidencia.departamento.nombre|default:"-" }}</td>
+                        <td>
+                            {# Badge de Bootstrap según estado #}
+                            {% if inc.estado == "abierta" %}
+                                <span class="badge bg-success">Abierta</span>
+                            {% elif inc.estado == "derivada" %}
+                                <span class="badge bg-primary">Derivada</span>
+                            {% elif inc.estado == "proceso" %}
+                                <span class="badge bg-warning text-dark">En proceso</span>
+                            {% elif inc.estado == "finalizada" %}
+                                <span class="badge bg-secondary">Finalizada</span>
+                            {% elif inc.estado == "rechazada" %}
+                                <span class="badge bg-danger">Rechazada</span>
+                            {% else %}
+                                {{ inc.get_estado_display }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {# Botón de ver siempre disponible #}
+                            <a href="{% url 'incidencia_detalle' inc.id %}" class="btn btn-sm btn-outline-secondary">
+                                Ver
+                            </a>
 
-            {# Departamento (encargado) puede derivar #}
-            {% if group_name == "Departamento" %}
-              <a href="{% url 'derivar_incidencia' inc.id %}" class="btn btn-sm btn-warning">
-                Derivar
-              </a>
-            {% endif %}
+                            {# Territorial puede editar/eliminar sus propias incidencias #}
+                            {% if group_name == "Territorial" and inc.territorial == request.user %}
+                                <a href="{% url 'editar_incidencia' inc.id %}" class="btn btn-sm btn-info text-white">
+                                    Editar
+                                </a>
+                                <a href="{% url 'eliminar_incidencia' inc.id %}" class="btn btn-sm btn-danger">
+                                    Eliminar
+                                </a>
+                            {% endif %}
 
-            {# Cuadrilla (encargado) puede finalizar si es su cuadrilla #}
-            {% if group_name == "Cuadrilla" and inc.cuadrilla_id %}
-              {% if inc.cuadrilla.encargado_id == request.user.id %}
-                <form action="{% url 'finalizar_incidencia' inc.id %}" method="post" class="d-inline">
-                  {% csrf_token %}
-                  <button class="btn btn-sm btn-success" type="submit">
-                    Finalizar
-                  </button>
-                </form>
-              {% endif %}
-            {% endif %}
-          </td>
-        </tr>
-      {% empty %}
-        <tr>
-          <td colspan="6" class="text-muted">No hay incidencias.</td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </div>
+                            {# Lógica para otros roles (Derivar/Finalizar) sigue aquí igual... #}
+                            {% if group_name == "Departamento" %}
+                                <a href="{% url 'derivar_incidencia' inc.id %}" class="btn btn-sm btn-warning">
+                                    Derivar
+                                </a>
+                            {% endif %}
+                            
+                            {% if group_name == "Cuadrilla" and inc.cuadrilla_id %}
+                                {% if inc.cuadrilla.encargado_id == request.user.id %}
+                                    <form action="{% url 'finalizar_incidencia' inc.id %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button class="btn btn-sm btn-success" type="submit">Finalizar</button>
+                                    </form>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted p-4 fst-italic">
+                            No hay incidencias registradas con este filtro.
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

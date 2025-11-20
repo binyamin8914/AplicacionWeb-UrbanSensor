@@ -1,78 +1,124 @@
-{% extends 'core/base.html' %} 
+{% extends 'core/base.html' %}
+{% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-4 sm:p-6 lg:p-8 font-sans">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-2">
-        <h1 class="text-3xl font-bold text-gray-800 mb-4 sm:mb-0">{{ title }}</h1>
-        
-        <!-- Botón para volver al dashboard. -->
-        <a href="{% url 'secpla_dashboard' %}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-150 shadow-sm">
-            ← Volver al Dashboard
-        </a>
-    </div>
 
-    {% if incidencias %}
-        <div class="overflow-x-auto bg-white rounded-xl shadow-xl border border-gray-200">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1 text-gray-800">{{ title }}</h2>
+        <p class="text-muted small mb-0">
+            Listado completo | Estado actual: 
+            <span class="fw-bold text-dark">{{ current_status|default:"Todas"|upper }}</span>
+        </p>
+    </div>
+    <a href="{% url 'secpla_dashboard' %}" class="btn btn-outline-secondary shadow-sm">
+        <i class="bi bi-arrow-left me-2"></i>Volver al Dashboard
+    </a>
+</div>
+
+<div class="card shadow border-0 mb-5">
+    <div class="card-body p-0">
+        
+        {% if incidencias %}
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle mb-0">
+                <thead class="table-light text-secondary">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre (Tipo)</th> 
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dirección</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departamento</th>
-                        
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                        <th scope="col" class="ps-4 py-3">#</th>
+                        <th scope="col" class="py-3">Nombre (Tipo)</th>
+                        <th scope="col" class="py-3">Dirección (Entidad)</th>
+                        <th scope="col" class="py-3">Departamento</th>
+                        <th scope="col" class="py-3">Estado</th>
+                        <th scope="col" class="text-end pe-4 py-3">Acciones</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-100">
+                <tbody>
                     {% for inc in incidencias %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ inc.id }}</td>
-                        
-                        <!-- Columna: Nombre (Tipo) -->
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ inc.encuesta.tipo_incidencia.nombre }}</td>
-                        
-                        <!-- Columna: Dirección -->
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ inc.encuesta.departamento.direccion.nombre }}</td>
-                        
-                        <!-- Columna: Departamento -->
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ inc.encuesta.departamento.nombre }}</td>
-
-                        <!-- Columna de Estado con Badge -->
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            {% with estado=inc.estado %}
-                                {% if estado == 'finalizada' %} {% with color_class="bg-green-100 text-green-800" %} {% endwith %}
-                                {% elif estado == 'rechazada' %} {% with color_class="bg-red-100 text-red-800" %} {% endwith %}
-                                {% elif estado == 'derivada' or estado == 'proceso' %} {% with color_class="bg-yellow-100 text-yellow-800" %} {% endwith %}
-                                {% else %} {% with color_class="bg-blue-100 text-blue-800" %} {% endwith %}
-                                {% endif %}
-                            
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ color_class }}">
-                                    <!-- Muestra el nombre legible del estado (ej. "Derivada") -->
-                                    {{ inc.get_estado_display }} 
-                                </span>
-                            {% endwith %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-secondary">
+                            {{ inc.id }}
                         </td>
                         
-                        <!-- Acciones: Solo Ver -->
-                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                            <!-- Enlace a la URL de detalle (usando el ID) -->
-                            <a href="{% url 'incidencia_detalle' inc.id %}" class="text-blue-600 hover:text-blue-800 font-semibold">Ver</a>
+                        <td>
+                            <span class="fw-semibold text-dark d-block">
+                                {{ inc.encuesta.tipo_incidencia.nombre }}
+                            </span>
+                            <small class="text-muted text-truncate d-block" style="max-width: 250px;">
+                                {{ inc.encuesta.titulo }}
+                            </small>
+                        </td>
+
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-building-up text-danger me-2"></i>
+                                <span class="text-dark">
+                                    {{ inc.encuesta.tipo_incidencia.departamento.direccion.nombre|default:"Sin asignar" }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="badge bg-light text-dark border">
+                                <i class="bi bi-diagram-3 me-1"></i>
+                                {{ inc.encuesta.tipo_incidencia.departamento.nombre|default:"-" }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if inc.estado == 'finalizada' %}
+                                <span class="badge rounded-pill bg-success bg-opacity-75 text-white px-3">
+                                    <i class="bi bi-check-circle me-1"></i> Finalizada
+                                </span>
+                            {% elif inc.estado == 'rechazada' %}
+                                <span class="badge rounded-pill bg-danger bg-opacity-75 text-white px-3">
+                                    <i class="bi bi-x-circle me-1"></i> Rechazada
+                                </span>
+                            {% elif inc.estado == 'derivada' %}
+                                <span class="badge rounded-pill bg-primary text-white px-3">
+                                    <i class="bi bi-arrow-right-circle me-1"></i> Derivada
+                                </span>
+                            {% elif inc.estado == 'proceso' %}
+                                <span class="badge rounded-pill bg-warning text-dark px-3">
+                                    <i class="bi bi-hourglass-split me-1"></i> En Proceso
+                                </span>
+                            {% elif inc.estado == 'abierta' %}
+                                <span class="badge rounded-pill bg-info text-dark px-3">
+                                    <i class="bi bi-envelope-open me-1"></i> Abierta
+                                </span>
+                            {% else %}
+                                <span class="badge rounded-pill bg-secondary text-white px-3">
+                                    {{ inc.get_estado_display }}
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="text-end pe-4">
+                            <a href="{% url 'incidencia_detalle' inc.id %}" class="btn btn-sm btn-outline-primary shadow-sm" title="Ver Detalle">
+                                <i class="bi bi-eye-fill me-1"></i> Ver
+                            </a>
                         </td>
                     </tr>
-                    {% empty %}
-                        <tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No se encontraron incidencias en el estado seleccionado.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-    {% else %}
-        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg">
-            <p class="text-sm font-medium text-yellow-800">No se encontraron incidencias en el estado **{{ current_status|default:"Todas"|upper }}**.</p>
+
+        <div class="card-footer bg-white border-top py-3">
+            <small class="text-muted">Total de registros mostrados: <strong>{{ incidencias.count }}</strong></small>
         </div>
-    {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            <div class="mb-3">
+                <i class="bi bi-inbox text-gray-300" style="font-size: 3rem;"></i>
+            </div>
+            <h5 class="text-muted">No se encontraron incidencias</h5>
+            <p class="text-muted small">No hay registros con el estado "<strong>{{ current_status }}</strong>" actualmente.</p>
+        </div>
+        {% endif %}
+
+    </div>
 </div>
 {% endblock %}
