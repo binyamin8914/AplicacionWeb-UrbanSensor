@@ -1,4 +1,7 @@
 {% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo_pagina }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
@@ -15,11 +18,12 @@
             <form method="post">
                 {% csrf_token %}
 
+                {# Errores no campo (incluye validación de campos adicionales) #}
                 {% if form.non_field_errors %}
                     <div class="alert alert-danger">{{ form.non_field_errors }}</div>
                 {% endif %}
 
-                {# Renderizar campos hidden #}
+                {# Campos hidden (importante para HiddenInput en el form) #}
                 {% for hidden in form.hidden_fields %}
                     {{ hidden }}
                 {% endfor %}
@@ -31,7 +35,8 @@
                     {% if form.encuesta.errors %}<div class="text-danger small">{{ form.encuesta.errors }}</div>{% endif %}
                 </div>
 
-                {# Prioridad (render manual usando prioridad_choices pasado desde la view) #}
+                {# Prioridad (render manual para evitar problemas con widget oculto) #}
+                {% if prioridad_choices %}
                 <div class="mb-3">
                     <label for="id_prioridad" class="form-label">Prioridad:</label>
                     <select name="prioridad" id="id_prioridad" class="form-select">
@@ -45,6 +50,25 @@
                     </select>
                     {% if form.prioridad.errors %}<div class="text-danger small">{{ form.prioridad.errors }}</div>{% endif %}
                 </div>
+                {% endif %}
+
+                {# Contenedor de Campos Adicionales (server-side render si la vista pasó datos) #}
+                <div id="campos-adicionales-container">
+                    {% for campo in campos_adicionales %}
+                        <div class="mb-3" data-campo-id="{{ campo.id }}">
+                            <label class="form-label">
+                                {{ campo.titulo }}{% if campo.es_obligatoria %} <span class="text-danger">*</span>{% endif %}
+                            </label>
+                            <input type="text" name="campo_{{ campo.id }}" id="campo_{{ campo.id }}" class="form-control"
+                                   value="{{ campo.valor|default:'' }}">
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {# Inyectar prefill JSON para que el JS pueda reutilizarlo (opcional) #}
+                {% if respuestas_prefill %}
+                    {{ respuestas_prefill|json_script:"prefill-data" }}
+                {% endif %}
 
                 {# Descripción #}
                 <div class="mb-3">
@@ -74,7 +98,7 @@
                     {% if form.direccion_textual.errors %}<div class="text-danger small">{{ form.direccion_textual.errors }}</div>{% endif %}
                 </div>
 
-                {# Campos opcionales: iteramos sobre los BoundFields visibles y filtramos por optional_fields #}
+                {# Campos opcionales (vecino, territorial, cuadrilla, estado) renderizados a partir de form.visible_fields #}
                 {% for bf in form.visible_fields %}
                     {% if bf.name in optional_fields %}
                         <div class="mb-3">
@@ -92,4 +116,15 @@
         </div>
     </div>
 </div>
+
+{# Incluir el JS estático (archivo en static/includes/js/incidencias_camposA.js) #}
+<script
+  src="{% static 'includes/js/incidencias_camposA.js' %}"
+  defer
+  data-api-template="{% url 'api_campos_encuesta' 0 %}"
+  data-prefill-id="{% if respuestas_prefill %}prefill-data{% endif %}"
+  data-encuesta-selector="select[name='encuesta']"
+  data-container-selector="#campos-adicionales-container"
+></script>
+
 {% endblock %}

@@ -17,5 +17,5 @@ urlpatterns = [
 
     # Detalle de incidencia (solo visualización)
     path('detalle/<int:incidencia_id>/', views.detalle_incidencia, name='incidencia_detalle'),
-
+    path('api/campos_encuesta/<int:encuesta_id>/', views.api_campos_encuesta, name='api_campos_encuesta'),
 ]

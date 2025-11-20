@@ -8,8 +8,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from registration.models import Profile
 from cuadrillas.models import Cuadrilla
 from departamentos.models import Departamento
-from .models import Incidencia
+from .models import Incidencia, EncuestaRespuesta
 from .forms import IncidenciaForm
+from encuestas.models import CamposAdicionales
 
 
 # ---------------------------------------------------------------------
@@ -40,6 +41,14 @@ def is_direccion(user):
 
 def is_cuadrilla(user):
     return get_group_name(user) == "Cuadrilla"
+    
+@login_required
+def api_campos_encuesta(request, encuesta_id):
+    campos = list(
+        CamposAdicionales.objects.filter(encuesta_id=encuesta_id)
+        .values("id", "titulo", "es_obligatoria")
+    )
+    return JsonResponse({"campos": campos})
 
 
 # ---------------------------------------------------------------------
@@ -164,38 +173,90 @@ def gestion_incidencias(request):
 # ---------------------------------------------------------------------
 @login_required
 def crear_incidencia(request):
-    form = IncidenciaForm(user=request.user) 
+    profile = Profile.objects.get(user=request.user)
+    group_name = profile.group.name
+
+    campos_adicionales = []
+    respuestas_prefill = {}
 
     if request.method == "POST":
         form = IncidenciaForm(request.POST, user=request.user)
 
+        encuesta_id = request.POST.get("encuesta")
+        if encuesta_id:
+            campos_adicionales = list(CamposAdicionales.objects.filter(encuesta_id=encuesta_id))
+
+        # Prefill con lo enviado (para re-render si hay errores)
+        for campo in campos_adicionales:
+            respuestas_prefill[campo.id] = request.POST.get(f"campo_{campo.id}", "")
+
+        # Pasamos .valor a cada campo para que template lo use sin filtros
+        for campo in campos_adicionales:
+            campo.valor = respuestas_prefill.get(campo.id, "")
+
+        # DEBUG: ver estado del campo prioridad y campos adicionales
+        print("DEBUG crear_incidencia: campos_adicionales ids =", [c.id for c in campos_adicionales])
+        print("DEBUG crear_incidencia: prioridad in form.fields?", 'prioridad' in form.fields)
+        if 'prioridad' in form.fields:
+            print(" DEBUG prioridad.choices:", form.fields['prioridad'].choices)
+            print(" DEBUG prioridad.widget:", type(form.fields['prioridad'].widget))
+
         if form.is_valid():
-            incidencia = form.save(commit=False)
+            # validar obligatorios de campos adicionales
+            missing = [c.titulo for c in campos_adicionales if c.es_obligatoria and not (request.POST.get(f"campo_{c.id}", "") or "").strip()]
+            if missing:
+                form.add_error(None, "Faltan campos obligatorios: " + ", ".join(missing))
+                messages.error(request, "Revisa los campos adicionales obligatorios.")
+            else:
+                data = form.cleaned_data
+                incidencia = Incidencia(
+                    encuesta=data.get("encuesta"),
+                    vecino=data.get("vecino"),
+                    descripcion=data.get("descripcion"),
+                    latitud=data.get("latitud"),
+                    longitud=data.get("longitud"),
+                    direccion_textual=data.get("direccion_textual"),
+                )
+                if group_name == "Territorial":
+                    incidencia.territorial = request.user
+                    incidencia.estado = "abierta"
+                    incidencia.cuadrilla = None
+                else:
+                    incidencia.territorial = data.get("territorial") or None
+                    incidencia.cuadrilla = data.get("cuadrilla") or None
+                    incidencia.estado = data.get("estado") or "abierta"
 
-            profile = getattr(request.user, "profile", None)
-            group_name = profile.group.name if profile and profile.group else None
+                incidencia.save()
 
-            if group_name == "Territorial":
-                incidencia.territorial = request.user
-                incidencia.estado = "abierta"
+                # Guardar respuestas a campos adicionales
+                respuestas_objs = []
+                for campo in campos_adicionales:
+                    valor = (request.POST.get(f"campo_{campo.id}", "") or "").strip()
+                    if valor != "":
+                        respuestas_objs.append(
+                            EncuestaRespuesta(incidencia=incidencia, pregunta=campo, valor=valor)
+                        )
+                if respuestas_objs:
+                    EncuestaRespuesta.objects.bulk_create(respuestas_objs)
 
-            incidencia.save()
-
-            messages.success(request, "Incidencia creada correctamente.")
-            return redirect("gestion_incidencias")
-
+                messages.success(request, "Incidencia creada exitosamente.")
+                return redirect("gestion_incidencias")
         else:
             messages.error(request, "Revise los datos del formulario.")
 
+    else:
+        form = IncidenciaForm(user=request.user)
+
+    # si el form ya trae prioridad y quieres render manual, puedes pasar choices:
     prioridad_choices = list(form.fields['prioridad'].choices) if 'prioridad' in form.fields else []
-    optional_fields = ['vecino', 'territorial', 'cuadrilla', 'estado']
 
     return render(request, "incidencias/formulario_incidencia.html", {
         "form": form,
-        "prioridad_choices": prioridad_choices,
-        "group_name": get_group_name(request.user),
         "titulo_pagina": "Crear Incidencia",
-        "optional_fields": optional_fields,
+        "group_name": group_name,
+        "campos_adicionales": campos_adicionales,
+        "respuestas_prefill": respuestas_prefill,
+        "prioridad_choices": prioridad_choices,
     })
 
 # ---------------------------------------------------------------------
@@ -210,13 +271,28 @@ def editar_incidencia(request, incidencia_id):
     if group_name == "Territorial" and incidencia.territorial != request.user:
         messages.error(request, "No tienes permisos para editar esta incidencia.")
         return redirect("gestion_incidencias")
-
     if group_name == "Cuadrilla":
         messages.error(request, "No tienes permisos para editar incidencias.")
         return redirect("gestion_incidencias")
 
+    # campos de la encuesta actual y prefills
+    campos_adicionales = list(CamposAdicionales.objects.filter(encuesta=incidencia.encuesta))
+    respuestas_previas_qs = EncuestaRespuesta.objects.filter(incidencia=incidencia)
+    respuestas_prefill = {r.pregunta_id: r.valor for r in respuestas_previas_qs}
+    for campo in campos_adicionales:
+        campo.valor = respuestas_prefill.get(campo.id, "")
+
     if request.method == "POST":
         form = IncidenciaForm(request.POST, user=request.user)
+        encuesta_id = request.POST.get("encuesta") or (incidencia.encuesta.id if incidencia.encuesta else None)
+        # si cambio encuesta, recargar campos basados en la nueva encuesta seleccionada
+        if encuesta_id:
+            campos_adicionales = list(CamposAdicionales.objects.filter(encuesta_id=encuesta_id))
+            for campo in campos_adicionales:
+                campo.valor = request.POST.get(f"campo_{campo.id}", "")
+
+        prioridad_choices = list(form.fields['prioridad'].choices) if 'prioridad' in form.fields else []
+
         if form.is_valid():
             datos = form.cleaned_data
             incidencia.encuesta = datos.get("encuesta")
@@ -233,15 +309,40 @@ def editar_incidencia(request, incidencia_id):
             else:
                 incidencia.territorial = request.user
 
-            incidencia.save()
-            messages.success(request, "Incidencia actualizada.")
-            return redirect("gestion_incidencias")
+            # validar campos adicionales obligatorios
+            campos_post = list(CamposAdicionales.objects.filter(encuesta_id=encuesta_id))
+            missing = []
+            for campo in campos_post:
+                val = (request.POST.get(f"campo_{campo.id}", "") or "").strip()
+                if campo.es_obligatoria and not val:
+                    missing.append(campo.titulo)
+
+            if missing:
+                form.add_error(None, "Faltan campos obligatorios: " + ", ".join(missing))
+                messages.error(request, "Revisa los campos adicionales obligatorios.")
+            else:
+                incidencia.save()
+                # renovar respuestas
+                EncuestaRespuesta.objects.filter(incidencia=incidencia).delete()
+                respuestas_objs = []
+                for campo in campos_post:
+                    valor = (request.POST.get(f"campo_{campo.id}", "") or "").strip()
+                    if valor != "":
+                        respuestas_objs.append(
+                            EncuestaRespuesta(incidencia=incidencia, pregunta=campo, valor=valor)
+                        )
+                if respuestas_objs:
+                    EncuestaRespuesta.objects.bulk_create(respuestas_objs)
+
+                messages.success(request, "Incidencia actualizada.")
+                return redirect("gestion_incidencias")
+        else:
+            messages.error(request, "Revisa los datos del formulario.")
     else:
         try:
             cuadrilla_obj = incidencia.cuadrilla
         except ObjectDoesNotExist:
             cuadrilla_obj = None
-
         initial = {
             "encuesta": incidencia.encuesta,
             "vecino": incidencia.vecino,
@@ -254,17 +355,16 @@ def editar_incidencia(request, incidencia_id):
             "estado": incidencia.estado,
         }
         form = IncidenciaForm(initial=initial, user=request.user)
+        prioridad_choices = list(form.fields['prioridad'].choices) if 'prioridad' in form.fields else []
 
-    return render(
-        request,
-        "incidencias/formulario_incidencia.html",
-        {
-            "form": form,
-            "titulo_pagina": "Editar Incidencia",
-            "group_name": group_name,
-            "incidencia": incidencia,
-        },
-    )
+    return render(request, "incidencias/formulario_incidencia.html", {
+        "form": form,
+        "titulo_pagina": "Editar Incidencia",
+        "group_name": group_name,
+        "incidencia": incidencia,
+        "campos_adicionales": campos_adicionales,
+        "prioridad_choices": prioridad_choices,
+    })
 
 
 # ---------------------------------------------------------------------
@@ -421,12 +521,28 @@ def detalle_incidencia(request, incidencia_id):
     incidencia = get_object_or_404(
         Incidencia.objects.select_related(
             "encuesta__tipo_incidencia__departamento__direccion",
-            "territorial",
             "cuadrilla",
+            "territorial",
         ),
         id=incidencia_id
     )
-    return render(request, "incidencias/detalle_incidencia.html", {
+
+    campos = list(CamposAdicionales.objects.filter(encuesta=incidencia.encuesta).order_by("orden"))
+    respuestas_qs = EncuestaRespuesta.objects.filter(incidencia=incidencia).select_related("pregunta")
+    respuestas_map = {r.pregunta_id: r.valor for r in respuestas_qs}
+
+    campos_display = []
+    for c in campos:
+        campos_display.append({
+            "id": c.id,
+            "titulo": c.titulo,
+            "es_obligatoria": c.es_obligatoria,
+            "valor": respuestas_map.get(c.id),  # None si no respondido
+        })
+
+    context = {
         "incidencia": incidencia,
+        "campos_adicionales": campos_display,
         "group_name": get_group_name(request.user),
-    })
+    }
+    return render(request, "incidencias/detalle_incidencia.html", context)

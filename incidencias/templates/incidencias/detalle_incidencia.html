@@ -38,7 +38,6 @@
 
       <p><strong>Estado:</strong> {{ incidencia.get_estado_display }}</p>
 
-      {# Mostrar cuadrilla si existe o si estado == 'derivada' #}
       {% if incidencia.cuadrilla %}
         <p><strong>Derivada a cuadrilla:</strong>
           {{ incidencia.cuadrilla.nombre }}
@@ -48,6 +47,27 @@
         </p>
       {% elif incidencia.estado == 'derivada' %}
         <p class="text-warning"><strong>Derivada</strong> — cuadrilla no asignada</p>
+      {% endif %}
+
+      {# --- CAMPO ADICIONALES + RESPUESTAS --- #}
+      {% if campos_adicionales %}
+        <hr>
+        <h5>Respuestas a Campos Adicionales</h5>
+        <div class="mt-2">
+          {% for campo in campos_adicionales %}
+            <div class="mb-2">
+              <strong>{{ campo.titulo }}</strong>
+              {% if campo.es_obligatoria %}<span class="text-danger">*</span>{% endif %}
+              <div class="mt-1">
+                {% if campo.valor %}
+                  <div class="border rounded p-2 bg-light">{{ campo.valor }}</div>
+                {% else %}
+                  <div class="text-muted fst-italic">Sin respuesta</div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
       {% endif %}
 
       <a href="{% url 'gestion_incidencias' %}" class="btn btn-secondary mt-3">
