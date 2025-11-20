@@ -3,8 +3,6 @@ from .models import Encuesta, CamposAdicionales, TipoIncidencia
 from departamentos.models import Departamento
 from django.forms import inlineformset_factory
 
-print("¡¡CARGANDO FORMS.PY DE ENCUESTAS!! (Versión 4, 'orden' no obligatorio)")
-
 # --- FORMULARIO PRINCIPAL DE LA ENCUESTA ---
 class EncuestaForm(forms.ModelForm):
     

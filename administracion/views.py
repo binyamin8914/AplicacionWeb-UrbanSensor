@@ -3,8 +3,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
-
 from registration.models import Profile
+from direcciones.models import Direccion
 
 
 # ===================================================================
@@ -137,6 +137,18 @@ def usuario_actualizar(request, user_id=None):
 
             user_profile.group = group
             user_profile.telefono = telefono or ''
+            # ---- NUEVO: asignar dirección solo si es Territorial ----
+            if group.name == "Territorial":
+                direccion_id = request.POST.get("direccion_id")
+                try:
+                    direccion = Direccion.objects.get(pk=direccion_id)
+                except Direccion.DoesNotExist:
+                    messages.add_message(request, messages.INFO, "Debe seleccionar una dirección válida para el territorial.")
+                    return redirect("usuario_actualizar_id", user_id=user.id)
+                user_profile.direccion = direccion
+            else:
+                user_profile.direccion = None  # otros perfiles no tienen dirección asignada
+
             user_profile.save()
 
             messages.add_message(request, messages.INFO, "Usuario actualizado correctamente.")
@@ -167,7 +179,21 @@ def usuario_actualizar(request, user_id=None):
                 return redirect("usuario_actualizar")
 
             user.groups.add(group)
-            Profile.objects.create(user=user, group=group, telefono=telefono or '')
+            direccion = None
+            if group.name == "Territorial":
+                direccion_id = request.POST.get("direccion_id")
+                try:
+                    direccion = Direccion.objects.get(pk=direccion_id)
+                except Direccion.DoesNotExist:
+                    messages.add_message(request, messages.INFO, "Debe seleccionar una dirección válida para el territorial.")
+                    return redirect("usuario_actualizar")
+
+            Profile.objects.create(
+                user=user,
+                group=group,
+                telefono=telefono or '',
+                direccion=direccion
+            )
 
             messages.add_message(request, messages.INFO, "Usuario creado correctamente.")
         return redirect("usuarios_listar")
@@ -177,6 +203,7 @@ def usuario_actualizar(request, user_id=None):
         "usuario": user,
         "user_profile": user_profile,
         "grupos": grupos,
+        "direcciones": Direccion.objects.filter(esta_activa=True),
         "group_name": profile.group.name
     })
 
