@@ -19,7 +19,6 @@ class EncuestaForm(forms.ModelForm):
             'titulo': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'estado': forms.Select(attrs={'class': 'form-select'}),
-            'prioridad': forms.Select(attrs={'class': 'form-select'}),
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

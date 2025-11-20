@@ -15,16 +15,10 @@ class Encuesta(models.Model):
         ('vigente', 'Vigente'),
         ('bloqueado', 'Bloqueado'),
     ]
-    PRIORIDAD_CHOICES = [
-        ('alta', 'Alta'),
-        ('normal', 'Normal'),
-        ('baja', 'Baja'),
-    ]
     titulo = models.CharField(max_length=255)
     descripcion = models.CharField(max_length=400)
     tipo_incidencia = models.ForeignKey(TipoIncidencia, on_delete=models.PROTECT)
     estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='creado')
-    prioridad = models.CharField(max_length=10, choices=PRIORIDAD_CHOICES, default='normal')
 
     def __str__(self):
         return self.titulo

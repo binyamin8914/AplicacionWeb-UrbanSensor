@@ -15,10 +15,6 @@ urlpatterns = [
     path('derivar/<int:incidencia_id>/', views.derivar_incidencia, name='derivar_incidencia'),
     path('finalizar/<int:incidencia_id>/', views.finalizar_incidencia, name='finalizar_incidencia'),
 
-    # NUEVAS URLs PARA EL DASHBOARD Y LISTADO SECPLA
-    path('secpla/dashboard/', views.secpla_dashboard, name='secpla_dashboard'),
-    path('secpla/listado/', views.secpla_incidencias_list, name='secpla_listado_todas'),
-    path('secpla/listado/<str:status>/', views.secpla_incidencias_list, name='secpla_listado_filtrado'),
     # Detalle de incidencia (solo visualización)
     path('detalle/<int:incidencia_id>/', views.detalle_incidencia, name='incidencia_detalle'),
 

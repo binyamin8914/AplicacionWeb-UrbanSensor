@@ -8,13 +8,47 @@
       <h3>Incidencia #{{ incidencia.id }}</h3>
     </div>
     <div class="card-body">
-      <p><strong>Tipo:</strong> {{ incidencia.encuesta.tipo_incidencia.nombre }}</p>
+      <p><strong>Tipo:</strong>
+        {% if incidencia.encuesta and incidencia.encuesta.tipo_incidencia %}
+          {{ incidencia.encuesta.tipo_incidencia.nombre }}
+        {% else %}
+          Sin tipo asignado
+        {% endif %}
+      </p>
+
+      <p><strong>Prioridad:</strong> {{ incidencia.get_prioridad_display }}</p>
+
       <p><strong>Descripción:</strong> {{ incidencia.descripcion }}</p>
-      <p><strong>Dirección:</strong> {{ incidencia.encuesta.departamento.direccion.nombre }}</p>
-      <p><strong>Departamento:</strong> {{ incidencia.encuesta.departamento.nombre }}</p>
+
+      <p><strong>Dirección:</strong>
+        {% if incidencia.encuesta and incidencia.encuesta.tipo_incidencia and incidencia.encuesta.tipo_incidencia.departamento and incidencia.encuesta.tipo_incidencia.departamento.direccion %}
+          {{ incidencia.encuesta.tipo_incidencia.departamento.direccion.nombre }}
+        {% else %}
+          Sin asignar
+        {% endif %}
+      </p>
+
+      <p><strong>Departamento:</strong>
+        {% if incidencia.encuesta and incidencia.encuesta.tipo_incidencia and incidencia.encuesta.tipo_incidencia.departamento %}
+          {{ incidencia.encuesta.tipo_incidencia.departamento.nombre }}
+        {% else %}
+          Sin asignar
+        {% endif %}
+      </p>
+
       <p><strong>Estado:</strong> {{ incidencia.get_estado_display }}</p>
 
-      {# Aquí SOLO se ve el detalle, sin formulario de derivar #}
+      {# Mostrar cuadrilla si existe o si estado == 'derivada' #}
+      {% if incidencia.cuadrilla %}
+        <p><strong>Derivada a cuadrilla:</strong>
+          {{ incidencia.cuadrilla.nombre }}
+          {% if incidencia.cuadrilla.encargado %}
+            (Encargado: {{ incidencia.cuadrilla.encargado.get_full_name|default:incidencia.cuadrilla.encargado.username }})
+          {% endif %}
+        </p>
+      {% elif incidencia.estado == 'derivada' %}
+        <p class="text-warning"><strong>Derivada</strong> — cuadrilla no asignada</p>
+      {% endif %}
 
       <a href="{% url 'gestion_incidencias' %}" class="btn btn-secondary mt-3">
         Volver a incidencias

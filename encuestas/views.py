@@ -149,12 +149,9 @@ def gestion_encuestas(request):
     )
 
     estado = request.GET.get("estado")
-    prioridad = request.GET.get("prioridad")
 
     if estado:
         qs = qs.filter(estado=estado)
-    if prioridad:
-        qs = qs.filter(prioridad=prioridad)
 
     page_obj = Paginator(qs, 10).get_page(request.GET.get("page"))
 
@@ -164,7 +161,6 @@ def gestion_encuestas(request):
     return render(request, "encuestas/gestion_encuestas.html", {
         "encuestas": page_obj,
         "f_estado": estado or "",
-        "f_prioridad": prioridad or "",
         "group_name": profile.group.name,
         "es_secpla": es_secpla,  # usado para mostrar/ocultar botón Crear
     })

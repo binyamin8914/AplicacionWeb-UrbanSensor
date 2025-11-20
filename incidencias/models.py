@@ -21,7 +21,13 @@ class Incidencia(models.Model):
         ('cerrada', 'Cerrada'),
         ('rechazada', 'Rechazada'),
     ]
+    PRIORIDAD_CHOICES = [
+        ('alta', 'Alta'),
+        ('normal', 'Normal'),
+        ('baja', 'Baja'),
+    ]
     encuesta = models.ForeignKey('encuestas.Encuesta', on_delete=models.PROTECT)
+    prioridad = models.CharField(max_length=10, choices=PRIORIDAD_CHOICES, default='normal')
     vecino = models.ForeignKey(Vecino, on_delete=models.PROTECT, null=True, blank=True)
     territorial = models.ForeignKey(User, on_delete=models.PROTECT, related_name='incidencias_territorial')
     cuadrilla = models.ForeignKey(Cuadrilla, on_delete=models.PROTECT, null=True, blank=True)

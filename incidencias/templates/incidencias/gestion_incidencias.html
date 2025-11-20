@@ -1,133 +1,271 @@
 {% extends "core/base.html" %}
+{% load static %}
+
 {% block title %}Gestión de Incidencias{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container-fluid mt-4">
 
-    {# Título adaptado al perfil #}
-    {% if group_name == "Territorial" %}
-        <h1 class="mb-3">Mis incidencias</h1>
-    {% else %}
-        <h1 class="mb-3">Gestión de Incidencias</h1>
+    {# TÍTULO ADAPTADO AL PERFIL #}
+    <h1 class="mb-3">
+        {% if group_name == "Territorial" %}
+            Mis Incidencias
+        {% elif group_name == "SECPLA" %}
+            Todas las Incidencias
+        {% elif group_name == "Direccion" %}
+            Incidencias de mi Dirección
+        {% elif group_name == "Departamento" %}
+            Incidencias de mi Departamento
+        {% elif group_name == "Cuadrilla" %}
+            Incidencias Asignadas
+        {% endif %}
+    </h1>
+
+    {# CARDS DE RESUMEN - (Lógica del template nuevo) #}
+    {% if group_name in "SECPLA,Direccion,Departamento" %}
+    <div class="row g-3 mb-4">
+        {# ... (Mantener todas las CARDS de resumen aquí) ... #}
+        <div class="col-md-2">
+            <a href="?estado=" class="text-decoration-none">
+                <div class="card text-center shadow-sm {% if not estado_filtrado %}border-primary{% endif %}">
+                    <div class="card-body">
+                        <h6 class="text-muted">Total</h6>
+                        <h3 class="text-dark">{{ count_total }}</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="?estado=abierta" class="text-decoration-none">
+                <div class="card text-center shadow-sm {% if estado_filtrado == 'abierta' %}border-info{% endif %}"> 
+                    <div class="card-body">
+                        <h6 class="text-muted">Abiertas</h6>
+                        <h3 class="text-info">{{ count_abiertas }}</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="?estado=derivada" class="text-decoration-none">
+                <div class="card text-center shadow-sm {% if estado_filtrado == 'derivada' %}border-primary{% endif %}">
+                    <div class="card-body">
+                        <h6 class="text-muted">Derivadas</h6>
+                        <h3 class="text-primary">{{ count_derivadas }}</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="?estado=rechazada" class="text-decoration-none">
+                <div class="card text-center shadow-sm {% if estado_filtrado == 'rechazada' %}border-danger{% endif %}">
+                    <div class="card-body">
+                        <h6 class="text-muted">Rechazadas</h6>
+                        <h3 class="text-danger">{{ count_rechazadas }}</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="?estado=finalizada" class="text-decoration-none">
+                <div class="card text-center shadow-sm {% if estado_filtrado == 'finalizada' %}border-success{% endif %}"> 
+                    <div class="card-body">
+                        <h6 class="text-muted">Finalizadas</h6>
+                        <h3 class="text-success">{{ count_finalizadas }}</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="?estado=cerrada" class="text-decoration-none">
+                <div class="card text-center shadow-sm {% if estado_filtrado == 'cerrada' %}border-dark{% endif %}">
+                    <div class="card-body">
+                        <h6 class="text-muted">Cerradas</h6>
+                        <h3 class="text-dark">{{ count_cerradas }}</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
     {% endif %}
 
+    {# BARRA DE ACCIONES Y FILTROS (Mantenemos la lógica de botón) #}
     <div class="d-flex justify-content-between align-items-center mb-3">
         
-        <div class="d-flex">
-            <div class="dropdown">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-filter-left me-1"></i>
-                    {% if request.GET.estado %}
-                        {{ request.GET.estado|capfirst }}
-                    {% else %}
-                        Estado
-                    {% endif %}
-                </button>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a class="dropdown-item {% if not request.GET.estado %}active{% endif %}" href="{% url 'gestion_incidencias' %}">
-                            Todos los Estados
-                        </a>
-                    </li>
-                    <li><hr class="dropdown-divider"></li>
-                    
-                    <li><a class="dropdown-item" href="?estado=abierta">Abierta</a></li>
-                    <li><a class="dropdown-item" href="?estado=derivada">Derivada</a></li>
-                    <li><a class="dropdown-item" href="?estado=proceso">En proceso</a></li>
-                    <li><a class="dropdown-item" href="?estado=finalizada">Finalizada</a></li>
-                    <li><a class="dropdown-item" href="?estado=rechazada">Rechazada</a></li>
-                </ul>
-            </div>
+        {# FILTRO POR ESTADO (Dropdown - para Territorial y Cuadrilla) #}
+        {% if group_name in "Territorial,Cuadrilla" %}
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-filter-left me-1"></i>
+                {% if estado_filtrado %}
+                    {{ estado_filtrado|capfirst }}
+                {% else %}
+                    Todos los Estados
+                {% endif %}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item {% if not estado_filtrado %}active{% endif %}" href="{% url 'gestion_incidencias' %}">Todos</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="?estado=abierta">Abierta</a></li>
+                <li><a class="dropdown-item" href="?estado=derivada">Derivada</a></li>
+                <li><a class="dropdown-item" href="?estado=finalizada">Finalizada</a></li>
+                <li><a class="dropdown-item" href="?estado=rechazada">Rechazada</a></li>
+            </ul>
         </div>
-
-        {% if group_name == "Territorial" %}
-            <a href="{% url 'crear_incidencia' %}" class="btn btn-primary">
-                <i class="bi bi-plus-circle-fill me-2"></i>Crear Nueva Incidencia
-            </a>
+        {% else %}
+        {# ESTADO ACTUAL PARA ROLES ADMINISTRATIVOS (MÁS DETALLADO) #}
+        <div class="mb-0">
+            <p class="text-muted small mb-0">
+                Listado completo | Estado actual: 
+                <span class="fw-bold text-dark">{{ estado_filtrado|default:"Todas"|upper }}</span>
+            </p>
+        </div>
         {% endif %}
-        
+
+        {# BOTÓN CREAR (solo Territorial) #}
+        {% if group_name == "Territorial" %}
+        <a href="{% url 'crear_incidencia' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle-fill me-2"></i>Crear Nueva Incidencia
+        </a>
+        {% endif %}
     </div>
 
-    <div class="card shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-hover table-striped mb-0 align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>#</th>
-                        <th>Tipo</th>
-                        <th>Dirección</th>
-                        <th>Departamento</th>
-                        <th>Estado</th>
-                        <th style="width: 260px;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for inc in incidencias %}
-                    <tr>
-                        <td>{{ inc.id }}</td>
-                        <td>{{ inc.encuesta.tipo_incidencia.nombre }}</td>
-                        <td>
-                            {{ inc.encuesta.tipo_incidencia.departamento.direccion.nombre|default:"-" }}
-                        </td>
-                        <td>{{ inc.encuesta.tipo_incidencia.departamento.nombre|default:"-" }}</td>
-                        <td>
-                            {# Badge de Bootstrap según estado #}
-                            {% if inc.estado == "abierta" %}
-                                <span class="badge bg-success">Abierta</span>
-                            {% elif inc.estado == "derivada" %}
-                                <span class="badge bg-primary">Derivada</span>
-                            {% elif inc.estado == "proceso" %}
-                                <span class="badge bg-warning text-dark">En proceso</span>
-                            {% elif inc.estado == "finalizada" %}
-                                <span class="badge bg-secondary">Finalizada</span>
-                            {% elif inc.estado == "rechazada" %}
-                                <span class="badge bg-danger">Rechazada</span>
-                            {% else %}
-                                {{ inc.get_estado_display }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {# Botón de ver siempre disponible #}
-                            <a href="{% url 'incidencia_detalle' inc.id %}" class="btn btn-sm btn-outline-secondary">
-                                Ver
-                            </a>
-
-                            {# Territorial puede editar/eliminar sus propias incidencias #}
-                            {% if group_name == "Territorial" and inc.territorial == request.user %}
-                                <a href="{% url 'editar_incidencia' inc.id %}" class="btn btn-sm btn-info text-white">
-                                    Editar
-                                </a>
-                                <a href="{% url 'eliminar_incidencia' inc.id %}" class="btn btn-sm btn-danger">
-                                    Eliminar
-                                </a>
-                            {% endif %}
-
-                            {# Lógica para otros roles (Derivar/Finalizar) sigue aquí igual... #}
-                            {% if group_name == "Departamento" %}
-                                <a href="{% url 'derivar_incidencia' inc.id %}" class="btn btn-sm btn-warning">
-                                    Derivar
-                                </a>
-                            {% endif %}
+    {# TABLA DE INCIDENCIAS #}
+    <div class="card shadow border-0 mb-5">
+        <div class="card-body p-0">
+            
+            {% if incidencias %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-light text-secondary">
+                        <tr>
+                            <th scope="col" class="ps-4 py-3">#</th>
+                            <th scope="col" class="py-3">Nombre (Tipo)</th>
+                            <th scope="col" class="py-3">Dirección (Entidad)</th>
+                            <th scope="col" class="py-3">Departamento</th>
+                            <th scope="col" class="py-3">Estado</th>
+                            <th scope="col" class="py-3">Prioridad</th>
+                            <th scope="col" class="text-end pe-4 py-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inc in incidencias %}
+                        <tr>
+                            <td class="ps-4 fw-bold text-secondary">
+                                {{ inc.id }}
+                            </td>
                             
-                            {% if group_name == "Cuadrilla" and inc.cuadrilla_id %}
-                                {% if inc.cuadrilla.encargado_id == request.user.id %}
+                            <td>
+                                <span class="fw-semibold text-dark d-block">
+                                    {{ inc.encuesta.tipo_incidencia.nombre }}
+                                </span>
+                                <small class="text-muted text-truncate d-block" style="max-width: 250px;">
+                                    {{ inc.encuesta.titulo|default:"Sin título" }} 
+                                </small>
+                            </td>
+
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-building-up text-danger me-2"></i>
+                                    <span class="text-dark">
+                                        {{ inc.encuesta.tipo_incidencia.departamento.direccion.nombre|default:"Sin asignar" }}
+                                    </span>
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    <i class="bi bi-diagram-3 me-1"></i>
+                                    {{ inc.encuesta.tipo_incidencia.departamento.nombre|default:"-" }}
+                                </span>
+                            </td>
+
+                            {# BADGES DE ESTADO (Usando la versión más detallada de colores) #}
+                            <td>
+                                {% if inc.estado == 'finalizada' %}
+                                    <span class="badge rounded-pill bg-success bg-opacity-75 text-white px-3">
+                                        <i class="bi bi-check-circle me-1"></i> Finalizada
+                                    </span>
+                                {% elif inc.estado == 'rechazada' %}
+                                    <span class="badge rounded-pill bg-danger bg-opacity-75 text-white px-3">
+                                        <i class="bi bi-x-circle me-1"></i> Rechazada
+                                    </span>
+                                {% elif inc.estado == 'derivada' %}
+                                    <span class="badge rounded-pill bg-primary text-white px-3">
+                                        <i class="bi bi-arrow-right-circle me-1"></i> Derivada
+                                    </span>
+                                {% elif inc.estado == 'proceso' %}
+                                    <span class="badge rounded-pill bg-warning text-dark px-3">
+                                        <i class="bi bi-hourglass-split me-1"></i> En Proceso
+                                    </span>
+                                {% elif inc.estado == 'abierta' %}
+                                    <span class="badge rounded-pill bg-info text-dark px-3">
+                                        <i class="bi bi-envelope-open me-1"></i> Abierta
+                                    </span>
+                                {% elif inc.estado == 'cerrada' %}
+                                    <span class="badge rounded-pill bg-dark text-white px-3">
+                                        <i class="bi bi-lock me-1"></i> Cerrada
+                                    </span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-secondary text-white px-3">
+                                        {{ inc.get_estado_display }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if inc.prioridad == 'alta' %}
+                                    <span class="badge bg-danger">Alta</span>
+                                {% elif inc.prioridad == 'normal' %}
+                                    <span class="badge bg-warning text-dark">Normal</span>
+                                {% elif inc.prioridad == 'baja' %}
+                                    <span class="badge bg-info text-dark">Baja</span>
+                                {% else %}
+                                    {{ inc.get_prioridad_display|default:inc.prioridad }}
+                                {% endif %}
+                            </td>
+
+                            {# ACCIONES (Lógica del template nuevo) #}
+                            <td class="text-end pe-4">
+                                <a href="{% url 'incidencia_detalle' inc.id %}" class="btn btn-sm btn-outline-primary shadow-sm" title="Ver Detalle">
+                                    <i class="bi bi-eye-fill me-1"></i> Ver
+                                </a>
+                                
+                                {% if group_name == "Territorial" and inc.territorial == request.user %}
+                                    <a href="{% url 'editar_incidencia' inc.id %}" class="btn btn-sm btn-info text-white">Editar</a>
+                                    <a href="{% url 'eliminar_incidencia' inc.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                {% endif %}
+
+                                {% if group_name == "Departamento" %}
+                                    <a href="{% url 'derivar_incidencia' inc.id %}" class="btn btn-sm btn-warning">Derivar</a>
+                                {% endif %}
+                                
+                                {% if group_name == "Cuadrilla" and inc.cuadrilla_id and inc.cuadrilla.encargado_id == request.user.id %}
                                     <form action="{% url 'finalizar_incidencia' inc.id %}" method="post" class="d-inline">
                                         {% csrf_token %}
                                         <button class="btn btn-sm btn-success" type="submit">Finalizar</button>
                                     </form>
                                 {% endif %}
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="6" class="text-center text-muted p-4 fst-italic">
-                            No hay incidencias registradas con este filtro.
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-footer bg-white border-top py-3">
+                <small class="text-muted">Total de registros mostrados: <strong>{{ incidencias.count }}</strong></small>
+            </div>
+
+            {% else %}
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-inbox text-gray-300" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="text-muted">No se encontraron incidencias</h5>
+                <p class="text-muted small">No hay registros con el estado "<strong>{{ estado_filtrado|default:'Todos' }}</strong>" actualmente.</p>
+            </div>
+            {% endif %}
+
         </div>
     </div>
 </div>

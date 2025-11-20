@@ -50,20 +50,23 @@ def gestion_incidencias(request):
     profile = Profile.objects.get(user=request.user)
     group_name = profile.group.name
 
-    context_counts = {}
-
     if group_name == "SECPLA":
-        return redirect("secpla_dashboard")
-
+        # SECPLA ve TODAS las incidencias
+        incidencias = (
+            Incidencia.objects.all()
+            .select_related("encuesta__tipo_incidencia__departamento__direccion")
+            .order_by("-created_at")
+        )
     elif group_name == "Territorial":
+        # Territorial ve solo SUS incidencias
         incidencias = (
             Incidencia.objects
             .select_related("encuesta__tipo_incidencia__departamento__direccion")
             .filter(territorial=request.user)
             .order_by("-created_at")
         )
-
     elif group_name == "Departamento":
+        # Departamento ve incidencias de SU departamento
         departamento = Departamento.objects.filter(encargado=request.user).first()
         if not departamento:
             incidencias = Incidencia.objects.none()
@@ -74,8 +77,8 @@ def gestion_incidencias(request):
                 .filter(encuesta__tipo_incidencia__departamento=departamento)
                 .order_by("-created_at")
             )
-
     elif group_name == "Direccion":
+        # Dirección ve incidencias de SU dirección
         direccion = getattr(request.user, "direccion_encargada", None)
         if not direccion:
             incidencias = Incidencia.objects.none()
@@ -86,8 +89,8 @@ def gestion_incidencias(request):
                 .filter(encuesta__tipo_incidencia__departamento__direccion=direccion)
                 .order_by("-created_at")
             )
-
     elif group_name == "Cuadrilla":
+        # Cuadrilla ve incidencias ASIGNADAS a ella
         cuadrilla = Cuadrilla.objects.filter(encargado=request.user).first()
         if not cuadrilla:
             incidencias = Incidencia.objects.none()
@@ -108,9 +111,49 @@ def gestion_incidencias(request):
     if estado_q:
         incidencias = incidencias.filter(estado=estado_q)
 
+    # CONTADORES DE ESTADOS 
+    context_counts = {}
+    if group_name in ["SECPLA", "Direccion", "Departamento"]:
+        # Calculamos contadores basados en el queryset ya filtrado por rol
+        # (sin aplicar filtro de estado)
+        queryset_completo = incidencias if not estado_q else (
+            Incidencia.objects.all().select_related(
+                "encuesta__tipo_incidencia__departamento__direccion"
+            ) if group_name == "SECPLA" else
+            incidencias.model.objects.filter(
+                pk__in=incidencias.values_list('pk', flat=True)
+            )
+        )
+        
+        # Recalcular sin el filtro de estado
+        if group_name == "SECPLA":
+            base_qs = Incidencia.objects.all()
+        elif group_name == "Direccion":
+            direccion = getattr(request.user, "direccion_encargada", None)
+            base_qs = Incidencia.objects.filter(
+                encuesta__tipo_incidencia__departamento__direccion=direccion
+            ) if direccion else Incidencia.objects.none()
+        elif group_name == "Departamento":
+            departamento = Departamento.objects.filter(encargado=request.user).first()
+            base_qs = Incidencia.objects.filter(
+                encuesta__tipo_incidencia__departamento=departamento
+            ) if departamento else Incidencia.objects.none()
+        else:
+            base_qs = Incidencia.objects.none()
+
+        context_counts = {
+            "count_abiertas": base_qs.filter(estado="abierta").count(),
+            "count_derivadas": base_qs.filter(estado="derivada").count(),
+            "count_rechazadas": base_qs.filter(estado="rechazada").count(),
+            "count_finalizadas": base_qs.filter(estado="finalizada").count(),
+            "count_cerradas": base_qs.filter(estado="cerrada").count(),
+            "count_total": base_qs.count(),
+        }
+
     context = {
         "incidencias": incidencias,
         "group_name": group_name,
+        "estado_filtrado": estado_q,
         **context_counts,
     }
     return render(request, "incidencias/gestion_incidencias.html", context)
@@ -121,46 +164,39 @@ def gestion_incidencias(request):
 # ---------------------------------------------------------------------
 @login_required
 def crear_incidencia(request):
-    profile = Profile.objects.get(user=request.user)
-    group_name = profile.group.name
+    form = IncidenciaForm(user=request.user) 
 
     if request.method == "POST":
         form = IncidenciaForm(request.POST, user=request.user)
+
         if form.is_valid():
-            data = form.cleaned_data
-            incidencia = Incidencia(
-                encuesta=data.get("encuesta"),
-                vecino=data.get("vecino"),
-                descripcion=data.get("descripcion"),
-                latitud=data.get("latitud"),
-                longitud=data.get("longitud"),
-                direccion_textual=data.get("direccion_textual"),
-            )
+            incidencia = form.save(commit=False)
+
+            profile = getattr(request.user, "profile", None)
+            group_name = profile.group.name if profile and profile.group else None
+
             if group_name == "Territorial":
                 incidencia.territorial = request.user
                 incidencia.estado = "abierta"
-                incidencia.cuadrilla = None
-            else:
-                incidencia.territorial = data.get("territorial") or None
-                incidencia.cuadrilla = data.get("cuadrilla") or None
-                incidencia.estado = data.get("estado") or "abierta"
 
             incidencia.save()
-            messages.success(request, "Incidencia creada exitosamente.")
+
+            messages.success(request, "Incidencia creada correctamente.")
             return redirect("gestion_incidencias")
-    else:
-        form = IncidenciaForm(user=request.user)
 
-    return render(
-        request,
-        "incidencias/formulario_incidencia.html",
-        {
-            "form": form,
-            "titulo_pagina": "Crear Incidencia",
-            "group_name": group_name,
-        },
-    )
+        else:
+            messages.error(request, "Revise los datos del formulario.")
 
+    prioridad_choices = list(form.fields['prioridad'].choices) if 'prioridad' in form.fields else []
+    optional_fields = ['vecino', 'territorial', 'cuadrilla', 'estado']
+
+    return render(request, "incidencias/formulario_incidencia.html", {
+        "form": form,
+        "prioridad_choices": prioridad_choices,
+        "group_name": get_group_name(request.user),
+        "titulo_pagina": "Crear Incidencia",
+        "optional_fields": optional_fields,
+    })
 
 # ---------------------------------------------------------------------
 # Editar Incidencia
@@ -291,13 +327,16 @@ def eliminar_incidencia(request, incidencia_id):
 # ---------------------------------------------------------------------
 @login_required
 def derivar_incidencia(request, incidencia_id):
-    incidencia = get_object_or_404(Incidencia, id=incidencia_id)
+    incidencia = get_object_or_404(
+        Incidencia.objects.select_related(
+            "encuesta__tipo_incidencia__departamento",
+            "cuadrilla",
+        ),
+        id=incidencia_id
+    )
     profile = Profile.objects.get(user=request.user)
     group_name = profile.group.name
 
-    # AQUÍ ESTABA EL ERROR: Encuesta no tiene 'departamento'.
-    # Lo correcto es pasar por tipo_incidencia:
-    #   encuesta -> tipo_incidencia -> departamento
     try:
         departamento = incidencia.encuesta.tipo_incidencia.departamento
     except AttributeError:
@@ -307,7 +346,6 @@ def derivar_incidencia(request, incidencia_id):
         )
         return redirect("gestion_incidencias")
 
-    # Solo el encargado del departamento puede derivar
     if group_name != "Departamento" or departamento.encargado != request.user:
         messages.error(request, "No tienes permisos para derivar esta incidencia.")
         return redirect("gestion_incidencias")
@@ -320,24 +358,20 @@ def derivar_incidencia(request, incidencia_id):
 
         cuadrilla = get_object_or_404(Cuadrilla, id=cuadrilla_id)
 
-        if cuadrilla.departamento_id != departamento.id:
-            messages.error(
-                request,
-                "La cuadrilla seleccionada no pertenece a este departamento.",
-            )
-            return redirect("gestion_incidencias")
-
         incidencia.cuadrilla = cuadrilla
         incidencia.estado = "derivada"
         incidencia.save()
-        messages.success(request, "Incidencia derivada a cuadrilla correctamente.")
+        messages.success(
+            request,
+            f"Incidencia derivada a la cuadrilla '{cuadrilla.nombre}'."
+        )
         return redirect("gestion_incidencias")
 
     cuadrillas = Cuadrilla.objects.filter(departamento=departamento, esta_activa=True)
 
     return render(
         request,
-        "incidencias/derivar.html",  # o 'incidencias/derivar_incidencia.html' si así se llama tu template
+        "incidencias/derivar.html",
         {
             "incidencia": incidencia,
             "cuadrillas": cuadrillas,
@@ -382,72 +416,17 @@ def territorial_dashboard_data(request):
         }
     )
 
-
-@login_required
-def secpla_dashboard(request):
-    """
-    Dashboard para el perfil SECPLA: Muestra conteo de incidencias por estado.
-    """
-    profile = get_object_or_404(Profile, user=request.user)
-    group_name_upper = profile.group.name.upper()
-
-    if group_name_upper != "SECPLA":
-        messages.error(
-            request,
-            "Acceso denegado: Solo SECPLA puede ver este dashboard.",
-        )
-        return redirect("gestion_incidencias")
-
-    all_incidencias = Incidencia.objects.all()
-
-    context = {
-        "total_creadas": all_incidencias.count(),
-        "count_derivadas": all_incidencias.filter(estado="derivada").count(),
-        "count_rechazadas": all_incidencias.filter(estado="rechazada").count(),
-        "count_finalizadas": all_incidencias.filter(estado="finalizada").count(),
-        "group_name": profile.group.name,
-    }
-
-    return render(request, "incidencias/secpla_dashboard.html", context)
-
-
-@login_required
-def secpla_incidencias_list(request, status=None):
-    profile = get_object_or_404(Profile, user=request.user)
-    group_name_upper = profile.group.name.upper()
-
-    if group_name_upper != "SECPLA":
-        messages.error(request, "Acceso denegado.")
-        return redirect("gestion_incidencias")
-
-    queryset = (
-        Incidencia.objects
-        .select_related(
-            "encuesta",
-            "encuesta__tipo_incidencia",
-            "encuesta__tipo_incidencia__departamento",
-            "encuesta__tipo_incidencia__departamento__direccion",
-        )
-        .order_by("-id")
-    )
-
-    if status and status != "todas":
-        incidencias = queryset.filter(estado=status)
-        title = f"Listado: Incidencias '{status.capitalize()}'"
-    else:
-        incidencias = queryset.all()
-        title = "Listado: Todas las Incidencias Creadas"
-
-    context = {
-        "incidencias": incidencias,
-        "title": title,
-        "group_name": profile.group.name,
-        "current_status": status or "todas",
-    }
-    return render(request, "incidencias/secpla_incidencias_list.html", context)
-
-
 @login_required
 def detalle_incidencia(request, incidencia_id):
-    incidencia = get_object_or_404(Incidencia, id=incidencia_id)
-    return render(request, "incidencias/detalle_incidencia.html", {"incidencia": incidencia})
+    incidencia = get_object_or_404(
+        Incidencia.objects.select_related(
+            "encuesta__tipo_incidencia__departamento__direccion",
+            "territorial",
+            "cuadrilla",
+        ),
+        id=incidencia_id
+    )
+    return render(request, "incidencias/detalle_incidencia.html", {
+        "incidencia": incidencia,
+        "group_name": get_group_name(request.user),
+    })
