@@ -4,6 +4,14 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.shortcuts import get_object_or_404, redirect
 
+# Equivalencias entre el codigo y el modelo
+#  - ------------------------------------------------------------------------
+#  - | Nombre de la tabla en el modelo  | Nombre de la tabla en el codigo   |
+#  - ------------------------------------------------------------------------
+#  - | Usuario                          | Profile                           |
+#  - | -------                          | User                              | -> Tabla manejada por django, contiene la mitad de los datos de la tabla Usuarios del modelo
+#  - | Perfiles                         | Group                             | -> Group es una tabla manejada por django
+#  - ------------------------------------------------------------------------
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

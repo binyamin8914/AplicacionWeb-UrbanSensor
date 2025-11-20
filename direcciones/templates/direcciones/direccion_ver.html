@@ -1,0 +1,10 @@
+{% extends "core/base.html" %}
+{% block title %}Ver Dirección{% endblock %}
+{% block content %}
+<h4>Ver Dirección</h4>
+<a href="{% url 'direccion_listar' %}">Volver</a>
+<hr>
+<p><b>Nombre Dirección:</b> {{ direccion.nombre }}</p>
+<p><b>Encargado:</b> {{ direccion.encargado.get_full_name }}</p>
+<p><b>Estado:</b> {% if direccion.esta_activa %}Activa{% else %}Bloqueada{% endif %}</p>
+{% endblock %}
