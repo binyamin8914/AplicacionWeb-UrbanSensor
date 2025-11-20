@@ -1,0 +1,138 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1 class="mb-1">{{ titulo }}</h1>
+    <p class="text-muted">{{ descripcion }}</p>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    
+    <div class="d-flex">
+        
+        <div class="dropdown me-2">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-filter-left me-1"></i>
+                {% if current_filtro_estado %}{{ current_filtro_estado }}{% else %}Estado{% endif %}
+            </button>
+            <ul class="dropdown-menu">
+                {% for opcion in filtros.0.opciones %} 
+                <li>
+                    <a class="dropdown-item" href="{% url 'usuarios_listar' %}?estado={{ opcion }}&perfil={{ current_filtro_perfil|default:'' }}">{{ opcion }}</a>
+                </li>
+                {% endfor %}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'usuarios_listar' %}?perfil={{ current_filtro_perfil|default:'' }}">Todos los Estados</a></li>
+            </ul>
+        </div>
+
+        <div class="dropdown me-2">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-fill me-1"></i>
+                {% if current_filtro_perfil %}{{ current_filtro_perfil }}{% else %}Perfil{% endif %}
+            </button>
+            <ul class="dropdown-menu">
+                {% for opcion in filtros.1.opciones %} 
+                <li>
+                    <a class="dropdown-item" href="{% url 'usuarios_listar' %}?estado={{ current_filtro_estado|default:'' }}&perfil={{ opcion }}">{{ opcion }}</a>
+                </li>
+                {% endfor %}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'usuarios_listar' %}?estado={{ current_filtro_estado|default:'' }}">Todos los Perfiles</a></li>
+            </ul>
+        </div>
+
+    </div>
+
+    <a href="{% url url.name %}" class="btn btn-success">
+        <i class="bi bi-plus-circle-fill me-2"></i>
+        {{ url.label }}
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">#</th>
+                    {% for th in titulos %}
+                    <th scope="col">{{ th }}</th>
+                    {% endfor %}
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fila in filas %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    
+                    {% for col in fila.columnas %}
+                    <td>
+                        {% if forloop.counter == 7 %}
+                            {% if col == 'Activo' %}
+                            <span class="badge bg-success">{{ col }}</span>
+                            {% else %}
+                            <span class="badge bg-danger">{{ col }}</span>
+                            {% endif %}
+                        {% else %}
+                            {{ col|default:"—" }}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+
+                    <td class="text-nowrap">
+                        {% for accion in fila.acciones %}
+                            <a href="{% url accion.url fila.id %}" class="btn btn-sm 
+                                {% if 'Editar' in accion.name %}btn-secondary
+                                {% elif 'Ver' in accion.name %}btn-secondary
+                                {% elif 'Bloquear' in accion.name %}btn-danger
+                                {% elif 'Activar' in accion.name %}btn-success
+                                {% endif %}">
+                                {{ accion.name }}
+                            </a>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{{ titulos|length|add:2 }}" class="text-center text-muted fst-italic p-4">
+                        No hay usuarios registrados. (Intenta limpiar los filtros)
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- PAGINACIÓN -->
+{% if usuarios.has_other_pages %}
+<nav aria-label="Navegación de páginas" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if usuarios.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1&estado={{ current_filtro_estado }}&perfil={{ current_filtro_perfil }}">&laquo; Primera</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ usuarios.previous_page_number }}&estado={{ current_filtro_estado }}&perfil={{ current_filtro_perfil }}">Anterior</a>
+            </li>
+        {% endif %}
+        
+        <li class="page-item active" aria-current="page">
+            <span class="page-link">Página {{ usuarios.number }} de {{ usuarios.paginator.num_pages }}</span>
+        </li>
+        
+        {% if usuarios.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ usuarios.next_page_number }}&estado={{ current_filtro_estado }}&perfil={{ current_filtro_perfil }}">Siguiente</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ usuarios.paginator.num_pages }}&estado={{ current_filtro_estado }}&perfil={{ current_filtro_perfil }}">Última &raquo;</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}
+    {% if usuario %}Editar Usuario: {{ usuario.username }}{% else %}Crear Usuario{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="content-header mb-4">
+    <h1 class="mb-1">
+        {% if usuario %}Editar Usuario{% else %}Crear Usuario{% endif %}
+    </h1>
+    <p class="text-muted">
+        {% if usuario %}Modifica la información del usuario existente.{% else %}Registra un nuevo usuario en la plataforma.{% endif %}
+    </p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7"> {# Columna para limitar el ancho del formulario #}
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Datos del Usuario</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Usuario</label>
+                        <input type="text" class="form-control" id="id_username" name="username" 
+                               value="{{ usuario.username|default:'' }}" 
+                               {% if usuario %}readonly{% endif %} required>
+                        {% if usuario %}<small class="form-text text-muted">El nombre de usuario no se puede cambiar.</small>{% endif %}
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="id_first_name" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="id_first_name" name="first_name" 
+                                   value="{{ usuario.first_name|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_last_name" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="id_last_name" name="last_name" 
+                                   value="{{ usuario.last_name|default:'' }}">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="id_email" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="id_email" name="email" 
+                                   value="{{ usuario.email|default:'' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_telefono" class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" id="id_telefono" name="telefono" 
+                                   value="{{ user_profile.telefono|default:'' }}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_group" class="form-label">Perfil</label>
+                        <select class="form-select" id="id_group" name="group" required>
+                            <option value="">Seleccione un perfil</option>
+                            {% for group in grupos %}
+                                <option value="{{ group.name }}" 
+                                        {% if user_profile.group.name == group.name %}selected{% endif %}>
+                                    {{ group.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="id_password" name="password" 
+                               {% if not usuario %}required{% endif %}>
+                        {% if usuario %}<small class="form-text text-muted">Deja en blanco para no cambiar la contraseña.</small>{% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">
+                            {% if usuario %}Actualizar Usuario{% else %}Crear Usuario{% endif %}
+                        </button>
+                        <a href="{% url 'usuarios_listar' %}" class="btn btn-secondary">Volver</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

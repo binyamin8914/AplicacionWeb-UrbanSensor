@@ -1,0 +1,162 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo_pagina }}{% endblock %}
+
+{% block content %}
+<div class="content-header mb-4">
+    <h1 class="mb-1">{{ titulo_pagina }}</h1>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <form method="POST" action="" novalidate>
+            {% csrf_token %}
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Datos de la Encuesta</h5>
+                </div>
+                <div class="card-body">
+                    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+                    <div class="mb-3">
+                        <label for="{{ form.titulo.id_for_label }}" class="form-label">{{ form.titulo.label }}</label>
+                        {{ form.titulo }}
+                        {% if form.titulo.errors %}<div class="text-danger small">{{ form.titulo.errors|striptags }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.tipo_incidencia.id_for_label }}" class="form-label">{{ form.tipo_incidencia.label }}</label>
+                        {{ form.tipo_incidencia }}
+                        {% if form.tipo_incidencia.errors %}<div class="text-danger small">{{ form.tipo_incidencia.errors|striptags }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.descripcion.id_for_label }}" class="form-label">{{ form.descripcion.label }}</label>
+                        {{ form.descripcion }}
+                        {% if form.descripcion.errors %}<div class="text-danger small">{{ form.descripcion.errors|striptags }}</div>{% endif %}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.estado.id_for_label }}" class="form-label">{{ form.estado.label }}</label>
+                            {{ form.estado }}
+                            {% if form.estado.errors %}<div class="text-danger small">{{ form.estado.errors|striptags }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.prioridad.id_for_label }}" class="form-label">{{ form.prioridad.label }}</label>
+                            {{ form.prioridad }}
+                            {% if form.prioridad.errors %}<div class="text-danger small">{{ form.prioridad.errors|striptags }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div> <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Campos Adicionales</h5>
+                </div>
+                <div class="card-body">
+                    {{ formset.management_form }}
+                    {% if formset.non_form_errors %}<div class="alert alert-danger">{{ formset.non_form_errors }}</div>{% endif %}
+
+                    <div id="campos-adicionales-container">
+                        {% for campo_form in formset %}
+                            <div class="campo-adicional-form">
+                                {% if campo_form.non_field_errors %}<div class="alert alert-danger">{{ campo_form.non_field_errors }}</div>{% endif %}
+                                {% for field in campo_form.hidden_fields %}
+                                    {{ field }} {% endfor %}
+                                
+                                <div class="row align-items-end g-2">
+                                    <div class="col-md-9">
+                                        <label for="{{ campo_form.titulo.id_for_label }}" class="form-label">{{ campo_form.titulo.label }}</label>
+                                        {{ campo_form.titulo }}
+                                        {% if campo_form.titulo.errors %}<div class="text-danger small">{{ campo_form.titulo.errors|striptags }}</div>{% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-3 text-center">
+                                        <div class="form-check">
+                                            {{ campo_form.es_obligatoria }}
+                                            <label for="{{ campo_form.es_obligatoria.id_for_label }}" class="form-check-label">{{ campo_form.es_obligatoria.label }}</label>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if campo_form.instance.pk and formset.can_delete %}
+                                    <div class="col-12 text-end">
+                                        <div class="form-check">
+                                            {{ campo_form.DELETE }}
+                                            <label for="{{ campo_form.DELETE.id_for_label }}" class="form-check-label text-danger">Marcar para Eliminar</label>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <button type="button" id="add-campo-btn" class="btn btn-success mt-2">
+                        <i class="bi bi-plus-circle me-2"></i>Añadir Nuevo Campo
+                    </button>
+                    <button type="button" id="remove-campo-btn" class="btn btn-danger mt-2 ms-2">
+                        <i class="bi bi-trash me-2"></i>Eliminar Último
+                    </button>
+                </div>
+            </div> <div class="d-flex justify-content-between mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    {% if modo == 'editar' %}Actualizar Encuesta{% else %}Guardar Encuesta{% endif %}
+                </button>
+                <a href="{% url 'gestion_encuestas' %}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="hidden" id="empty-form-template">
+    <div class="campo-adicional-form">
+        {% for field in formset.empty_form.hidden_fields %}{{ field }}{% endfor %}
+        <div class="row align-items-end g-2">
+            <div class="col-md-9">
+                <label for="{{ formset.empty_form.titulo.id_for_label }}" class="form-label">{{ formset.empty_form.titulo.label }}</label>
+                {{ formset.empty_form.titulo }}
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="form-check">
+                    {{ formset.empty_form.es_obligatoria }}
+                    <label for="{{ formset.empty_form.es_obligatoria.id_for_label }}" class="form-check-label">{{ formset.empty_form.es_obligatoria.label }}</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addBtn = document.getElementById('add-campo-btn');
+    const removeBtn = document.getElementById('remove-campo-btn'); 
+    const container = document.getElementById('campos-adicionales-container');
+    const template = document.getElementById('empty-form-template');
+    const totalFormsInput = document.getElementById('id_campos-TOTAL_FORMS');
+    
+    addBtn.addEventListener('click', function() {
+        let formCount = parseInt(totalFormsInput.value, 10);
+        let newFormHtml = template.innerHTML.replace(/__prefix__/g, formCount);
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = newFormHtml;
+        const newForm = tempDiv.firstElementChild; 
+        container.appendChild(newForm); 
+        totalFormsInput.value = formCount + 1;
+    });
+
+    removeBtn.addEventListener('click', function() {
+        const numFormsActuales = container.children.length;
+        if (numFormsActuales <= {{ formset.extra }}) { 
+            return; 
+        }
+        const lastForm = container.lastElementChild;
+        if (lastForm && lastForm.classList.contains('campo-adicional-form')) {
+            container.removeChild(lastForm);
+            totalFormsInput.value = parseInt(totalFormsInput.value, 10) - 1;
+        }
+    });
+});
+</script>
+
+{% endblock %}

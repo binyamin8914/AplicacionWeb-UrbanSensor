@@ -1,0 +1,44 @@
+{% load static %}
+{% block title %}Perfil{% endblock %}
+{% block content %}
+    <style>.errorlist{color:red;} label{display:none}</style>
+    <main>
+    <div>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div>
+                    <div>  
+                        <div>
+                            {% if request.user.profile.avatar %}
+                                <img src="{{request.user.profile.avatar.url}}">
+                                <p>¿Borrar? <input type="checkbox" id="avatar-clear" name="avatar-clear" /></p>
+                            {% else %}
+                                <img src="{% static 'registration/img/no-avatar.jpg' %}">
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div>
+                                 <div>
+                                    <input type="file" name="avatar" id="id_avatar">
+                                    {{ form.link }}
+                                </div>
+                                <div>
+                                    <input type="submit" value="Actualizar">
+                                </div>     
+                                <div>
+                                    <a href="{% url 'check_group_main' %}">
+                                        Volver
+                                    </a>
+                                </div>     
+                            </div>
+
+                        </div>
+                    </div>  
+                </div>
+            </div>
+            </form>
+        </div>
+        </div>
+    </div>
+    </main>
+{% endblock %}

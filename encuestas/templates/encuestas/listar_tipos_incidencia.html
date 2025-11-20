@@ -1,0 +1,67 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Gestión de Tipos de Incidencia{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1 class="mb-3">Gestión de Tipos de Incidencia</h1>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <!-- Espacio para futuros filtros si los necesitas -->
+    </div>
+    
+    <a href="{% url 'crear_tipo_incidencia' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle-fill me-2"></i>
+        Crear Nuevo Tipo
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Descripción</th>
+                    <th scope="col">Departamento</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tipo in tipos %}
+                <tr>
+                    <td>{{ tipo.nombre }}</td>
+                    <td>{{ tipo.descripcion|truncatewords:10 }}</td>
+                    <td>{{ tipo.departamento.nombre }}</td>
+                    
+                    <td class="text-nowrap">
+                        <a href="{% url 'editar_tipo_incidencia' tipo.id %}" class="btn btn-sm btn-secondary" title="Editar tipo">
+                            <i class="bi bi-pencil-fill"></i> Editar
+                        </a>
+                        <a href="{% url 'eliminar_tipo_incidencia' tipo.id %}" class="btn btn-sm btn-danger" title="Eliminar tipo">
+                            <i class="bi bi-trash-fill"></i> Eliminar
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted fst-italic p-4">
+                        No hay tipos de incidencia registrados.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-2"></i>
+        Volver al Menú Principal
+    </a>
+</div>
+
+{% endblock %}

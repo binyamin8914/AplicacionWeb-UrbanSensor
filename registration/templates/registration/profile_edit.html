@@ -1,0 +1,49 @@
+{% load static %}
+{% block title %}Perfil{% endblock %}
+{% block content %}
+    <style>.errorlist{color:red;} label{display:none}</style>
+    <main>
+    <div>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div>
+                <div>
+                    <h4>Editar información de {{ request.user.first_name }} {{ request.user.last_name }} ({{request.user.email}})</h4>
+                    <div>  
+                        <div>
+                            Nombre (*)
+                            <input type="text" value="{{ request.user.first_name }}" id="first_name" name="first_name" maxlength="254" required/>
+                        </div>
+                        <div>
+                            Apellidos (*)
+                            <input type="text" value="{{ request.user.last_name }}" id="last_name" name="last_name" maxlength="254" required/>
+                        </div>
+                    </div>                    
+                    <div>  
+                        <div>
+                            Teléfono Fijo (*)
+                            <input type="text" value="{{ profile.phone }}" id="phone" name="phone" maxlength="254" required/>
+                        </div>
+                        <div>
+                            Teléfono Móvil (*)
+                            <input type="text" value="{{ profile.mobile }}" id="mobile" name="mobile" maxlength="254" required/>
+                        </div>
+                    </div> 
+                    <div>
+                        <div>
+                            <input type="submit" value="Actualizar">
+                        </div>     
+                        <div>
+                            <a href="{% url 'check_profile' %}">
+                                Volver
+                            </a>
+                        </div>     
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+        </div>
+    </div>
+    </main>
+{% endblock %}

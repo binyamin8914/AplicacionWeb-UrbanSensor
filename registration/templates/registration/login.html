@@ -1,0 +1,35 @@
+{% extends "registration/base.html" %}
+{% load static %}
+{% block content %}
+    <form id="form_contenedor" action="" method="post">
+      {% csrf_token %}
+      <p id="form_titulo" class="form_texto">Iniciar sesión</p>
+      <p class="form_texto">Ingrese sus datos para ingresar a la plataforma</p>
+      <!-- Entender como funciona esto -->
+      {% if form.non_field_errors %}
+        <p style="color:red">Credenciales erroneas</p>
+      {% endif %}
+      <!-- --------------------------- -->
+      <div class="form_input_cover">
+        <p class="form_texto">Correo</p>
+        <div class="form_input_div">
+          <p class="form_texto form_icon">󰇮</p>
+          <input class="form_texto" type="text" name="username" placeholder="Ingrese su correo"/>
+        </div>
+      </div>
+      <div class="form_input_cover">
+        <p class="form_texto">Contraseña</p>
+        <div class="form_input_div">
+          <p class="form_texto form_icon"></p>
+          <input class="form_texto" type="password" name="password" placeholder="Ingrese su contraseña"/>
+        </div>
+      </div>
+      <div id="form_button_div">
+        <button type="submit"><span class="form_texto">Iniciar sesión</span></button>
+      </div>
+      <div class="text-center">
+        <!-- <a class="small" href="{% url 'password_reset' %}">¿Olvidaste tu Contraseña?</a> -->
+        <a class="small" href="{% url 'reset_password_form' %}">¿Olvidaste tu Contraseña?</a>
+      </div>
+    </form>
+{% endblock %}

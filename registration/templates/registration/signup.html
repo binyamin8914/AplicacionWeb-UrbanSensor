@@ -1,0 +1,19 @@
+{% load static %}
+{% block title %}Registro{% endblock %}
+{% block content %}
+    <style>.errorlist{color:red;}label{display:none}</style>
+    <main>
+        <div>
+            <div>
+            <div>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <h3 class="mb-4">Registro</h3>
+                    {{form.as_p}}
+                    <p><input type="submit" value="Confirmar"></p>
+                </form>
+            </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

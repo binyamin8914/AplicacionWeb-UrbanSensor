@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>UrbanSensors</title>
+  <link href="{% static 'registration/css/login.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@v3.3.0/build/firacode-nerd-font.css">
+</head>
+<body style="background-image: url({% static 'registration/img/unnamed.jpg' %});">
+  <div id="bg_sombra">
+    <div id="logo_contenedor">
+      <img alt="Logo" src="{% static 'registration/img/logo-blanco.png' %}" />
+      <p>Municipalidad de peñalolén</p>
+    </div>
+    {% block content %}
+    {% endblock %}
+  </div>
+</body>
+</html>
