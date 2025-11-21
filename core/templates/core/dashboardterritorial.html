@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil Territorial</title>
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --secondary: #3498db;
+      --accent: #1abc9c;
+      --light: #ecf0f1;
+      --dark: #34495e;
+      --success: #2ecc71;
+      --warning: #f39c12;
+      --danger: #e74c3c;
+      --gray: #95a5a6;
+      --purple: #9b59b6;
+      --orange: #e67e22;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 0;
+      color: var(--dark);
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background-color: var(--primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+
+    .logo-text {
+      font-size: 1.5em;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+
+    .territorial-header {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      margin-bottom: 30px;
+      border-left: 5px solid var(--orange);
+    }
+
+    .territorial-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .territorial-title h1 {
+      margin: 0;
+      color: var(--primary);
+      font-size: 1.8em;
+    }
+
+    .territorial-meta {
+      display: flex;
+      gap: 20px;
+      color: var(--gray);
+      font-size: 0.9em;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Layout Principal */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    /* Incidencias por Estado */
+    .incidents-container {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .incidents-container h2 {
+      margin-top: 0;
+      color: var(--primary);
+      font-size: 1.4em;
+      font-weight: 600;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .incidents-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .incident-card {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      border-top: 4px solid var(--secondary);
+    }
+
+    .incident-card.creada { border-top-color: var(--secondary); }
+    .incident-card.derivada { border-top-color: var(--accent); }
+    .incident-card.proceso { border-top-color: var(--warning); }
+    .incident-card.rechazada { border-top-color: var(--danger); }
+    .incident-card.finalizada { border-top-color: var(--success); }
+    .incident-card.resuelta { border-top-color: var(--purple); }
+
+    .incident-card h3 {
+      margin: 0 0 10px 0;
+      font-size: 0.9em;
+      color: var(--gray);
+      font-weight: 500;
+    }
+
+    .incident-card .count {
+      font-size: 2.2em;
+      font-weight: 700;
+      margin: 0;
+      color: var(--dark);
+    }
+
+    .incident-card .subtitle {
+      font-size: 0.8em;
+      color: var(--gray);
+      margin: 5px 0 0 0;
+    }
+
+    /* Incidencias por Tipo */
+    .types-container {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .types-container h2 {
+      margin-top: 0;
+      color: var(--primary);
+      font-size: 1.4em;
+      font-weight: 600;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .types-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .type-card {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      border-left: 4px solid var(--orange);
+    }
+
+    .type-card h3 {
+      margin: 0 0 10px 0;
+      font-size: 0.9em;
+      color: var(--gray);
+      font-weight: 500;
+    }
+
+    .type-card .count {
+      font-size: 2.2em;
+      font-weight: 700;
+      margin: 0;
+      color: var(--dark);
+    }
+
+    /* Resumen del Mes */
+    .monthly-container {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      grid-column: 1 / -1;
+    }
+
+    .monthly-container h2 {
+      margin-top: 0;
+      color: var(--primary);
+      font-size: 1.4em;
+      font-weight: 600;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .monthly-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .monthly-card {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 25px;
+      text-align: center;
+      border-left: 4px solid var(--success);
+    }
+
+    .monthly-card.resueltas {
+      border-left-color: var(--success);
+    }
+
+    .monthly-card.creadas {
+      border-left-color: var(--secondary);
+    }
+
+    .monthly-card h3 {
+      margin: 0 0 15px 0;
+      font-size: 1em;
+      color: var(--gray);
+      font-weight: 500;
+    }
+
+    .monthly-card .count {
+      font-size: 3em;
+      font-weight: 700;
+      margin: 0;
+      color: var(--dark);
+    }
+
+    .monthly-card .period {
+      font-size: 0.9em;
+      color: var(--gray);
+      margin: 10px 0 0 0;
+    }
+
+    .progress-info {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .progress-label {
+      font-size: 0.8em;
+      color: var(--gray);
+      margin-bottom: 5px;
+    }
+
+    .progress-value {
+      font-size: 1.1em;
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .territorial-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      
+      .incidents-grid,
+      .types-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .monthly-stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">M</div>
+        <div class="logo-text">Sistema Municipal</div>
+      </div>
+      <div class="user-info">
+        <div class="user-avatar">TR</div>
+        <div>Usuario Territorial</div>
+      </div>
+    </header>
+
+    <!-- Encabezado del Perfil Territorial -->
+    <div class="territorial-header">
+      <div class="territorial-title">
+        <h1>Perfil Territorial</h1>
+        <div class="territorial-meta">
+          <div class="meta-item">
+            <strong>Zona:</strong>
+            <span>Zona Norte</span>
+          </div>
+          <div class="meta-item">
+            <strong>Activo desde:</strong>
+            <span>Enero 2024</span>
+          </div>
+          <div class="meta-item">
+            <strong>Actualizado:</strong>
+            <span>15 Nov 2024, 10:30 AM</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layout Principal -->
+    <div class="dashboard-grid">
+      <!-- Incidencias por Estado -->
+      <div class="incidents-container">
+        <h2>Incidencias por Estado</h2>
+        <div class="incidents-grid">
+          <div class="incident-card creada">
+            <h3>Creadas</h3>
+            <p class="count">28</p>
+            <p class="subtitle">Por atender</p>
+          </div>
+          <div class="incident-card derivada">
+            <h3>Derivadas</h3>
+            <p class="count">15</p>
+            <p class="subtitle">En gestión</p>
+          </div>
+          <div class="incident-card proceso">
+            <h3>En Proceso</h3>
+            <p class="count">12</p>
+            <p class="subtitle">En trabajo</p>
+          </div>
+          <div class="incident-card rechazada">
+            <h3>Rechazadas</h3>
+            <p class="count">3</p>
+            <p class="subtitle">No proceden</p>
+          </div>
+          <div class="incident-card finalizada">
+            <h3>Finalizadas</h3>
+            <p class="count">42</p>
+            <p class="subtitle">Completadas</p>
+          </div>
+          <div class="incident-card resuelta">
+            <h3>Resueltas</h3>
+            <p class="count">38</p>
+            <p class="subtitle">Solucionadas</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Incidencias por Tipo -->
+      <div class="types-container">
+        <h2>Incidencias por Tipo</h2>
+        <div class="types-grid">
+          <div class="type-card">
+            <h3>Derivadas</h3>
+            <p class="count">15</p>
+            <p class="subtitle">Asignadas a otros</p>
+          </div>
+          <div class="type-card">
+            <h3>Finalizadas</h3>
+            <p class="count">42</p>
+            <p class="subtitle">Completadas</p>
+          </div>
+          <div class="type-card">
+            <h3>Resueltas</h3>
+            <p class="count">38</p>
+            <p class="subtitle">Solucionadas</p>
+          </div>
+          <div class="type-card">
+            <h3>Pendientes</h3>
+            <p class="count">18</p>
+            <p class="subtitle">Por atender</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen del Mes Actual -->
+    <div class="monthly-container">
+      <h2>Resumen del Mes Actual - Noviembre 2024</h2>
+      <div class="monthly-stats">
+        <div class="monthly-card resueltas">
+          <h3>Incidencias Resueltas</h3>
+          <p class="count">24</p>
+          <p class="period">Este mes</p>
+          <div class="progress-info">
+            <div class="progress-label">Meta mensual</div>
+            <div class="progress-value">80% completado</div>
+          </div>
+        </div>
+        <div class="monthly-card creadas">
+          <h3>Incidencias Creadas</h3>
+          <p class="count">32</p>
+          <p class="period">Este mes</p>
+          <div class="progress-info">
+            <div class="progress-label">Tasa de resolución</div>
+            <div class="progress-value">75% efectividad</div>
+          </div>
+        </div>
+        <div class="monthly-card">
+          <h3>Promedio Diario</h3>
+          <p class="count">1.2</p>
+          <p class="period">Resueltas por día</p>
+          <div class="progress-info">
+            <div class="progress-label">Tiempo promedio</div>
+            <div class="progress-value">2.3 días/resolución</div>
+          </div>
+        </div>
+        <div class="monthly-card">
+          <h3>Satisfacción</h3>
+          <p class="count">92%</p>
+          <p class="period">Calificación usuarios</p>
+          <div class="progress-info">
+            <div class="progress-label">Encuestas respondidas</div>
+            <div class="progress-value">18 de 24</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
