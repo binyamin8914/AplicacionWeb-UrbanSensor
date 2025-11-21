@@ -21,6 +21,7 @@
             </ul>
         </div>
         
+        {% if group_name != "Direccion" %}
         <div class="dropdown me-2">
             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-building me-1"></i>
@@ -37,12 +38,14 @@
                 <li><a class="dropdown-item" href="{% url 'departamento_listar' %}?estado={{ current_filtro_estado|default:'' }}">Todas las Direcciones</a></li>
             </ul>
         </div>
+        {% endif %}
     </div>
-    
+    {% if group_name != "Direccion" %}
     <a href="{% url 'departamento_crear' %}" class="btn btn-success">
         <i class="bi bi-plus-circle-fill me-2"></i>
         Nuevo Departamento
     </a>
+    {% endif %}
 </div>
 
 <div class="card shadow-sm">
@@ -53,7 +56,6 @@
                     <th scope="col">#</th>
                     <th scope="col">Nombre Departamento</th>
                     <th scope="col">Encargado</th>
-                    <th scope="col">Correo Encargado</th>
                     <th scope="col">Dirección (Padre)</th>
                     <th scope="col">Estado</th>
                     <th scope="col">Acciones</th>

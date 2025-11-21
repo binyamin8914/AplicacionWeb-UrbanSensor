@@ -86,10 +86,9 @@
           <td>{{ inc.id }}</td>
           <td>{{ inc.encuesta.tipo_incidencia.nombre }}</td>
           <td>
-            {# Si tienes direccion_textual podrías mostrarla aquí; por ahora, la de encuesta #}
-            {{ inc.encuesta.departamento.direccion.nombre }}
+            {{ inc.encuesta.tipo_incidencia.departamento.direccion.nombre }}
           </td>
-          <td>{{ inc.encuesta.departamento.nombre }}</td>
+          <td>{{ inc.encuesta.tipo_incidencia.departamento.nombre }}</td>
           <td>
             {# Badge de Bootstrap según estado interno #}
             {% if inc.estado == "abierta" %}

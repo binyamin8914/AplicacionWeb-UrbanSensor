@@ -10,8 +10,8 @@
     <div class="card-body">
       <p><strong>Tipo:</strong> {{ incidencia.encuesta.tipo_incidencia.nombre }}</p>
       <p><strong>Descripción:</strong> {{ incidencia.descripcion }}</p>
-      <p><strong>Dirección:</strong> {{ incidencia.encuesta.departamento.direccion.nombre }}</p>
-      <p><strong>Departamento:</strong> {{ incidencia.encuesta.departamento.nombre }}</p>
+      <p><strong>Dirección:</strong> {{ incidencia.encuesta.tipo_incidencia.departamento.direccion.nombre }}</p>
+      <p><strong>Departamento:</strong> {{ incidencia.encuesta.tipo_incidencia.departamento.nombre }}</p>
       <p><strong>Estado:</strong> {{ incidencia.get_estado_display }}</p>
 
       {# Aquí SOLO se ve el detalle, sin formulario de derivar #}

@@ -12,4 +12,6 @@ urlpatterns = [
     path("reset_password_form/", views.reset_password_form, name="reset_password_form"),
     path("reset_password_change/", views.reset_password_change, name="reset_password_change"),
     path("reset_password_change/<str:email>/", views.reset_password_change, name="reset_password_change"),
+
+    path('api/login/', views.api_login),
     ]

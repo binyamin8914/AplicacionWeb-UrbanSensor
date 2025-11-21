@@ -10,6 +10,11 @@ from django.urls import reverse_lazy, reverse
 from django.shortcuts import render, redirect
 from django import forms
 from .models import Profile
+# para la api de login
+from django.contrib.auth import authenticate, login
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 class SignUpView(CreateView):
     form_class = UserCreationFormWithEmail
@@ -98,4 +103,18 @@ def reset_password_change(request):
 
 
 
+#api de login
 
+@csrf_exempt
+def api_login(request):
+    data = json.loads(request.body)
+    user = authenticate(
+        request,
+        username=data.get('username'),
+        password=data.get('password')
+    )
+    if user is None:
+        return JsonResponse({"error": 'Credenciales incorrectas'}, status=400)
+
+    login(request, user)
+    return JsonResponse({'mensaje': 'Login correcto'})

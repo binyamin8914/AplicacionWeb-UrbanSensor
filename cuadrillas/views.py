@@ -5,6 +5,11 @@ from django.contrib.auth.models import User, Group # <-- ¡Añadido Group!
 from registration.models import Profile
 from departamentos.models import Departamento # <-- ¡Cambiado!
 from .models import Cuadrilla
+# para la api de login
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+# from rest_framework.decorators import api_view
+import json
 
 # --- ¡¡IMPORTANTE: Importa el manejador de errores!! ---
 from django.db import IntegrityError 
@@ -135,3 +140,15 @@ def cuadrilla_bloquear(request, cuadrilla_id):
     estado = "activada" if cuadrilla.esta_activa else "bloqueada"
     messages.success(request, f"Cuadrilla {estado} correctamente.")
     return redirect("cuadrilla_listar")
+
+# funciones para la api
+@login_required
+@csrf_exempt
+# @api_view(['GET'])
+def api_cuadrilla_list(request):
+    profile = Profile.objects.get(user=request.user)
+    if profile.group.name != "SECPLA":
+        return JsonResponse({"mensaje": 'No tienes permisos. Usuario incorrecto'}, status=400)
+
+    cuadrillas = Cuadrilla.objects.all().order_by('nombre').values('id', 'nombre', 'esta_activa', 'encargado__username', 'departamento__nombre')
+    return JsonResponse({'mensaje': "Exito", 'cuadrillas': list(cuadrillas)})

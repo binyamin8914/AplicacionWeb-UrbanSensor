@@ -37,11 +37,12 @@
             </ul>
         </div>
     </div>
-    
+    {% if group_name != "Territorial" %}
     <a href="{% url 'crear_encuesta' %}" class="btn btn-success">
         <i class="bi bi-plus-circle-fill me-2"></i>
         Crear Nueva Encuesta
     </a>
+    {% endif %}
 </div>
 
 <div class="card shadow-sm">
@@ -81,7 +82,7 @@
                     </td>
                     <td class="text-nowrap">
                         <a href="{% url 'editar_encuesta' encuesta.id %}" class="btn btn-sm btn-secondary">Editar</a>
-                        <a href="{% url 'eliminar_encuesta' encuesta.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                        {% if group_name != "Territorial" %}<a href="{% url 'eliminar_encuesta' encuesta.id %}" class="btn btn-sm btn-danger">Eliminar</a>{% endif %}
                     </td>
                 </tr>
                 {% empty %}

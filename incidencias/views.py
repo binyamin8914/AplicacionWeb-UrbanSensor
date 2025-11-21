@@ -6,9 +6,10 @@ from django.http import JsonResponse
 from registration.models import Profile
 from cuadrillas.models import Cuadrilla
 from departamentos.models import Departamento
-from .models import Incidencia
-from .forms import IncidenciaForm
+from .models import Incidencia, EncuestaRespuesta
+from .forms import IncidenciaForm, EncuestaRespuestaForm
 from django.core.exceptions import ObjectDoesNotExist
+from encuestas.models import CamposAdicionales
 
 # ---------------------------------------------------------------------
 # Helpers de rol / permiso
@@ -145,6 +146,7 @@ def editar_incidencia(request, incidencia_id):
         return redirect('gestion_incidencias')
 
     if request.method == 'POST':
+        print(request.POST)
         form = IncidenciaForm(request.POST, user=request.user)
         if form.is_valid():
             datos = form.cleaned_data
@@ -162,7 +164,19 @@ def editar_incidencia(request, incidencia_id):
                 incidencia.territorial = request.user
             incidencia.save()
             messages.success(request, "Incidencia actualizada.")
-            return redirect('gestion_incidencias')
+        for i in range(len(request.POST.getlist("pregunta"))):
+            print(i)
+            # for por pregunta
+            incidencia = get_object_or_404(Incidencia, id=request.POST.getlist('incidencia')[i])
+            pregunta = get_object_or_404(CamposAdicionales, id=request.POST.getlist('pregunta')[i])
+            form = EncuestaRespuestaForm(incidencia=incidencia, pregunta=pregunta, valor=request.POST.getlist('valor')[i])
+            if not form.is_valid():
+                continue # o pass
+            datos = form.cleaned_data
+            print(datos)
+            respuesta = EncuestaRespuesta.objects.create(incidencia=form.incidencia, pregunta=form.pregunta, valor=datos.get('valor'))
+            respuesta.save()
+        return redirect('gestion_incidencias')
     else:
         # obtener la cuadrilla de forma segura
         try:
@@ -182,9 +196,18 @@ def editar_incidencia(request, incidencia_id):
             'estado': incidencia.estado,
         }
         form = IncidenciaForm(initial=initial, user=request.user)
+        form_preguntas_ad = []
+        preguntas = CamposAdicionales.objects.filter(encuesta__id=incidencia.encuesta.id)
+        for pregunta in preguntas:
+            respuesta_prebia = EncuestaRespuesta.objects.filter(pregunta__id=pregunta.id).first()
+            init = {
+                'valor': respuesta_prebia.valor
+            }
+            form_preguntas_ad.append(EncuestaRespuestaForm(initial=init, incidencia=incidencia, pregunta=pregunta))
 
     return render(request, 'incidencias/formulario_incidencia.html', {
         'form': form,
+        'form_preguntas_ad': form_preguntas_ad,
         'titulo_pagina': 'Editar Incidencia',
         'group_name': group_name,
         'incidencia': incidencia
@@ -250,7 +273,7 @@ def derivar_incidencia(request, incidencia_id):
     profile = Profile.objects.get(user=request.user)
     group_name = profile.group.name
 
-    departamento = incidencia.encuesta.departamento
+    departamento = incidencia.encuesta.tipo_incidencia.departamento
     if group_name != "Departamento" or departamento.encargado != request.user:
         messages.error(request, "No tienes permisos para derivar esta incidencia.")
         return redirect('gestion_incidencias')

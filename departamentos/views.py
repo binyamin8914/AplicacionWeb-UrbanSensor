@@ -22,15 +22,21 @@ def departamento_listar(request):
     # --- Lógica de Filtro AÑADIDA ---
     filtro_estado = request.GET.get('estado')
     filtro_direccion = request.GET.get('direccion')
-    
+
     departamentos = Departamento.objects.select_related('direccion').all()
+
+    if profile.group.name == "Direccion":
+        direccion = Direccion.objects.get(encargado__id=profile.id)
+        if not direccion:
+            return redirect("dashboard")
+        departamentos = Departamento.objects.filter(direccion__id=direccion.id)
 
     if filtro_estado == 'Activo':
         departamentos = departamentos.filter(esta_activo=True)
     elif filtro_estado == 'Inactivo':
         departamentos = departamentos.filter(esta_activo=False)
         
-    if filtro_direccion:
+    if filtro_direccion and direccion and direccion.id == filtro_direccion:
         # Filtramos por el ID de la dirección
         departamentos = departamentos.filter(direccion__id=filtro_direccion) 
 

@@ -9,6 +9,13 @@
                 {% csrf_token %}
                 {{ form.as_p }}
                 <hr>
+                {% for form_pregunta in form_preguntas_ad %}
+                    <p>{{form_pregunta.pregunta.titulo}}</p>
+                    <p><input type="text" name="incidencia" required="" value={{form_pregunta.incidencia.id}} style="display: none; visibility: hidden; overflow: hidden;"></p>
+                    <p><input type="text" name="pregunta" required="" value={{form_pregunta.pregunta.id}} style="display: none; visibility: hidden; overflow: hidden;"></p>
+                    {{ form_pregunta.as_p }}
+                    <hr>
+                {% endfor %}
                 <button type="submit" class="btn btn-primary">Guardar</button>
                 <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-secondary">Cancelar</a>
             </form>

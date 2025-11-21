@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 from cuadrillas.models import Cuadrilla
 from encuestas.models import Encuesta
-from .models import Incidencia, Vecino
+from .models import Incidencia, Vecino, EncuestaRespuesta
 
 
 class IncidenciaForm(forms.Form):
@@ -89,7 +89,7 @@ class IncidenciaForm(forms.Form):
 
         # 1) Querysets base (para cualquier usuario)
         #    -> Todas las encuestas disponibles
-        self.fields['encuesta'].queryset = Encuesta.objects.all().order_by('-id')
+        self.fields['encuesta'].queryset = Encuesta.objects.all().order_by('titulo')
 
         #    -> Cuadrillas activas
         self.fields['cuadrilla'].queryset = Cuadrilla.objects.filter(esta_activa=True)
@@ -143,3 +143,24 @@ class IncidenciaForm(forms.Form):
             """
             self.fields['cuadrilla'].queryset = Cuadrilla.objects.filter(esta_activa=True)
             self.fields['territorial'].queryset = User.objects.filter(groups__name='Territorial')
+
+class EncuestaRespuestaForm(forms.Form):
+    valor = forms.CharField(
+        label="Respuesta",
+        widget=forms.Textarea(
+            attrs={
+                'class': 'form-control',
+                'rows': 3
+            }
+        )
+    )
+    incidencia = None
+    pregunta = None
+
+    def __init__(self, *args, incidencia=None, pregunta=None, valor=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.incidencia=incidencia
+        self.pregunta=pregunta
+        self.fields['valor'].required = self.pregunta.es_obligatoria
+        self.fields['valor'].initial = valor
+
