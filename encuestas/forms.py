@@ -3,8 +3,6 @@ from .models import Encuesta, CamposAdicionales, TipoIncidencia
 from departamentos.models import Departamento
 from django.forms import inlineformset_factory
 
-print("¡¡CARGANDO FORMS.PY DE ENCUESTAS!! (Versión 4, 'orden' no obligatorio)")
-
 # --- FORMULARIO PRINCIPAL DE LA ENCUESTA ---
 class EncuestaForm(forms.ModelForm):
     
@@ -21,7 +19,6 @@ class EncuestaForm(forms.ModelForm):
             'titulo': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'estado': forms.Select(attrs={'class': 'form-select'}),
-            'prioridad': forms.Select(attrs={'class': 'form-select'}),
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

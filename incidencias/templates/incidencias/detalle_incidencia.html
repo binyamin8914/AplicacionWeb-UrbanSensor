@@ -8,13 +8,67 @@
       <h3>Incidencia #{{ incidencia.id }}</h3>
     </div>
     <div class="card-body">
-      <p><strong>Tipo:</strong> {{ incidencia.encuesta.tipo_incidencia.nombre }}</p>
+      <p><strong>Tipo:</strong>
+        {% if incidencia.encuesta and incidencia.encuesta.tipo_incidencia %}
+          {{ incidencia.encuesta.tipo_incidencia.nombre }}
+        {% else %}
+          Sin tipo asignado
+        {% endif %}
+      </p>
+
+      <p><strong>Prioridad:</strong> {{ incidencia.get_prioridad_display }}</p>
+
       <p><strong>Descripción:</strong> {{ incidencia.descripcion }}</p>
-      <p><strong>Dirección:</strong> {{ incidencia.encuesta.departamento.direccion.nombre }}</p>
-      <p><strong>Departamento:</strong> {{ incidencia.encuesta.departamento.nombre }}</p>
+
+      <p><strong>Dirección:</strong>
+        {% if incidencia.encuesta and incidencia.encuesta.tipo_incidencia and incidencia.encuesta.tipo_incidencia.departamento and incidencia.encuesta.tipo_incidencia.departamento.direccion %}
+          {{ incidencia.encuesta.tipo_incidencia.departamento.direccion.nombre }}
+        {% else %}
+          Sin asignar
+        {% endif %}
+      </p>
+
+      <p><strong>Departamento:</strong>
+        {% if incidencia.encuesta and incidencia.encuesta.tipo_incidencia and incidencia.encuesta.tipo_incidencia.departamento %}
+          {{ incidencia.encuesta.tipo_incidencia.departamento.nombre }}
+        {% else %}
+          Sin asignar
+        {% endif %}
+      </p>
+
       <p><strong>Estado:</strong> {{ incidencia.get_estado_display }}</p>
 
-      {# Aquí SOLO se ve el detalle, sin formulario de derivar #}
+      {% if incidencia.cuadrilla %}
+        <p><strong>Derivada a cuadrilla:</strong>
+          {{ incidencia.cuadrilla.nombre }}
+          {% if incidencia.cuadrilla.encargado %}
+            (Encargado: {{ incidencia.cuadrilla.encargado.get_full_name|default:incidencia.cuadrilla.encargado.username }})
+          {% endif %}
+        </p>
+      {% elif incidencia.estado == 'derivada' %}
+        <p class="text-warning"><strong>Derivada</strong> — cuadrilla no asignada</p>
+      {% endif %}
+
+      {# --- CAMPO ADICIONALES + RESPUESTAS --- #}
+      {% if campos_adicionales %}
+        <hr>
+        <h5>Respuestas a Campos Adicionales</h5>
+        <div class="mt-2">
+          {% for campo in campos_adicionales %}
+            <div class="mb-2">
+              <strong>{{ campo.titulo }}</strong>
+              {% if campo.es_obligatoria %}<span class="text-danger">*</span>{% endif %}
+              <div class="mt-1">
+                {% if campo.valor %}
+                  <div class="border rounded p-2 bg-light">{{ campo.valor }}</div>
+                {% else %}
+                  <div class="text-muted fst-italic">Sin respuesta</div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
 
       <a href="{% url 'gestion_incidencias' %}" class="btn btn-secondary mt-3">
         Volver a incidencias

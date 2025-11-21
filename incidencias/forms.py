@@ -4,142 +4,96 @@ from django.contrib.auth.models import User
 from cuadrillas.models import Cuadrilla
 from encuestas.models import Encuesta
 from .models import Incidencia, Vecino
+from registration.models import Profile  # <-- AGREGAR ESTE IMPORT
 
-
-class IncidenciaForm(forms.Form):
-    """
-    Formulario manual para gestionar las Incidencias.
-
-    Acepta parámetro 'user' en __init__ para:
-    - Adaptar los campos según el rol (Territorial, SECPLA, etc.).
-    - Filtrar y configurar los querysets de forma dinámica.
-    """
-
-    # ---------- Campos ----------
-    encuesta = forms.ModelChoiceField(
-        label="Encuesta Asociada",
-        queryset=Encuesta.objects.none(),  # se setea en __init__
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-
-    vecino = forms.ModelChoiceField(
-        label="Vecino que reporta (Opcional)",
-        queryset=Vecino.objects.all(),     # aunque no haya vecinos, no rompe
-        required=False,
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-
-    territorial = forms.ModelChoiceField(
-        label="Agente Territorial",
-        queryset=User.objects.filter(groups__name='Territorial'),
-        required=False,
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-
-    cuadrilla = forms.ModelChoiceField(
-        label="Cuadrilla Asignada",
-        queryset=Cuadrilla.objects.none(),  # se setea en __init__
-        required=False,
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-
-    descripcion = forms.CharField(
-        label="Descripción Detallada",
-        widget=forms.Textarea(
-            attrs={
-                'class': 'form-control',
-                'rows': 3
-            }
-        )
-    )
-
-    latitud = forms.DecimalField(
-        label="Latitud (Opcional)",
-        required=False,
-        widget=forms.NumberInput(attrs={'class': 'form-control'})
-    )
-
-    longitud = forms.DecimalField(
-        label="Longitud (Opcional)",
-        required=False,
-        widget=forms.NumberInput(attrs={'class': 'form-control'})
-    )
-
-    direccion_textual = forms.CharField(
-        label="Dirección Escrita (Opcional)",
-        required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-
-    estado = forms.ChoiceField(
-        label="Estado Actual",
-        choices=Incidencia.ESTADO_CHOICES,
-        required=False,
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-
-    # ---------- Inicialización dinámica ----------
+class IncidenciaForm(forms.ModelForm):
+    class Meta:
+        model = Incidencia
+        fields = [
+            "encuesta",
+            "prioridad",
+            "descripcion",
+            "latitud",
+            "longitud",
+            "direccion_textual",
+            "vecino",
+            "territorial",
+            "cuadrilla",
+            "estado",
+        ]
+        widgets = {
+            "encuesta": forms.Select(attrs={"class": "form-select"}),
+            "prioridad": forms.Select(attrs={"class": "form-select"}),
+            "descripcion": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+            "latitud": forms.NumberInput(attrs={"class": "form-control"}),
+            "longitud": forms.NumberInput(attrs={"class": "form-control"}),
+            "direccion_textual": forms.TextInput(attrs={"class": "form-control"}),
+            "vecino": forms.Select(attrs={"class": "form-select"}),
+            "territorial": forms.Select(attrs={"class": "form-select"}),
+            "cuadrilla": forms.Select(attrs={"class": "form-select"}),
+            "estado": forms.Select(attrs={"class": "form-select"}),
+        }
 
     def __init__(self, *args, user=None, **kwargs):
-        """
-        Inicializa el formulario adaptando querysets y visibilidad
-        de campos según el usuario conectado.
-        """
         super().__init__(*args, **kwargs)
 
-        # 1) Querysets base (para cualquier usuario)
-        #    -> Todas las encuestas disponibles
+        # Force choices (evita problemas por import/carga o sobrescrituras)
+        self.fields['prioridad'].choices = list(Incidencia.PRIORIDAD_CHOICES)
+        # default initial
+        if not self.fields['prioridad'].initial:
+            self.fields['prioridad'].initial = 'normal'
+
+        # Querysets base
         self.fields['encuesta'].queryset = Encuesta.objects.all().order_by('-id')
-
-        #    -> Cuadrillas activas
         self.fields['cuadrilla'].queryset = Cuadrilla.objects.filter(esta_activa=True)
-
-        #    -> Vecinos (si no hay, simplemente aparece vacío; es opcional)
         self.fields['vecino'].queryset = Vecino.objects.all().order_by('id')
         self.fields['vecino'].required = False
 
-        # Si no tenemos usuario, no seguimos adaptando por rol
         if user is None:
             return
 
-        # 2) Intentar obtener el grupo del usuario
+        # Determinar rol de forma robusta
         try:
-            group_name = user.profile.group.name
+            is_territorial = user.groups.filter(name__iexact='territorial').exists()
         except Exception:
-            group_name = None
+            is_territorial = False
 
-        # 3) Configuración específica para TERRITORIAL
-        if group_name == "Territorial":
-            """
-            Para el Territorial:
-            - Puede elegir encuesta.
-            - Describe la incidencia.
-            - NO asigna cuadrilla, estado ni territorial explícitamente.
-            - Vecino aún no está implementado -> lo ocultamos por ahora.
-            """
+        if is_territorial:
+            # Si el territorial tiene direccion, filtrar encuestas vigentes
+            try:
+                profile = Profile.objects.get(user=user)
+            except Profile.DoesNotExist:
+                profile = None
 
-            # Si en el futuro quieres filtrar encuestas por algo (ej: comuna, sector, etc.),
-            # este es el lugar para hacerlo. Por ahora, ve todas:
-            # self.fields['encuesta'].queryset = Encuesta.objects.filter(algún_filtro_relacionado_a_user)
+            if profile and getattr(profile, 'direccion', None):
+                self.fields['encuesta'].queryset = Encuesta.objects.filter(
+                    tipo_incidencia__departamento__direccion=profile.direccion,
+                    estado='vigente'
+                ).order_by('-id')
+            else:
+                self.fields['encuesta'].queryset = Encuesta.objects.none()
 
             # Ocultar campos que el Territorial no debe manipular
             self.fields['cuadrilla'].widget = forms.HiddenInput()
             self.fields['estado'].widget = forms.HiddenInput()
             self.fields['territorial'].widget = forms.HiddenInput()
-
-            # Vecino todavía no está implementado -> lo dejamos oculto y opcional
             self.fields['vecino'].widget = forms.HiddenInput()
-            self.fields['vecino'].required = False
 
-            # Y nos aseguramos de que estos campos no sean requeridos
+            # <-- LÍNEAS AÑADIR: marcar como no requeridos si los ocultamos -->
             self.fields['cuadrilla'].required = False
             self.fields['estado'].required = False
             self.fields['territorial'].required = False
+            self.fields['vecino'].required = False
+            # <-- fin de líneas añadidas -->
+
+            # Asegurar widget y requerido para prioridad
+            self.fields['prioridad'].widget = forms.Select(attrs={'class': 'form-select'})
+            self.fields['prioridad'].required = True
 
         else:
-            """
-            Para otros roles (SECPLA, Departamento, etc.) mantenemos
-            todos los campos visibles y usamos los querysets base.
-            """
+            # Para otros roles ocultar prioridad
+            self.fields['prioridad'].widget = forms.HiddenInput()
+            self.fields['prioridad'].required = False
+
             self.fields['cuadrilla'].queryset = Cuadrilla.objects.filter(esta_activa=True)
             self.fields['territorial'].queryset = User.objects.filter(groups__name='Territorial')

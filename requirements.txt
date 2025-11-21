@@ -1,0 +1,6 @@
+asgiref==3.9.1
+Django==5.2.4
+django-environ==0.12.0
+psycopg2-binary==2.9.10
+sqlparse==0.5.3
+tzdata==2025.2

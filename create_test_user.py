@@ -6,9 +6,11 @@ django.setup()
 
 from django.contrib.auth.models import User, Group
 from registration.models import Profile
+from direcciones.models import Direccion
 
 def build_usuarios():
     usuarios = []
+    direcciones = list(Direccion.objects.all())
 
     # SECPLA: secpla_user1..secpla_user2..secpla_user3
     for i in range(1, 4):
@@ -22,7 +24,6 @@ def build_usuarios():
             'last_name': f'SecplaSurname{i}'
         })
 
-    # Territorial: territorial_user1..territorial_user2
     for i in range(1, 4):
         usuarios.append({
             'username': f'territorial_user{i}',
@@ -31,7 +32,10 @@ def build_usuarios():
             'group': 'Territorial',
             'telefono': f'2222-{i}{i}{i}{i}',
             'first_name': f'TerritorialName{i}',
-            'last_name': f'TerritorialSurname{i}'
+            'last_name': f'TerritorialSurname{i}',
+
+            # ➤ AGREGAMOS la dirección
+            'direccion': direcciones[(i - 1) % len(direcciones)] if direcciones else None
         })
 
     # Direccion: direccion_user1..direccion_user9 (suficientes para varias direcciones)

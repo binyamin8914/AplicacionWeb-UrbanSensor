@@ -588,5 +588,16 @@ incidencias = [
     "estado": "proceso"},
 ]
 
+# Ahora, antes de crear las Incidencias, determinamos la cuadrilla correcta por departamento de la encuesta
+for i in incidencias:
+    encuesta = i.get("encuesta")
+    cuadrilla_obj = None
+    if encuesta and getattr(encuesta, 'tipo_incidencia', None):
+        departamento = encuesta.tipo_incidencia.departamento
+        if departamento:
+            cuadrilla_obj = Cuadrilla.objects.filter(departamento=departamento, esta_activa=True).first()
+    # asignamos la cuadrilla sólo si pertenece al departamento de la encuesta
+    i["cuadrilla"] = cuadrilla_obj
+
 for i in incidencias:
     Incidencia.objects.create(**i)

@@ -70,6 +70,19 @@
                             {% endfor %}
                         </select>
                     </div>
+                    <!-- NUEVO CAMPO SOLO PARA TERRITORIAL -->
+                    <div class="mb-3" id="direccion-container" style="display: none;">
+                        <label for="id_direccion" class="form-label">Dirección</label>
+                        <select class="form-select" id="id_direccion" name="direccion_id">
+                            <option value="">Seleccione una dirección</option>
+                            {% for d in direcciones %}
+                                <option value="{{ d.id }}" 
+                                    {% if user_profile.direccion_id == d.id %}selected{% endif %}>
+                                    {{ d.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
                     <div class="mb-4">
                         <label for="id_password" class="form-label">Contraseña</label>
@@ -89,4 +102,6 @@
         </div>
     </div>
 </div>
+{% load static %}
+<script src="{% static 'includes/js/territorial.js' %}"></script>
 {% endblock %}

@@ -3,15 +3,8 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.shortcuts import get_object_or_404, redirect
+from direcciones.models import Direccion
 
-# Equivalencias entre el codigo y el modelo
-#  - ------------------------------------------------------------------------
-#  - | Nombre de la tabla en el modelo  | Nombre de la tabla en el codigo   |
-#  - ------------------------------------------------------------------------
-#  - | Usuario                          | Profile                           |
-#  - | -------                          | User                              | -> Tabla manejada por django, contiene la mitad de los datos de la tabla Usuarios del modelo
-#  - | Perfiles                         | Group                             | -> Group es una tabla manejada por django
-#  - ------------------------------------------------------------------------
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -19,6 +12,7 @@ class Profile(models.Model):
     telefono = models.CharField(max_length=30, blank=True)
     token_app_session = models.CharField(max_length = 240,null=True, blank=True, default='')
     first_session = models.CharField(max_length = 240,null=True, blank=True, default='Si')
+    direccion = models.ForeignKey(Direccion, null=True, blank=True, on_delete=models.SET_NULL)
 
     class Meta:
         ordering = ['user__username']

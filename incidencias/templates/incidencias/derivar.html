@@ -10,6 +10,7 @@
     <div class="card-body">
       <p><strong>Tipo:</strong> {{ incidencia.encuesta.tipo_incidencia.nombre }}</p>
       <p><strong>Descripción:</strong> {{ incidencia.descripcion }}</p>
+      <p><strong>Prioridad:</strong> {{ incidencia.get_prioridad_display }}</p>
 
       <form method="post">
         {% csrf_token %}
