@@ -9,6 +9,8 @@ from incidencias.models import Incidencia
 from cuadrillas.models import Cuadrilla
 from django.db.models import Count
 from django.db import IntegrityError # --- Importa el manejador de errores!! ---
+from rest_framework import viewsets
+from .serializers import DepartamentoSerializer
 
 # --- CRUD Departamento ---
 
@@ -234,3 +236,8 @@ def incidencia_ver_y_derivar(request, incidencia_id):
         "group_name": profile.group.name
     }
     return render(request, "incidencias/detalle_incidencia.html", context)
+
+#angular
+class DepartamentoViewSet(viewsets.ModelViewSet):
+    queryset = Departamento.objects.all()
+    serializer_class = DepartamentoSerializer

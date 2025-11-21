@@ -9,7 +9,10 @@ from departamentos.models import Departamento
 from .models import Incidencia
 from .forms import IncidenciaForm
 from django.core.exceptions import ObjectDoesNotExist
-
+from rest_framework import viewsets
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .serializers import IncidenciaSerializer
 # ---------------------------------------------------------------------
 # Helpers de rol / permiso
 # ---------------------------------------------------------------------
@@ -396,3 +399,26 @@ def secpla_incidencias_list(request, status=None):
 def detalle_incidencia(request, incidencia_id):
     incidencia = get_object_or_404(Incidencia, id=incidencia_id)
     return render(request, 'incidencias/detalle_incidencia.html', {'incidencia': incidencia})
+
+#angular
+class IncidenciaViewSet(viewsets.ModelViewSet):
+    queryset = Incidencia.objects.all()
+    serializer_class = IncidenciaSerializer
+    
+class DashboardStatsView(APIView):
+    """
+    API que devuelve los conteos para el Dashboard.
+    """
+    def get(self, request):
+        # Lógica idéntica a tu función original, pero sin el HTML
+        all_incidencias = Incidencia.objects.all()
+
+        data = {
+            'total_creadas': all_incidencias.count(),
+            'count_derivadas': all_incidencias.filter(estado='derivada').count(),
+            'count_rechazadas': all_incidencias.filter(estado='rechazada').count(),
+            'count_finalizadas': all_incidencias.filter(estado='finalizada').count(),
+            'count_abiertas': all_incidencias.filter(estado='abierta').count(), # Agregué esta por si acaso
+        }
+        
+        return Response(data)

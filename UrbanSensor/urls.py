@@ -18,6 +18,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from core.urls import core_urlpatterns
+from rest_framework.routers import DefaultRouter
+from departamentos.views import DepartamentoViewSet
+from incidencias.views import IncidenciaViewSet
+from incidencias.views import DashboardStatsView
+
+router = DefaultRouter()
+router.register(r'departamentos', DepartamentoViewSet)
+router.register(r'incidencias', IncidenciaViewSet)
 
 urlpatterns = [
     path('', include(core_urlpatterns)),
@@ -34,4 +42,7 @@ urlpatterns = [
     path('accounts/', include('registration.urls')),
     path('encuestas/', include('encuestas.urls')),
     path('incidencias/', include('incidencias.urls')),
+    #angular
+    path('api/', include(router.urls)),
+    path('api/dashboard-stats/', DashboardStatsView.as_view(), name='dashboard-stats')
 ]
