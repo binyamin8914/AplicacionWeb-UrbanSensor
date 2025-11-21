@@ -34,4 +34,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('encuestas/', include('encuestas.urls')),
     path('incidencias/',include('incidencias.urls')),
+
+    # APIs
+    path('api/administracion/', include('administracion.api.urls')),
 ]

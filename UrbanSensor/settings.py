@@ -54,9 +54,12 @@ INSTALLED_APPS = [
     'direcciones',
     'incidencias',
     'encuestas',
+    'rest_framework', # Agrega Django REST framework
+    'corsheaders', # Agrega django-cors-headers
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', # Agrega el middleware de CORS
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -147,3 +150,31 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# CORS: permitir el frontend de Vite en desarrollo
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+# Permitir cookies (necesario si usas SessionAuthentication y axios withCredentials)
+CORS_ALLOW_CREDENTIALS = True
+
+# (Opcional) Si quieres evitar problemas puntuales en dev puedes usar temporalmente:
+# CORS_ALLOW_ALL_ORIGINS = True
+
+# REST Framework - ajustes básicos
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',  # opcional para tests
+    ),
+    # En desarrollo si quieres permitir llamadas sin login temporalmente, usa AllowAny:
+    # 'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny',),
+    # En producción/uso normal cambia a IsAuthenticated o permisos personalizados:
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+}
