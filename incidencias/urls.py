@@ -11,9 +11,10 @@ urlpatterns = [
     path('eliminar/<int:incidencia_id>/', views.eliminar_incidencia, name='eliminar_incidencia'),
     path('confirmar-eliminar/<int:incidencia_id>/', views.eliminar_incidencia, name='confirmar_eliminar_incidencia'),
 
-    # Derivar / finalizar
+    # Derivar / finalizar / rechazar incidencia
     path('derivar/<int:incidencia_id>/', views.derivar_incidencia, name='derivar_incidencia'),
     path('finalizar/<int:incidencia_id>/', views.finalizar_incidencia, name='finalizar_incidencia'),
+    path("incidencia/<int:incidencia_id>/rechazar/", views.rechazar_incidencia, name="rechazar_incidencia"),
 
     # Detalle de incidencia (solo visualización)
     path('detalle/<int:incidencia_id>/', views.detalle_incidencia, name='incidencia_detalle'),
