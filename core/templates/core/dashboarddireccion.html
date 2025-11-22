@@ -1,750 +1,373 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Perfil Dirección</title>
-  <style>
-    :root {
-      --primary: #2c3e50;
-      --secondary: #3498db;
-      --accent: #1abc9c;
-      --light: #ecf0f1;
-      --dark: #34495e;
-      --success: #2ecc71;
-      --warning: #f39c12;
-      --danger: #e74c3c;
-      --gray: #95a5a6;
-      --purple: #9b59b6;
-    }
+{% load static %}
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f5f7fa;
-      margin: 0;
-      padding: 0;
-      color: var(--dark);
-    }
+{% block css_adicional %}
 
-    .container {
-      padding: 20px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
+<style>
+  :root {
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --accent: #1abc9c;
+    --light: #ecf0f1;
+    --dark: #34495e;
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --gray: #95a5a6;
+    --purple: #9b59b6;
+    --orange: #e67e22;
+    --teal: #1abc9c;
+  }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #e0e0e0;
-    }
+  .dashboard_container {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    background-color: #f5f7fa;
+    color: var(--dark);
+  }
 
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-      background-color: var(--primary);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-    }
+  .squad-header {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    border-left: 5px solid var(--teal);
+  }
 
-    .logo-text {
-      font-size: 1.5em;
-      font-weight: 600;
-      color: var(--primary);
-    }
+  .squad-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+  .squad-title h1 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 1.8em;
+  }
 
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: var(--secondary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-    }
+  .squad-meta {
+    display: flex;
+    gap: 20px;
+    color: var(--gray);
+    font-size: 0.9em;
+  }
 
-    .dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
 
-    .filters {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
+  /* Tarjetas de Resumen */
+  .summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
 
-    .filter-select {
-      padding: 8px 15px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background: white;
-      font-size: 0.9em;
-    }
+  .summary-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    border-left: 4px solid var(--secondary);
+  }
 
-    /* Tarjetas de Resumen */
-    .summary-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
-    }
+  .summary-card h3 {
+    margin: 0;
+    font-size: 0.9em;
+    color: var(--gray);
+    font-weight: 500;
+  }
 
-    .summary-card {
-      background: white;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      text-align: center;
-      border-left: 4px solid var(--secondary);
-    }
+  .summary-card p {
+    font-size: 2em;
+    font-weight: 700;
+    margin: 10px 0 0 0;
+    color: var(--dark);
+  }
 
-    .summary-card h3 {
-      margin: 0;
-      font-size: 0.9em;
-      color: var(--gray);
-      font-weight: 500;
-    }
+  /* Layout Principal */
+  .dashboard-layout {
+    margin-bottom: 30px;
+  }
 
-    .summary-card p {
-      font-size: 2em;
-      font-weight: 700;
-      margin: 10px 0 0 0;
-      color: var(--dark);
-    }
+  /* Gráfico de Estados por Dirección */
+  .chart-container {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
 
-    /* Layout Principal */
+  .chart-container h2 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 1.3em;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .states-chart {
+    height: 400px;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 20px 0;
+  }
+
+  .direction-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .direction-label {
+    font-size: 0.8em;
+    color: var(--gray);
+    text-align: center;
+    margin-bottom: 10px;
+    height: 40px;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .states-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 300px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .state-bar {
+    width: 20px;
+    border-radius: 3px 3px 0 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .state-bar:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+
+  .bar-creada { background-color: var(--secondary); }
+  .bar-derivada { background-color: var(--accent); }
+  .bar-rechazada { background-color: var(--danger); }
+  .bar-finalizada { background-color: var(--success); }
+  .bar-proceso { background-color: var(--warning); }
+
+  /* Mapa de Departamentos */
+  .departments-container {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    grid-column: 1 / -1;
+  }
+
+  .departments-container h2 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 1.3em;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .departments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+  }
+
+  .department-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    border-left: 4px solid var(--purple);
+  }
+
+  .department-card h4 {
+    margin: 0 0 10px 0;
+    color: var(--primary);
+    font-size: 1em;
+  }
+
+  .department-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    color: var(--gray);
+  }
+
+  .department-count {
+    font-weight: 600;
+    color: var(--dark);
+  }
+
+  /* Leyenda */
+  .legend {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8em;
+  }
+
+  .legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
     .dashboard-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 30px;
-      margin-bottom: 30px;
+      grid-template-columns: 1fr;
     }
-
-    /* Gráfico de Estados por Dirección */
-    .chart-container {
-      background: white;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .chart-container h2 {
-      margin-top: 0;
-      color: var(--primary);
-      font-size: 1.3em;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-
+    
     .states-chart {
-      height: 400px;
-      display: flex;
-      align-items: flex-end;
-      gap: 10px;
-      padding: 20px 0;
-    }
-
-    .direction-group {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .direction-label {
-      font-size: 0.8em;
-      color: var(--gray);
-      text-align: center;
-      margin-bottom: 10px;
-      height: 40px;
-      display: flex;
-      align-items: flex-end;
-    }
-
-    .states-bars {
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
       height: 300px;
-      width: 100%;
-      justify-content: center;
     }
+  }
 
-    .state-bar {
-      width: 20px;
-      border-radius: 3px 3px 0 0;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-
-    .state-bar:hover {
-      opacity: 0.8;
-      transform: scale(1.05);
-    }
-
-    .bar-creada { background-color: var(--secondary); }
-    .bar-derivada { background-color: var(--accent); }
-    .bar-rechazada { background-color: var(--danger); }
-    .bar-finalizada { background-color: var(--success); }
-    .bar-proceso { background-color: var(--warning); }
-
-    /* Tabla de Usuarios */
-    .users-table-container {
-      background: white;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      max-height: 500px;
-      overflow-y: auto;
-    }
-
-    .users-table-container h2 {
-      margin-top: 0;
-      color: var(--primary);
-      font-size: 1.3em;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-
-    .users-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .users-table th {
-      text-align: left;
-      padding: 12px 10px;
-      border-bottom: 2px solid #e0e0e0;
-      color: var(--gray);
-      font-weight: 600;
-      font-size: 0.9em;
-      position: sticky;
-      top: 0;
-      background: white;
-    }
-
-    .users-table td {
-      padding: 12px 10px;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    .users-table tr:hover {
-      background-color: #f8f9fa;
-    }
-
-    .user-role {
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 0.8em;
-      font-weight: 600;
-      background-color: rgba(52, 152, 219, 0.1);
-      color: var(--secondary);
-    }
-
-    .incident-count {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-size: 0.8em;
-      font-weight: 600;
-      background-color: rgba(231, 76, 60, 0.1);
-      color: var(--danger);
-    }
-
-    /* Mapa de Departamentos */
-    .departments-container {
-      background: white;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      grid-column: 1 / -1;
-    }
-
-    .departments-container h2 {
-      margin-top: 0;
-      color: var(--primary);
-      font-size: 1.3em;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-
-    .departments-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  @media (max-width: 768px) {
+    .dashboard-header {
+      flex-direction: column;
       gap: 15px;
+      align-items: flex-start;
     }
+  }
+</style>
 
-    .department-card {
-      background: #f8f9fa;
-      border-radius: 8px;
-      padding: 15px;
-      border-left: 4px solid var(--purple);
-    }
+{% endblock %}
+{% block content %}
 
-    .department-card h4 {
-      margin: 0 0 10px 0;
-      color: var(--primary);
-      font-size: 1em;
-    }
+<div class="dashboard_container">
 
-    .department-stats {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.9em;
-      color: var(--gray);
-    }
-
-    .department-count {
-      font-weight: 600;
-      color: var(--dark);
-    }
-
-    /* Leyenda */
-    .legend {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid #eee;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 0.8em;
-    }
-
-    .legend-color {
-      width: 12px;
-      height: 12px;
-      border-radius: 2px;
-    }
-
-    /* Responsive */
-    @media (max-width: 1024px) {
-      .dashboard-layout {
-        grid-template-columns: 1fr;
-      }
-      
-      .states-chart {
-        height: 300px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .dashboard-header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: flex-start;
-      }
-      
-      .filters {
-        width: 100%;
-      }
-      
-      .filter-select {
-        flex: 1;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <div class="logo">
-        <div class="logo-icon">M</div>
-        <div class="logo-text">Municipalidad - Gestión por Dirección</div>
-      </div>
-      <div class="user-info">
-        <div class="user-avatar">AD</div>
-        <div>Administrador</div>
-      </div>
-    </header>
-
-    <!-- Filtros -->
-    <div class="dashboard-header">
-      <h1>Dashboard de Usuarios por Dirección</h1>
-      <div class="filters">
-        <select class="filter-select" id="filter-direction">
-          <option value="">Todas las Direcciones</option>
-          <option value="obras">Obras Públicas</option>
-          <option value="servicios">Servicios Municipales</option>
-          <option value="medioambiente">Medio Ambiente</option>
-          <option value="desarrollo">Desarrollo Social</option>
-          <option value="seguridad">Seguridad Ciudadana</option>
-        </select>
-        <select class="filter-select" id="filter-department">
-          <option value="">Todos los Departamentos</option>
-          <option value="construccion">Construcción</option>
-          <option value="forestal">Forestal</option>
-          <option value="agua">Agua y Saneamiento</option>
-          <option value="social">Desarrollo Social</option>
-        </select>
-        <select class="filter-select" id="filter-time">
-          <option value="today">Hoy</option>
-          <option value="week">Esta Semana</option>
-          <option value="month" selected>Este Mes</option>
-          <option value="year">Este Año</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Tarjetas de Resumen -->
-    <div class="summary-cards">
-      <div class="summary-card">
-        <h3>Total de Usuarios</h3>
-        <p id="total-users">45</p>
-      </div>
-      <div class="summary-card">
-        <h3>Direcciones Activas</h3>
-        <p id="total-directions">8</p>
-      </div>
-      <div class="summary-card">
-        <h3>Departamentos</h3>
-        <p id="total-departments">12</p>
-      </div>
-      <div class="summary-card">
-        <h3>Incidencias Totales</h3>
-        <p id="total-incidents">342</p>
-      </div>
-    </div>
-
-    <!-- Layout Principal -->
-    <div class="dashboard-layout">
-      <!-- Gráfico de Estados por Dirección -->
-      <div class="chart-container">
-        <h2>Incidencias por Estado y Dirección</h2>
-        <div class="states-chart" id="states-chart">
-          <!-- Generado dinámicamente -->
+  <div class="squad-header">
+    <div class="squad-title">
+      <h1>Perfil de Direccion</h1>
+      <div class="squad-meta">
+        <div class="meta-item">
+          <strong>Direccion:</strong>
+          <span>{{divicion_data.nombre}}</span>
         </div>
-        <div class="legend">
-          <div class="legend-item">
-            <div class="legend-color bar-creada"></div>
-            <span>Creadas</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color bar-derivada"></div>
-            <span>Derivadas</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color bar-proceso"></div>
-            <span>En Proceso</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color bar-rechazada"></div>
-            <span>Rechazadas</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color bar-finalizada"></div>
-            <span>Finalizadas</span>
-          </div>
+        <div class="meta-item">
+          <strong>Estado:</strong>
+          <span>{{divicion_data.estado}}</span>
         </div>
-      </div>
-
-      <!-- Tabla de Usuarios -->
-      <div class="users-table-container">
-        <h2>Usuarios por Dirección</h2>
-        <table class="users-table">
-          <thead>
-            <tr>
-              <th>Usuario</th>
-              <th>Dirección</th>
-              <th>Departamento</th>
-              <th>Incidencias</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody id="users-table-body">
-            <!-- Generado dinámicamente -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Mapa de Departamentos -->
-    <div class="departments-container">
-      <h2>Distribución por Departamentos</h2>
-      <div class="departments-grid" id="departments-grid">
-        <!-- Generado dinámicamente -->
       </div>
     </div>
   </div>
 
-  <script>
-    class UsersByDirectionDashboard {
-      constructor() {
-        this.currentData = {
-          total_usuarios: 45,
-          total_direcciones: 8,
-          total_departamentos: 12,
-          total_incidencias: 342,
-          direcciones: [
-            {
-              nombre: "Obras Públicas",
-              departamentos: 3,
-              usuarios: 8,
-              incidencias: {
-                creadas: 45,
-                derivadas: 32,
-                proceso: 28,
-                rechazadas: 5,
-                finalizadas: 35
-              }
-            },
-            {
-              nombre: "Servicios Municipales",
-              departamentos: 2,
-              usuarios: 6,
-              incidencias: {
-                creadas: 38,
-                derivadas: 25,
-                proceso: 22,
-                rechazadas: 3,
-                finalizadas: 30
-              }
-            },
-            {
-              nombre: "Medio Ambiente",
-              departamentos: 2,
-              usuarios: 5,
-              incidencias: {
-                creadas: 28,
-                derivadas: 20,
-                proceso: 18,
-                rechazadas: 2,
-                finalizadas: 24
-              }
-            },
-            {
-              nombre: "Desarrollo Social",
-              departamentos: 3,
-              usuarios: 7,
-              incidencias: {
-                creadas: 32,
-                derivadas: 24,
-                proceso: 20,
-                rechazadas: 4,
-                finalizadas: 26
-              }
-            },
-            {
-              nombre: "Seguridad Ciudadana",
-              departamentos: 2,
-              usuarios: 4,
-              incidencias: {
-                creadas: 25,
-                derivadas: 18,
-                proceso: 15,
-                rechazadas: 2,
-                finalizadas: 20
-              }
-            }
-          ],
-          usuarios: [
-            { nombre: "Ana García", direccion: "Obras Públicas", departamento: "Construcción", incidencias: 15, estado: "Activo" },
-            { nombre: "Carlos López", direccion: "Obras Públicas", departamento: "Vialidad", incidencias: 12, estado: "Activo" },
-            { nombre: "María Rodríguez", direccion: "Servicios Municipales", departamento: "Limpieza", incidencias: 18, estado: "Activo" },
-            { nombre: "Juan Pérez", direccion: "Medio Ambiente", departamento: "Forestal", incidencias: 10, estado: "Activo" },
-            { nombre: "Laura Martínez", direccion: "Desarrollo Social", departamento: "Bienestar", incidencias: 14, estado: "Activo" },
-            { nombre: "Pedro Sánchez", direccion: "Seguridad Ciudadana", departamento: "Patrullaje", incidencias: 8, estado: "Activo" },
-            { nombre: "Sofia Hernández", direccion: "Obras Públicas", departamento: "Construcción", incidencias: 9, estado: "Inactivo" },
-            { nombre: "Diego Ramírez", direccion: "Servicios Municipales", departamento: "Alumbrado", incidencias: 11, estado: "Activo" }
-          ],
-          departamentos: [
-            { nombre: "Construcción", direccion: "Obras Públicas", usuarios: 3, incidencias: 42 },
-            { nombre: "Vialidad", direccion: "Obras Públicas", usuarios: 2, incidencias: 35 },
-            { nombre: "Limpieza", direccion: "Servicios Municipales", usuarios: 2, incidencias: 38 },
-            { nombre: "Alumbrado", direccion: "Servicios Municipales", usuarios: 1, incidencias: 25 },
-            { nombre: "Forestal", direccion: "Medio Ambiente", usuarios: 2, incidencias: 28 },
-            { nombre: "Residuos", direccion: "Medio Ambiente", usuarios: 1, incidencias: 22 },
-            { nombre: "Bienestar", direccion: "Desarrollo Social", usuarios: 2, incidencias: 32 },
-            { nombre: "Educación", direccion: "Desarrollo Social", usuarios: 1, incidencias: 20 },
-            { nombre: "Patrullaje", direccion: "Seguridad Ciudadana", usuarios: 2, incidencias: 25 },
-            { nombre: "Emergencias", direccion: "Seguridad Ciudadana", usuarios: 1, incidencias: 18 }
-          ]
-        };
+  <!-- Tarjetas de Resumen -->
+  <div class="summary-cards">
+    {% for nombre, n, ic in datos %}
+    <div class="summary-card">
+      <h3>{{nombre}}</h3>
+      <p id="total-departments">{{n}}</p>
+    </div>
+    {% endfor %}
+  </div>
 
-        this.init();
-      }
+  <!-- Layout Principal -->
+  <div class="dashboard-layout">
+    <!-- Gráfico de Estados por Dirección -->
+    <div class="chart-container">
+      <h2>Incidencias por Estado y Dirección</h2>
+      <div class="states-chart" id="states-chart">
+        <!-- Generado dinámicamente -->
 
-      init() {
-        this.renderSummaryCards();
-        this.renderStatesChart();
-        this.renderUsersTable();
-        this.renderDepartmentsGrid();
-        this.setupEventListeners();
-      }
+        {% for dep in dep_inc %}
+        <div class="direction-group">
+          <div class="states-bars">
+            <!-- widthratio x y z = (x/y)*z -->
+            <div class="state-bar bar-creada" style="height: {% widthratio 250 max_total dep.n_inc %}px;", title="Total: {{dep.n_inc}}">
 
-      setupEventListeners() {
-        document.getElementById('filter-direction').addEventListener('change', (e) => {
-          this.filterData();
-        });
-
-        document.getElementById('filter-department').addEventListener('change', (e) => {
-          this.filterData();
-        });
-
-        document.getElementById('filter-time').addEventListener('change', (e) => {
-          this.filterData();
-        });
-      }
-
-      filterData() {
-        // En una implementación real, aquí harías una llamada a la API
-        // con los filtros seleccionados
-        console.log('Filtrando datos...');
-      }
-
-      renderSummaryCards() {
-        document.getElementById('total-users').textContent = this.currentData.total_usuarios;
-        document.getElementById('total-directions').textContent = this.currentData.total_direcciones;
-        document.getElementById('total-departments').textContent = this.currentData.total_departamentos;
-        document.getElementById('total-incidents').textContent = this.currentData.total_incidencias;
-      }
-
-      renderStatesChart() {
-        const container = document.getElementById('states-chart');
-        container.innerHTML = '';
-
-        // Encontrar el valor máximo para escalar
-        let maxTotal = 0;
-        this.currentData.direcciones.forEach(dir => {
-          const total = Object.values(dir.incidencias).reduce((a, b) => a + b, 0);
-          if (total > maxTotal) maxTotal = total;
-        });
-
-        const escala = 250 / maxTotal;
-
-        this.currentData.direcciones.forEach(direccion => {
-          const group = document.createElement('div');
-          group.className = 'direction-group';
-
-          const label = document.createElement('div');
-          label.className = 'direction-label';
-          label.textContent = direccion.nombre;
-          group.appendChild(label);
-
-          const barsContainer = document.createElement('div');
-          barsContainer.className = 'states-bars';
-
-          const states = [
-            { key: 'creadas', class: 'bar-creada', title: 'Creadas' },
-            { key: 'derivadas', class: 'bar-derivada', title: 'Derivadas' },
-            { key: 'proceso', class: 'bar-proceso', title: 'En Proceso' },
-            { key: 'rechazadas', class: 'bar-rechazada', title: 'Rechazadas' },
-            { key: 'finalizadas', class: 'bar-finalizada', title: 'Finalizadas' }
-          ];
-
-          states.forEach(state => {
-            const bar = document.createElement('div');
-            bar.className = `state-bar ${state.class}`;
-            bar.style.height = `${direccion.incidencias[state.key] * escala}px`;
-            bar.title = `${state.title}: ${direccion.incidencias[state.key]}`;
-            barsContainer.appendChild(bar);
-          });
-
-          group.appendChild(barsContainer);
-          container.appendChild(group);
-        });
-      }
-
-      renderUsersTable() {
-        const tbody = document.getElementById('users-table-body');
-        tbody.innerHTML = '';
-
-        this.currentData.usuarios.forEach(usuario => {
-          const row = document.createElement('tr');
-          
-          row.innerHTML = `
-            <td>${usuario.nombre}</td>
-            <td>${usuario.direccion}</td>
-            <td>${usuario.departamento}</td>
-            <td><span class="incident-count">${usuario.incidencias}</span></td>
-            <td><span class="user-role">${usuario.estado}</span></td>
-          `;
-          
-          tbody.appendChild(row);
-        });
-      }
-
-      renderDepartmentsGrid() {
-        const container = document.getElementById('departments-grid');
-        container.innerHTML = '';
-
-        this.currentData.departamentos.forEach(depto => {
-          const card = document.createElement('div');
-          card.className = 'department-card';
-          
-          card.innerHTML = `
-            <h4>${depto.nombre}</h4>
-            <div class="department-stats">
-              <span>Dirección:</span>
-              <span>${depto.direccion}</span>
             </div>
-            <div class="department-stats">
-              <span>Usuarios:</span>
-              <span class="department-count">${depto.usuarios}</span>
-            </div>
-            <div class="department-stats">
-              <span>Incidencias:</span>
-              <span class="department-count">${depto.incidencias}</span>
-            </div>
-          `;
-          
-          container.appendChild(card);
-        });
-      }
+            <div class="state-bar bar-derivada" style="height: {% widthratio 250 max_total dep.n_inc_derivada %}px;", title="Derivada: {{dep.n_inc_derivada}}">
 
-      // Método para actualizar datos en tiempo real
-      updateData(newData) {
-        this.currentData = { ...this.currentData, ...newData };
-        this.renderSummaryCards();
-        this.renderStatesChart();
-        this.renderUsersTable();
-        this.renderDepartmentsGrid();
-      }
-    }
+            </div>
+            <div class="state-bar bar-proceso" style="height: {% widthratio 250 max_total dep.n_inc_proceso %}px;", title="En proceso: {{dep.n_inc_proceso}}">
 
-    // Inicializar el dashboard
-    document.addEventListener('DOMContentLoaded', () => {
-      const dashboard = new UsersByDirectionDashboard();
-      
-      // Simular actualización en tiempo real
-      setInterval(() => {
-        // En una implementación real, esto vendría de WebSockets o API
-        const randomUpdate = {
-          total_incidencias: dashboard.currentData.total_incidencias + Math.floor(Math.random() * 5)
-        };
-        dashboard.updateData(randomUpdate);
-      }, 30000);
-    });
-  </script>
-</body>
-</html>
+            </div>
+            <div class="state-bar bar-rechazada" style="height: {% widthratio 250 max_total dep.n_inc_rechazada %}px;", title="Rechazada: {{dep.n_inc_rechazada}}">
+
+            </div>
+            <div class="state-bar bar-finalizada" style="height: {% widthratio 250 max_total dep.n_inc_finalizada %}px;", title="Finalizada: {{dep.n_inc_finalizada}}">
+
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+
+
+
+      </div>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-color bar-creada"></div>
+          <span>Total</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color bar-derivada"></div>
+          <span>Derivadas</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color bar-proceso"></div>
+          <span>En Proceso</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color bar-rechazada"></div>
+          <span>Rechazadas</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color bar-finalizada"></div>
+          <span>Finalizadas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mapa de Departamentos -->
+  <div class="departments-container">
+    <h2>Distribución por Departamentos</h2>
+    <div class="departments-grid" id="departments-grid">
+      {% for depto in dep_inc %}
+      <div class="department-card">
+        <h4>{{depto.nombre_dep}}</h4>
+          <div class="department-stats">
+            <span>Dirección:</span>
+            <span>{{divicion_data.nombre}}</span>
+          </div>
+          <div class="department-stats">
+            <span>Incidencias:</span>
+            <span class="department-count">{{depto.n_inc}}</span>
+          </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

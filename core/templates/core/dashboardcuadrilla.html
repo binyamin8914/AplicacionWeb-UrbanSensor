@@ -1,472 +1,263 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Perfil de Cuadrilla</title>
-  <style>
-    :root {
-      --primary: #2c3e50;
-      --secondary: #3498db;
-      --accent: #1abc9c;
-      --light: #ecf0f1;
-      --dark: #34495e;
-      --success: #2ecc71;
-      --warning: #f39c12;
-      --danger: #e74c3c;
-      --gray: #95a5a6;
-      --purple: #9b59b6;
-      --orange: #e67e22;
-      --teal: #1abc9c;
-    }
+{% load static %}
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f5f7fa;
-      margin: 0;
-      padding: 0;
-      color: var(--dark);
-    }
+{% block css_adicional %}
 
-    .container {
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+<style>
+  :root {
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --accent: #1abc9c;
+    --light: #ecf0f1;
+    --dark: #34495e;
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --gray: #95a5a6;
+    --purple: #9b59b6;
+    --orange: #e67e22;
+    --teal: #1abc9c;
+  }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #e0e0e0;
-    }
+  .dashboard_container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #f5f7fa;
+    color: var(--dark);
+  }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+  .squad-header {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    border-left: 5px solid var(--teal);
+  }
 
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-      background-color: var(--primary);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-    }
+  .squad-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
 
-    .logo-text {
-      font-size: 1.5em;
-      font-weight: 600;
-      color: var(--primary);
-    }
+  .squad-title h1 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 1.8em;
+  }
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+  .squad-meta {
+    display: flex;
+    gap: 20px;
+    color: var(--gray);
+    font-size: 0.9em;
+  }
 
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: var(--teal);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-    }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
 
-    .squad-header {
-      background: white;
-      border-radius: 10px;
-      padding: 25px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      margin-bottom: 30px;
-      border-left: 5px solid var(--teal);
-    }
+  /* Layout Principal */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+  }
 
-    .squad-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
+  /* Incidencias por Estado */
+  .incidents-container {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
 
-    .squad-title h1 {
-      margin: 0;
-      color: var(--primary);
-      font-size: 1.8em;
-    }
+  .incidents-container h2 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+  }
 
-    .squad-meta {
-      display: flex;
-      gap: 20px;
-      color: var(--gray);
-      font-size: 0.9em;
-    }
+  .incidents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+  }
 
-    .meta-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
+  .incident-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    border-top: 4px solid var(--secondary);
+  }
 
-    /* Layout Principal */
+  .incident-card.creada { border-top-color: var(--secondary); }
+  .incident-card.derivada { border-top-color: var(--accent); }
+  .incident-card.proceso { border-top-color: var(--warning); }
+  .incident-card.rechazada { border-top-color: var(--danger); }
+  .incident-card.finalizada { border-top-color: var(--success); }
+  .incident-card.resuelta { border-top-color: var(--teal); }
+  .incident-card.pendiente { border-top-color: var(--orange); }
+
+  .incident-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 0.85em;
+    color: var(--gray);
+    font-weight: 500;
+  }
+
+  .incident-card .count {
+    font-size: 2em;
+    font-weight: 700;
+    margin: 0;
+    color: var(--dark);
+  }
+
+  .incident-card .subtitle {
+    font-size: 0.75em;
+    color: var(--gray);
+    margin: 5px 0 0 0;
+  }
+
+  /* Resumen de Rendimiento */
+  .performance-container {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  .performance-container h2 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .performance-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .performance-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    border-left: 4px solid var(--teal);
+  }
+
+  .performance-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 1em;
+    color: var(--gray);
+    font-weight: 500;
+  }
+
+  .performance-card .count {
+    font-size: 2.5em;
+    font-weight: 700;
+    margin: 0;
+    color: var(--dark);
+  }
+
+  .performance-card .details {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 0.85em;
+    color: var(--gray);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
     .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 25px;
-      margin-bottom: 30px;
+      grid-template-columns: 1fr;
     }
-
-    /* Incidencias por Estado */
-    .incidents-container {
-      background: white;
-      border-radius: 10px;
-      padding: 25px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    
+    .squad-title {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
     }
-
-    .incidents-container h2 {
-      margin-top: 0;
-      color: var(--primary);
-      font-size: 1.4em;
-      font-weight: 600;
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid #f0f0f0;
+    
+    .squad-meta {
+      flex-direction: column;
+      gap: 10px;
     }
-
+    
     .incidents-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 15px;
+      grid-template-columns: repeat(2, 1fr);
     }
+  }
+</style>
 
-    .incident-card {
-      background: #f8f9fa;
-      border-radius: 8px;
-      padding: 20px;
-      text-align: center;
-      border-top: 4px solid var(--secondary);
-    }
+{% endblock %}
+{% block content %}
 
-    .incident-card.creada { border-top-color: var(--secondary); }
-    .incident-card.derivada { border-top-color: var(--accent); }
-    .incident-card.proceso { border-top-color: var(--warning); }
-    .incident-card.rechazada { border-top-color: var(--danger); }
-    .incident-card.finalizada { border-top-color: var(--success); }
-    .incident-card.resuelta { border-top-color: var(--teal); }
-    .incident-card.pendiente { border-top-color: var(--orange); }
+<div class="dashboard_container">
 
-    .incident-card h3 {
-      margin: 0 0 10px 0;
-      font-size: 0.85em;
-      color: var(--gray);
-      font-weight: 500;
-    }
-
-    .incident-card .count {
-      font-size: 2em;
-      font-weight: 700;
-      margin: 0;
-      color: var(--dark);
-    }
-
-    .incident-card .subtitle {
-      font-size: 0.75em;
-      color: var(--gray);
-      margin: 5px 0 0 0;
-    }
-
-    /* Resumen de Rendimiento */
-    .performance-container {
-      background: white;
-      border-radius: 10px;
-      padding: 25px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .performance-container h2 {
-      margin-top: 0;
-      color: var(--primary);
-      font-size: 1.4em;
-      font-weight: 600;
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid #f0f0f0;
-    }
-
-    .performance-stats {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .performance-card {
-      background: #f8f9fa;
-      border-radius: 8px;
-      padding: 20px;
-      border-left: 4px solid var(--teal);
-    }
-
-    .performance-card h3 {
-      margin: 0 0 10px 0;
-      font-size: 1em;
-      color: var(--gray);
-      font-weight: 500;
-    }
-
-    .performance-card .count {
-      font-size: 2.5em;
-      font-weight: 700;
-      margin: 0;
-      color: var(--dark);
-    }
-
-    .performance-card .details {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      font-size: 0.85em;
-      color: var(--gray);
-    }
-
-    /* Información de la Cuadrilla */
-    .squad-info {
-      background: white;
-      border-radius: 10px;
-      padding: 25px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .squad-info h2 {
-      margin-top: 0;
-      color: var(--primary);
-      font-size: 1.4em;
-      font-weight: 600;
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid #f0f0f0;
-    }
-
-    .squad-details {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .detail-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    .detail-item:last-child {
-      border-bottom: none;
-    }
-
-    .detail-label {
-      color: var(--gray);
-      font-weight: 500;
-    }
-
-    .detail-value {
-      color: var(--dark);
-      font-weight: 600;
-    }
-
-    .status-badge {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.8em;
-      font-weight: 600;
-    }
-
-    .status-active {
-      background: rgba(46, 204, 113, 0.1);
-      color: var(--success);
-    }
-
-    .status-busy {
-      background: rgba(243, 156, 18, 0.1);
-      color: var(--warning);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .squad-title {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-      }
-      
-      .squad-meta {
-        flex-direction: column;
-        gap: 10px;
-      }
-      
-      .incidents-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <div class="logo">
-        <div class="logo-icon">M</div>
-        <div class="logo-text">Sistema Municipal</div>
-      </div>
-      <div class="user-info">
-        <div class="user-avatar">CQ</div>
-        <div>Usuario Cuadrilla</div>
-      </div>
-    </header>
-
-    <!-- Encabezado del Perfil de Cuadrilla -->
-    <div class="squad-header">
-      <div class="squad-title">
-        <h1>Perfil de Cuadrilla</h1>
-        <div class="squad-meta">
-          <div class="meta-item">
-            <strong>Cuadrilla:</strong>
-            <span>Cuadrilla Norte</span>
-          </div>
-          <div class="meta-item">
-            <strong>Departamento:</strong>
-            <span>Construcción</span>
-          </div>
-          <div class="meta-item">
-            <strong>Actualizado:</strong>
-            <span>15 Nov 2024, 10:30 AM</span>
-          </div>
+  <!-- Encabezado del Perfil de Cuadrilla -->
+  <div class="squad-header">
+    <div class="squad-title">
+      <h1>Perfil de Cuadrilla</h1>
+      <div class="squad-meta">
+        <div class="meta-item">
+          <strong>Departamento:</strong>
+          <span>{{divicion_data.nombre}}</span>
         </div>
-      </div>
-    </div>
-
-    <!-- Layout Principal -->
-    <div class="dashboard-grid">
-      <!-- Incidencias por Estado -->
-      <div class="incidents-container">
-        <h2>Incidencias por Estado</h2>
-        <div class="incidents-grid">
-          <div class="incident-card creada">
-            <h3>Creadas</h3>
-            <p class="count">8</p>
-            <p class="subtitle">Por atender</p>
-          </div>
-          <div class="incident-card derivada">
-            <h3>Derivadas</h3>
-            <p class="count">5</p>
-            <p class="subtitle">Recibidas</p>
-          </div>
-          <div class="incident-card proceso">
-            <h3>En Proceso</h3>
-            <p class="count">6</p>
-            <p class="subtitle">Trabajando</p>
-          </div>
-          <div class="incident-card pendiente">
-            <h3>Pendientes</h3>
-            <p class="count">3</p>
-            <p class="subtitle">En espera</p>
-          </div>
-          <div class="incident-card resuelta">
-            <h3>Resueltas</h3>
-            <p class="count">18</p>
-            <p class="subtitle">Completadas</p>
-          </div>
-          <div class="incident-card finalizada">
-            <h3>Finalizadas</h3>
-            <p class="count">15</p>
-            <p class="subtitle">Cerradas</p>
-          </div>
-          <div class="incident-card rechazada">
-            <h3>Rechazadas</h3>
-            <p class="count">2</p>
-            <p class="subtitle">No válidas</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Resumen de Rendimiento -->
-      <div class="performance-container">
-        <h2>Rendimiento de la Cuadrilla</h2>
-        <div class="performance-stats">
-          <div class="performance-card">
-            <h3>Total Resueltas</h3>
-            <p class="count">18</p>
-            <div class="details">
-              <span>Este mes: 12</span>
-              <span>Efectividad: 85%</span>
-            </div>
-          </div>
-          <div class="performance-card">
-            <h3>Incidencias Derivadas</h3>
-            <p class="count">5</p>
-            <div class="details">
-              <span>Este mes: 3</span>
-              <span>Por revisar: 2</span>
-            </div>
-          </div>
-          <div class="performance-card">
-            <h3>Tiempo Promedio</h3>
-            <p class="count">2.3</p>
-            <div class="details">
-              <span>Días por incidencia</span>
-              <span>Meta: 2.0 días</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Información de la Cuadrilla -->
-      <div class="squad-info">
-        <h2>Información de la Cuadrilla</h2>
-        <div class="squad-details">
-          <div class="detail-item">
-            <span class="detail-label">Estado:</span>
-            <span class="status-badge status-active">Activa</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Miembros:</span>
-            <span class="detail-value">4 personas</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Incidencias Activas:</span>
-            <span class="detail-value">6</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Zona de Trabajo:</span>
-            <span class="detail-value">Sector Norte</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Especialidad:</span>
-            <span class="detail-value">Construcción Menor</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Jefe de Cuadrilla:</span>
-            <span class="detail-value">Carlos López</span>
-          </div>
+        <div class="meta-item">
+          <strong>Estado:</strong>
+          <span>{{divicion_data.estado}}</span>
         </div>
       </div>
     </div>
   </div>
-</body>
-</html>
+
+  <!-- Layout Principal -->
+  <div class="dashboard-grid">
+    <!-- Incidencias por Estado -->
+    <div class="incidents-container">
+      <h2>Incidencias por Estado</h2>
+      <div class="incidents-grid">
+
+        {% for nombre, n, ic in datos %}
+        <div class="incident-card pendiente">
+          <h3>{{nombre}}</h3>
+          <p class="count">{{n}}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Resumen de Rendimiento -->
+    <div class="performance-container">
+      <h2>Resumen del Mes Actual - {{fecha|date:'M Y'}}</h2>
+      <div class="performance-stats">
+        <div class="performance-card">
+          <h3>Total Resueltas</h3>
+          <p class="count">{{n_inc_resueltas_mes}}</p>
+        </div>
+        <div class="performance-card">
+          <h3>Porcentaje completado</h3>
+          <p class="count">{{porcentaje_completado}}%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+ {% endblock %}

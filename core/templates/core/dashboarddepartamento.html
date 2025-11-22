@@ -1,557 +1,373 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Perfil de Departamento</title>
-  <style>
-    :root {
-      --primary: #2c3e50;
-      --secondary: #3498db;
-      --accent: #1abc9c;
-      --light: #ecf0f1;
-      --dark: #34495e;
-      --success: #2ecc71;
-      --warning: #f39c12;
-      --danger: #e74c3c;
-      --gray: #95a5a6;
-      --purple: #9b59b6;
-    }
+{% load static %}
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f5f7fa;
-      margin: 0;
-      padding: 0;
-      color: var(--dark);
-    }
+{% block css_adicional %}
 
-    .container {
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+<style>
+  :root {
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --accent: #1abc9c;
+    --light: #ecf0f1;
+    --dark: #34495e;
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --gray: #95a5a6;
+    --purple: #9b59b6;
+  }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #e0e0e0;
-    }
+  .dashboard_container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #f5f7fa;
+    color: var(--dark);
+  }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+  .department-header {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    border-left: 5px solid var(--accent);
+  }
 
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-      background-color: var(--primary);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-    }
+  .department-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
 
-    .logo-text {
-      font-size: 1.5em;
-      font-weight: 600;
-      color: var(--primary);
-    }
+  .department-title h1 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 1.8em;
+  }
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+  .department-meta {
+    display: flex;
+    gap: 20px;
+    color: var(--gray);
+    font-size: 0.9em;
+  }
 
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: var(--secondary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-    }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
 
-    .department-header {
-      background: white;
-      border-radius: 10px;
-      padding: 25px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      margin-bottom: 30px;
-      border-left: 5px solid var(--accent);
-    }
+  /* Layout Principal */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+  }
 
-    .department-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
+  /* Tarjetas de Incidencias por Estado */
+  .incidents-container {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
 
-    .department-title h1 {
-      margin: 0;
-      color: var(--primary);
-      font-size: 1.8em;
-    }
+  .incidents-container h2 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+  }
 
-    .department-meta {
-      display: flex;
-      gap: 20px;
-      color: var(--gray);
-      font-size: 0.9em;
-    }
+  .incidents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
 
-    .meta-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
+  .incident-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    border-top: 4px solid var(--secondary);
+  }
 
-    /* Layout Principal */
+  .incident-card.creada { border-top-color: var(--secondary); }
+  .incident-card.derivada { border-top-color: var(--accent); }
+  .incident-card.proceso { border-top-color: var(--warning); }
+  .incident-card.rechazada { border-top-color: var(--danger); }
+  .incident-card.finalizada { border-top-color: var(--success); }
+
+  .incident-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 0.9em;
+    color: var(--gray);
+    font-weight: 500;
+  }
+
+  .incident-card .count {
+    font-size: 2.5em;
+    font-weight: 700;
+    margin: 0;
+    color: var(--dark);
+  }
+
+  /* Información de Cuadrillas */
+  .crews-container {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  .crews-container h2 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .crews-summary {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  .crews-count {
+    font-size: 3em;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0;
+  }
+
+  .crews-label {
+    color: var(--gray);
+    font-size: 1em;
+    margin: 5px 0 0 0;
+  }
+
+  .crews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .crew-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    border-left: 4px solid var(--purple);
+  }
+
+  .crew-card h4 {
+    margin: 0 0 8px 0;
+    color: var(--primary);
+    font-size: 1em;
+  }
+
+  .crew-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85em;
+    color: var(--gray);
+  }
+
+  .crew-status {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+  }
+
+  .status-active { background: rgba(46, 204, 113, 0.1); color: var(--success); }
+  .status-inactive { background: rgba(149, 165, 166, 0.1); color: var(--gray); }
+  .status-busy { background: rgba(243, 156, 18, 0.1); color: var(--warning); }
+
+  /* Sección de Usuarios */
+  .users-section {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    grid-column: 1 / -1;
+  }
+
+  .users-section h2 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .user-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-left: 4px solid var(--secondary);
+  }
+
+  .user-avatar-small {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+
+  .user-details h4 {
+    margin: 0 0 5px 0;
+    color: var(--primary);
+    font-size: 1em;
+  }
+
+  .user-details p {
+    margin: 0;
+    color: var(--gray);
+    font-size: 0.85em;
+  }
+
+  .user-stats {
+    margin-left: auto;
+    text-align: right;
+  }
+
+  .user-incidents {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--dark);
+    margin: 0;
+  }
+
+  .user-incidents-label {
+    font-size: 0.8em;
+    color: var(--gray);
+    margin: 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
     .dashboard-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 30px;
-      margin-bottom: 30px;
+      grid-template-columns: 1fr;
     }
-
-    /* Tarjetas de Incidencias por Estado */
-    .incidents-container {
-      background: white;
-      border-radius: 10px;
-      padding: 25px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .incidents-container h2 {
-      margin-top: 0;
-      color: var(--primary);
-      font-size: 1.4em;
-      font-weight: 600;
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid #f0f0f0;
-    }
-
-    .incidents-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-    }
-
-    .incident-card {
-      background: #f8f9fa;
-      border-radius: 8px;
-      padding: 20px;
-      text-align: center;
-      border-top: 4px solid var(--secondary);
-    }
-
-    .incident-card.creada { border-top-color: var(--secondary); }
-    .incident-card.derivada { border-top-color: var(--accent); }
-    .incident-card.proceso { border-top-color: var(--warning); }
-    .incident-card.rechazada { border-top-color: var(--danger); }
-    .incident-card.finalizada { border-top-color: var(--success); }
-
-    .incident-card h3 {
-      margin: 0 0 10px 0;
-      font-size: 0.9em;
-      color: var(--gray);
-      font-weight: 500;
-    }
-
-    .incident-card .count {
-      font-size: 2.5em;
-      font-weight: 700;
-      margin: 0;
-      color: var(--dark);
-    }
-
-    /* Información de Cuadrillas */
-    .crews-container {
-      background: white;
-      border-radius: 10px;
-      padding: 25px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .crews-container h2 {
-      margin-top: 0;
-      color: var(--primary);
-      font-size: 1.4em;
-      font-weight: 600;
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid #f0f0f0;
-    }
-
-    .crews-summary {
-      text-align: center;
-      margin-bottom: 25px;
-    }
-
-    .crews-count {
-      font-size: 3em;
-      font-weight: 700;
-      color: var(--primary);
-      margin: 0;
-    }
-
-    .crews-label {
-      color: var(--gray);
-      font-size: 1em;
-      margin: 5px 0 0 0;
-    }
-
-    .crews-list {
-      display: flex;
+    
+    .department-title {
       flex-direction: column;
-      gap: 15px;
+      align-items: flex-start;
+      gap: 10px;
     }
-
-    .crew-card {
-      background: #f8f9fa;
-      border-radius: 8px;
-      padding: 15px;
-      border-left: 4px solid var(--purple);
+    
+    .incidents-grid {
+      grid-template-columns: 1fr;
     }
-
-    .crew-card h4 {
-      margin: 0 0 8px 0;
-      color: var(--primary);
-      font-size: 1em;
-    }
-
-    .crew-info {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.85em;
-      color: var(--gray);
-    }
-
-    .crew-status {
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 0.8em;
-      font-weight: 600;
-    }
-
-    .status-active { background: rgba(46, 204, 113, 0.1); color: var(--success); }
-    .status-inactive { background: rgba(149, 165, 166, 0.1); color: var(--gray); }
-    .status-busy { background: rgba(243, 156, 18, 0.1); color: var(--warning); }
-
-    /* Sección de Usuarios */
-    .users-section {
-      background: white;
-      border-radius: 10px;
-      padding: 25px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      grid-column: 1 / -1;
-    }
-
-    .users-section h2 {
-      margin-top: 0;
-      color: var(--primary);
-      font-size: 1.4em;
-      font-weight: 600;
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid #f0f0f0;
-    }
-
+    
     .users-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
+      grid-template-columns: 1fr;
     }
+  }
+</style>
 
-    .user-card {
-      background: #f8f9fa;
-      border-radius: 8px;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      border-left: 4px solid var(--secondary);
-    }
+{% endblock %}
+{% block content %}
 
-    .user-avatar-small {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: var(--secondary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-      font-size: 1.2em;
-    }
+<div class="dashboard_container">
 
-    .user-details h4 {
-      margin: 0 0 5px 0;
-      color: var(--primary);
-      font-size: 1em;
-    }
-
-    .user-details p {
-      margin: 0;
-      color: var(--gray);
-      font-size: 0.85em;
-    }
-
-    .user-stats {
-      margin-left: auto;
-      text-align: right;
-    }
-
-    .user-incidents {
-      font-size: 1.5em;
-      font-weight: 700;
-      color: var(--dark);
-      margin: 0;
-    }
-
-    .user-incidents-label {
-      font-size: 0.8em;
-      color: var(--gray);
-      margin: 0;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .department-title {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-      }
-      
-      .incidents-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .users-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <div class="logo">
-        <div class="logo-icon">M</div>
-        <div class="logo-text">Sistema Municipal</div>
-      </div>
-      <div class="user-info">
-        <div class="user-avatar">JD</div>
-        <div>Jefe de Departamento</div>
-      </div>
-    </header>
-
-    <!-- Encabezado del Departamento -->
-    <div class="department-header">
-      <div class="department-title">
-        <h1>Perfil de Departamento</h1>
-        <div class="department-meta">
-          <div class="meta-item">
-            <strong>Dirección:</strong>
-            <span>Nombre de Dirección</span>
-          </div>
-          <div class="meta-item">
-            <strong>Usuarios:</strong>
-            <span>8</span>
-          </div>
-          <div class="meta-item">
-            <strong>Actualizado:</strong>
-            <span>15 Nov 2024, 10:30 AM</span>
-          </div>
+  <!-- Encabezado del Departamento -->
+  <div class="department-header">
+    <div class="department-title">
+      <h1>Perfil de Departamento</h1>
+      <div class="department-meta">
+        <div class="meta-item">
+          <strong>Dirección:</strong>
+          <span>{{divicion_data.nombre}}</span>
         </div>
-      </div>
-    </div>
-
-    <!-- Layout Principal -->
-    <div class="dashboard-grid">
-      <!-- Incidencias por Estado -->
-      <div class="incidents-container">
-        <h2>Incidencias por Estado</h2>
-        <div class="incidents-grid">
-          <div class="incident-card creada">
-            <h3>Creadas</h3>
-            <p class="count">15</p>
-          </div>
-          <div class="incident-card derivada">
-            <h3>Derivadas</h3>
-            <p class="count">12</p>
-          </div>
-          <div class="incident-card proceso">
-            <h3>En Proceso</h3>
-            <p class="count">8</p>
-          </div>
-          <div class="incident-card rechazada">
-            <h3>Rechazadas</h3>
-            <p class="count">2</p>
-          </div>
-          <div class="incident-card finalizada">
-            <h3>Finalizadas</h3>
-            <p class="count">25</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Información de Cuadrillas -->
-      <div class="crews-container">
-        <h2>Cuadrillas del Departamento</h2>
-        <div class="crews-summary">
-          <p class="crews-count">4</p>
-          <p class="crews-label">Cuadrillas Activas</p>
-        </div>
-        <div class="crews-list">
-          <div class="crew-card">
-            <h4>Cuadrilla Norte</h4>
-            <div class="crew-info">
-              <span>3 responsables</span>
-              <span>5 incidencias</span>
-              <span class="crew-status status-active">Activa</span>
-            </div>
-          </div>
-          <div class="crew-card">
-            <h4>Cuadrilla Sur</h4>
-            <div class="crew-info">
-              <span>2 responsables</span>
-              <span>3 incidencias</span>
-              <span class="crew-status status-busy">Ocupada</span>
-            </div>
-          </div>
-          <div class="crew-card">
-            <h4>Cuadrilla Centro</h4>
-            <div class="crew-info">
-              <span>2 responsables</span>
-              <span>0 incidencias</span>
-              <span class="crew-status status-active">Activa</span>
-            </div>
-          </div>
-          <div class="crew-card">
-            <h4>Cuadrilla Especial</h4>
-            <div class="crew-info">
-              <span>1 responsable</span>
-              <span>2 incidencias</span>
-              <span class="crew-status status-inactive">Inactiva</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Usuarios del Departamento -->
-    <div class="users-section">
-      <h2>Usuarios del Departamento</h2>
-      <div class="users-grid">
-        <div class="user-card">
-          <div class="user-avatar-small">AG</div>
-          <div class="user-details">
-            <h4>Ana García</h4>
-            <p>Supervisor</p>
-          </div>
-          <div class="user-stats">
-            <p class="user-incidents">15</p>
-            <p class="user-incidents-label">incidencias</p>
-          </div>
-        </div>
-        <div class="user-card">
-          <div class="user-avatar-small">CL</div>
-          <div class="user-details">
-            <h4>Carlos López</h4>
-            <p>Técnico Senior</p>
-          </div>
-          <div class="user-stats">
-            <p class="user-incidents">12</p>
-            <p class="user-incidents-label">incidencias</p>
-          </div>
-        </div>
-        <div class="user-card">
-          <div class="user-avatar-small">MR</div>
-          <div class="user-details">
-            <h4>María Rodríguez</h4>
-            <p>Técnico</p>
-          </div>
-          <div class="user-stats">
-            <p class="user-incidents">8</p>
-            <p class="user-incidents-label">incidencias</p>
-          </div>
-        </div>
-        <div class="user-card">
-          <div class="user-avatar-small">JP</div>
-          <div class="user-details">
-            <h4>Juan Pérez</h4>
-            <p>Técnico</p>
-          </div>
-          <div class="user-stats">
-            <p class="user-incidents">10</p>
-            <p class="user-incidents-label">incidencias</p>
-          </div>
-        </div>
-        <div class="user-card">
-          <div class="user-avatar-small">LM</div>
-          <div class="user-details">
-            <h4>Laura Martínez</h4>
-            <p>Coordinador</p>
-          </div>
-          <div class="user-stats">
-            <p class="user-incidents">5</p>
-            <p class="user-incidents-label">incidencias</p>
-          </div>
-        </div>
-        <div class="user-card">
-          <div class="user-avatar-small">PS</div>
-          <div class="user-details">
-            <h4>Pedro Sánchez</h4>
-            <p>Técnico</p>
-          </div>
-          <div class="user-stats">
-            <p class="user-incidents">7</p>
-            <p class="user-incidents-label">incidencias</p>
-          </div>
-        </div>
-        <div class="user-card">
-          <div class="user-avatar-small">SH</div>
-          <div class="user-details">
-            <h4>Sofia Hernández</h4>
-            <p>Asistente</p>
-          </div>
-          <div class="user-stats">
-            <p class="user-incidents">3</p>
-            <p class="user-incidents-label">incidencias</p>
-          </div>
-        </div>
-        <div class="user-card">
-          <div class="user-avatar-small">DR</div>
-          <div class="user-details">
-            <h4>Diego Ramírez</h4>
-            <p>Técnico Junior</p>
-          </div>
-          <div class="user-stats">
-            <p class="user-incidents">4</p>
-            <p class="user-incidents-label">incidencias</p>
-          </div>
+        <div class="meta-item">
+          <strong>Estado:</strong>
+          <span>{{divicion_data.estado}}</span>
         </div>
       </div>
     </div>
   </div>
-</body>
-</html>
+
+  <!-- Layout Principal -->
+  <div class="dashboard-grid">
+    <!-- Incidencias por Estado -->
+    <div class="incidents-container">
+      <h2>Resumen</h2>
+      <div class="incidents-grid">
+
+        {% for nombre, n, ic in datos %}
+        <div class="incident-card proceso">
+          <h3>{{nombre}}</h3>
+          <p class="count">{{n}}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Información de Cuadrillas -->
+    <div class="crews-container">
+      <h2>Historial de actividad</h2>
+      <div class="crews-list">
+
+        {% for inc in historial_inc %}
+        <div class="crew-card">
+          <h4>{{inc.encuesta__titulo}}</h4>
+          <div class="crew-info">
+            <span>Utlima actualizacion: {{inc.updated_at|date:'d M Y'}}</span>
+            <!-- <span class="crew-status status-inactive">Inactiva</span>
+            <span class="crew-status status-busy">Ocupada</span> -->
+            <span class="crew-status status-active">{{inc.estado|capfirst}}</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+
+  <div class="users-section">
+    <h2>Cuadrillas</h2>
+    <div class="users-grid">
+
+      {% for cuadrilla in cuadrillas_data %}
+      <div class="user-card">
+        <div class="user-details">
+          <h4>{{cuadrilla.nombre}}</h4>
+          <p>{{cuadrilla.encargado__username}}</p>
+        </div>
+        <div class="user-stats">
+          <p class="crew-status status-active">{% if cuadrilla.esta_activa %}Activo{% else %}Inactivo {% endif %}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}
