@@ -1,0 +1,338 @@
+{% load static %}
+
+{% block css_adicional %}
+
+<style>
+  :root {
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --accent: #1abc9c;
+    --light: #ecf0f1;
+    --dark: #34495e;
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --gray: #95a5a6;
+    --purple: #9b59b6;
+    --orange: #e67e22;
+  }
+
+  .dashboard_container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #f5f7fa;
+    color: var(--dark);
+  }
+
+  .territorial-header {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    border-left: 5px solid var(--orange);
+  }
+
+  .territorial-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .territorial-title h1 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 1.8em;
+  }
+
+  .territorial-meta {
+    display: flex;
+    gap: 20px;
+    color: var(--gray);
+    font-size: 0.9em;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* Layout Principal */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+  }
+
+  /* Incidencias por Estado */
+  .incidents-container {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  .incidents-container h2 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .incidents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+  }
+
+  .incident-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    border-top: 4px solid var(--secondary);
+  }
+
+  .incident-card.creada { border-top-color: var(--secondary); }
+  .incident-card.derivada { border-top-color: var(--accent); }
+  .incident-card.proceso { border-top-color: var(--warning); }
+  .incident-card.rechazada { border-top-color: var(--danger); }
+  .incident-card.finalizada { border-top-color: var(--success); }
+  .incident-card.resuelta { border-top-color: var(--purple); }
+
+  .incident-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 0.9em;
+    color: var(--gray);
+    font-weight: 500;
+  }
+
+  .incident-card .count {
+    font-size: 2.2em;
+    font-weight: 700;
+    margin: 0;
+    color: var(--dark);
+  }
+
+  .incident-card .subtitle {
+    font-size: 0.8em;
+    color: var(--gray);
+    margin: 5px 0 0 0;
+  }
+
+  /* Incidencias por Tipo */
+  .types-container {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  .types-container h2 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+  }
+
+  .type-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    border-left: 4px solid var(--orange);
+  }
+
+  .type-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 0.9em;
+    color: var(--gray);
+    font-weight: 500;
+  }
+
+  .type-card .count {
+    font-size: 2.2em;
+    font-weight: 700;
+    margin: 0;
+    color: var(--dark);
+  }
+
+  /* Resumen del Mes */
+  .monthly-container {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    grid-column: 1 / -1;
+  }
+
+  .monthly-container h2 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .monthly-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .monthly-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 25px;
+    text-align: center;
+    border-left: 4px solid var(--success);
+  }
+
+  .monthly-card.resueltas {
+    border-left-color: var(--success);
+  }
+
+  .monthly-card.creadas {
+    border-left-color: var(--secondary);
+  }
+
+  .monthly-card h3 {
+    margin: 0 0 15px 0;
+    font-size: 1em;
+    color: var(--gray);
+    font-weight: 500;
+  }
+
+  .monthly-card .count {
+    font-size: 3em;
+    font-weight: 700;
+    margin: 0;
+    color: var(--dark);
+  }
+
+  .monthly-card .period {
+    font-size: 0.9em;
+    color: var(--gray);
+    margin: 10px 0 0 0;
+  }
+
+  .progress-info {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  .progress-label {
+    font-size: 0.8em;
+    color: var(--gray);
+    margin-bottom: 5px;
+  }
+
+  .progress-value {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--success);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .territorial-title {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .incidents-grid,
+    .types-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .monthly-stats {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+{% endblock %}
+{% block content %}
+
+<div class="dashboard_container">
+
+  <!-- Encabezado del Perfil Territorial -->
+  <div class="territorial-header">
+    <div class="territorial-title">
+      <h1>Perfil Territorial</h1>
+      <div class="territorial-meta">
+        {% if divicion_data.nombre%}
+        <div class="meta-item">
+          <strong>Direccion:</strong>
+          <span>{{divicion_data.nombre}}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Layout Principal -->
+  <div class="dashboard-grid">
+    <!-- Incidencias por Estado -->
+    <div class="incidents-container">
+      <h2>Incidencias por Estado</h2>
+      <div class="incidents-grid">
+        {% for nombre, n, ic in datos %}
+        <div class="incident-card resuelta">
+          <h3>{{nombre}}</h3>
+          <p class="count">{{n}}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Incidencias por Tipo -->
+    <div class="types-container">
+      <h2>Resumen del Mes Actual - {{fecha|date:'M Y'}}</h2>
+      <div class="types-grid">
+        <div class="monthly-card resueltas">
+          <h3>Incidencias Resueltas</h3>
+          <p class="count">{{n_inc_resueltas_mes}}</p>
+          <p class="period">Este mes</p>
+        </div>
+        <div class="monthly-card creadas">
+          <h3>Incidencias Creadas</h3>
+          <p class="count">{{n_inc_creadas_mes}}</p>
+          <p class="period">Este mes</p>
+        </div>
+        <div class="monthly-card">
+          <h3>Promedio Diario</h3>
+          <!-- widthratio x y z = (x/y)*z -->
+          <p class="count">{{promedio_diario}}</p>
+          <p class="period">Resueltas por día</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

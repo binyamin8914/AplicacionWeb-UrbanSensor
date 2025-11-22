@@ -2,18 +2,38 @@
 {% load static %}
 {% block title %}Dashboard{% endblock %}
 
-{% block css_adicional %}
+{% block content %}
+{% if group_name == "SECPLA" %}
+    <!-- { % include "core/dashboardsecpla.html" with titulo=titulo url=url titulos=titulos filas=filas tieneAcciones=tieneAcciones descripcion=descripcion filtros=filtros % } -->
+    {% include "core/dashboardsecpla.html" %}
+{% endif %}
+{% if group_name == "Direccion" %}
+  {% include "core/dashboarddireccion.html" %}
+{% endif %}
+{% if group_name == "Departamento" %}
+  {% include "core/dashboarddepartamento.html" %}
+{% endif %}
+{% if group_name == "Territorial" %}
+  {% include "core/dashboardterritorial.html" %}
+{% endif %}
+{% if group_name == "Cuadrilla" %}
+  {% include "core/dashboardcuadrilla.html" %}
+{% endif %}
 {% endblock %}
 
-{% block content %}
 
-<div class="content-header">
+<!-- { % block css_adicional % } -->
+<!-- { % endblock % } -->
+
+<!-- { % block content % } -->
+
+<!-- <div class="content-header">
   <h1 class="mb-3">Incidencias Creadas</h1>
 </div>
 
 <div class="row g-4 mt-4"> 
 
-  {% for nombre, dato, ic in datos %}
+  { % for nombre, dato, ic in datos % }
   <div class="col-md-6 col-lg-3">
     <a class="text-decoration-none text-dark">
         <div class="card shadow-sm h-100"> {# Quitamos los bordes de color #}
@@ -25,8 +45,8 @@
         </div>
     </a>
   </div>
-  {% endfor %}
+  { % endfor % }
 
-</div>
+</div> -->
 
-{% endblock %}
+<!-- { % endblock % } -->
