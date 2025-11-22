@@ -1,23 +1,44 @@
 {% extends "core/base.html" %}
-
-{% block title %}Rechazar incidencia{% endblock %}
+{% block title %}Rechazar incidencia #{{ incidencia.id }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-  <div class="card shadow-sm">
-    <div class="card-header">
-      <h3 class="mb-0">Rechazar Incidencia #{{ incidencia.id }}</h3>
-    </div>
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Rechazar incidencia #{{ incidencia.id }}</h4>
+        </div>
+        <div class="card-body">
+            {% if group_name == "Departamento" %}
+                <p>
+                    Estás a punto de rechazar esta incidencia desde el
+                    <strong>Departamento responsable</strong>. Esto la devolverá al
+                    territorial para que pueda revisarla y reenviarla al departamento que corresponda.
+                </p>
+            {% elif group_name == "Territorial" %}
+                <p>
+                    Estás a punto de rechazar esta incidencia luego de que la cuadrilla la marcó como
+                    <strong>finalizada</strong>. La incidencia pasará a estado
+                    <strong>Rechazada</strong> y luego podrás editarla y reasignarla.
+                </p>
+            {% else %}
+                <p>Estás a punto de rechazar esta incidencia.</p>
+            {% endif %}
 
-    <div class="card-body">
-      <p>¿Estás seguro que deseas <strong class="text-danger">rechazar</strong> esta incidencia?</p>
+            <div class="border rounded p-3 bg-light mb-3">
+                <p class="mb-1"><strong>Descripción:</strong></p>
+                <p class="mb-0">{{ incidencia.descripcion }}</p>
+            </div>
 
-      <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Rechazar</button>
-        <a href="{% url 'gestion_incidencias' %}" class="btn btn-secondary">Cancelar</a>
-      </form>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-x-octagon-fill me-1"></i> Confirmar rechazo
+                </button>
+                <a href="{% url 'incidencia_detalle' incidencia.id %}" class="btn btn-secondary ms-2">
+                    Cancelar
+                </a>
+            </form>
+        </div>
     </div>
-  </div>
 </div>
 {% endblock %}
