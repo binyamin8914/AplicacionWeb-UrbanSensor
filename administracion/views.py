@@ -3,13 +3,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
-
 from registration.models import Profile
+from direcciones.models import Direccion
 
 
 # ===================================================================
 # --- VISTAS DE USUARIOS (ÚNICO QUE QUEDA EN ESTA APP) ---
 # ===================================================================
+from django.core.paginator import Paginator
+
 @login_required
 def usuarios_listar(request):
     # Lista de usuarios con filtros por estado y perfil (grupo)
@@ -37,12 +39,18 @@ def usuarios_listar(request):
         usuarios_db = usuarios_db.filter(groups__name=filtro_perfil)
 
     usuarios_db = usuarios_db.order_by('username')
+    
+    # PAGINACIÓN
+    paginator = Paginator(usuarios_db, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     grupos_para_filtro = Group.objects.all()
 
     datos = {
         'titulo': "Gestión de Usuarios",
         'descripcion': "Gestión de todos los usuarios de la plataforma",
-        'url': {'name': 'usuario_actualizar', 'label': 'Nuevo Usuario', 'ic': ''},
+        'url': {'name': 'usuario_actualizar', 'label': 'Nuevo Usuario', 'ic': ''},
         'titulos': ['Usuario', 'Nombre', 'Apellido', 'Correo', 'Teléfono', 'Perfil', 'Estado'],
         'back': 'dashboard',
         'filtros': [
@@ -51,18 +59,20 @@ def usuarios_listar(request):
         ],
         'tieneAcciones': True,
         "group_name": profile.group.name,
-        'current_filtro_estado': filtro_estado,
-        'current_filtro_perfil': filtro_perfil,
+        'current_filtro_estado': filtro_estado or '',
+        'current_filtro_perfil': filtro_perfil or '',
+        'usuarios': page_obj,  # ← AGREGADO
         'filas': []
     }
 
-    for usuario in usuarios_db:
+    # ← CAMBIAR usuarios_db por page_obj
+    for usuario in page_obj:
         datos['filas'].append({
             "id": usuario.id,
             'acciones': [
-                {'url': 'usuario_ver', 'name': 'Ver', 'ic': ''},
-                {'url': 'usuario_actualizar_id', 'name': 'Editar', 'ic': ''},
-                {'url': 'usuario_bloquear', 'name': 'Bloquear' if usuario.is_active else 'Activar', 'ic': '' if usuario.is_active else ''}
+                {'url': 'usuario_ver', 'name': 'Ver', 'ic': ''},
+                {'url': 'usuario_actualizar_id', 'name': 'Editar', 'ic': ''},
+                {'url': 'usuario_bloquear', 'name': 'Bloquear' if usuario.is_active else 'Activar', 'ic': '' if usuario.is_active else ''}
             ],
             "columnas": [
                 usuario.username, usuario.first_name, usuario.last_name,
@@ -127,6 +137,18 @@ def usuario_actualizar(request, user_id=None):
 
             user_profile.group = group
             user_profile.telefono = telefono or ''
+            # ---- NUEVO: asignar dirección solo si es Territorial ----
+            if group.name == "Territorial":
+                direccion_id = request.POST.get("direccion_id")
+                try:
+                    direccion = Direccion.objects.get(pk=direccion_id)
+                except Direccion.DoesNotExist:
+                    messages.add_message(request, messages.INFO, "Debe seleccionar una dirección válida para el territorial.")
+                    return redirect("usuario_actualizar_id", user_id=user.id)
+                user_profile.direccion = direccion
+            else:
+                user_profile.direccion = None  # otros perfiles no tienen dirección asignada
+
             user_profile.save()
 
             messages.add_message(request, messages.INFO, "Usuario actualizado correctamente.")
@@ -157,7 +179,21 @@ def usuario_actualizar(request, user_id=None):
                 return redirect("usuario_actualizar")
 
             user.groups.add(group)
-            Profile.objects.create(user=user, group=group, telefono=telefono or '')
+            direccion = None
+            if group.name == "Territorial":
+                direccion_id = request.POST.get("direccion_id")
+                try:
+                    direccion = Direccion.objects.get(pk=direccion_id)
+                except Direccion.DoesNotExist:
+                    messages.add_message(request, messages.INFO, "Debe seleccionar una dirección válida para el territorial.")
+                    return redirect("usuario_actualizar")
+
+            Profile.objects.create(
+                user=user,
+                group=group,
+                telefono=telefono or '',
+                direccion=direccion
+            )
 
             messages.add_message(request, messages.INFO, "Usuario creado correctamente.")
         return redirect("usuarios_listar")
@@ -167,6 +203,7 @@ def usuario_actualizar(request, user_id=None):
         "usuario": user,
         "user_profile": user_profile,
         "grupos": grupos,
+        "direcciones": Direccion.objects.filter(esta_activa=True),
         "group_name": profile.group.name
     })
 

@@ -2,24 +2,226 @@
 {% block title %}Incidencia #{{ incidencia.id }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="card">
-    <div class="card-header">
-      <h3>Incidencia #{{ incidencia.id }}</h3>
-    </div>
-    <div class="card-body">
-      <p><strong>Tipo:</strong> {{ incidencia.encuesta.tipo_incidencia.nombre }}</p>
-      <p><strong>Descripción:</strong> {{ incidencia.descripcion }}</p>
-      <p><strong>Dirección:</strong> {{ incidencia.encuesta.tipo_incidencia.departamento.direccion.nombre }}</p>
-      <p><strong>Departamento:</strong> {{ incidencia.encuesta.tipo_incidencia.departamento.nombre }}</p>
-      <p><strong>Estado:</strong> {{ incidencia.get_estado_display }}</p>
+<div class="container-fluid mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center bg-light">
+            <h3 class="mb-0 text-primary">Incidencia #{{ incidencia.id }}</h3>
+            <small class="text-muted">{{ incidencia.created_at|date:"d M Y H:i" }}</small>
+        </div>
 
-      {# Aquí SOLO se ve el detalle, sin formulario de derivar #}
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-7">
+                    {# --- TIPO DE INCIDENCIA --- #}
+                    <p class="mb-1 text-muted small">Tipo de Incidencia:</p>
+                    <h5 class="fw-bold text-dark">
+                        {% if incidencia.encuesta and incidencia.encuesta.tipo_incidencia %}
+                            {{ incidencia.encuesta.tipo_incidencia.nombre }}
+                        {% else %}
+                            Sin tipo asignado
+                        {% endif %}
+                    </h5>
 
-      <a href="{% url 'gestion_incidencias' %}" class="btn btn-secondary mt-3">
-        Volver a incidencias
-      </a>
+                    {# --- PRIORIDAD --- #}
+                    <p class="mb-1 text-muted small mt-3">Prioridad:</p>
+                    <p>
+                        {% if incidencia.prioridad == 'alta' %}
+                            <span class="badge bg-danger fs-6">Alta</span>
+                        {% elif incidencia.prioridad == 'normal' %}
+                            <span class="badge bg-warning text-dark fs-6">Normal</span>
+                        {% elif incidencia.prioridad == 'baja' %}
+                            <span class="badge bg-info text-dark fs-6">Baja</span>
+                        {% else %}
+                            <span class="badge bg-secondary fs-6">{{ incidencia.get_prioridad_display }}</span>
+                        {% endif %}
+                    </p>
+
+                    {# --- DESCRIPCIÓN --- #}
+                    <p class="mt-4 mb-2 text-muted small">Descripción:</p>
+                    <div class="border rounded p-3 mb-4 bg-light shadow-sm">
+                        {{ incidencia.descripcion }}
+                    </div>
+
+                    {# --- UBICACIÓN --- #}
+                    <p class="mb-1 text-muted small">Ubicación y Dirección:</p>
+                    <div class="row">
+                        <div class="col-12 mb-2">
+                            <i class="bi bi-geo-alt-fill text-primary me-2"></i>
+                            <span class="fw-semibold">{{ incidencia.direccion_textual|default:"Dirección textual no especificada" }}</span>
+                        </div>
+                        <div class="col-12 mb-3 text-secondary small">
+                            Coordenadas: Latitud {{ incidencia.latitud|default:"N/A" }} / Longitud {{ incidencia.longitud|default:"N/A" }}
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    {# --- DESTINO Y ASIGNACIONES --- #}
+                    <p class="mb-1 text-muted small">Dirección (Entidad Principal):</p>
+                    <p class="fw-semibold">
+                        {% if incidencia.encuesta and incidencia.encuesta.tipo_incidencia and incidencia.encuesta.tipo_incidencia.departamento and incidencia.encuesta.tipo_incidencia.departamento.direccion %}
+                            <i class="bi bi-building me-1 text-danger"></i>
+                            {{ incidencia.encuesta.tipo_incidencia.departamento.direccion.nombre }}
+                        {% else %}
+                            Sin asignar
+                        {% endif %}
+                    </p>
+
+                    <p class="mb-1 text-muted small mt-3">Departamento Responsable:</p>
+                    <p class="fw-semibold">
+                        {% if incidencia.encuesta and incidencia.encuesta.tipo_incidencia and incidencia.encuesta.tipo_incidencia.departamento %}
+                            <span class="badge bg-primary bg-opacity-75 fs-7">
+                                <i class="bi bi-diagram-3 me-1"></i>
+                                {{ incidencia.encuesta.tipo_incidencia.departamento.nombre }}
+                            </span>
+                        {% else %}
+                            Sin asignar
+                        {% endif %}
+                    </p>
+
+                    {# Mostrar cuadrilla si existe #}
+                    <p class="mb-1 text-muted small mt-3">Asignación a Cuadrilla:</p>
+                    {% if incidencia.cuadrilla %}
+                        <div class="alert alert-success p-2 small d-inline-block">
+                            <i class="bi bi-person-gear me-1"></i>
+                            <strong>{{ incidencia.cuadrilla.nombre }}</strong>
+                            {% if incidencia.cuadrilla.encargado %}
+                                (Encargado: {{ incidencia.cuadrilla.encargado.get_full_name|default:incidencia.cuadrilla.encargado.username }})
+                            {% endif %}
+                        </div>
+                    {% elif incidencia.estado == 'derivada' %}
+                        <p class="text-warning small fst-italic">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            Derivada, pero cuadrilla aún no asignada.
+                        </p>
+                    {% else %}
+                        <p class="text-muted small fst-italic">Aún no se ha asignado a una cuadrilla.</p>
+                    {% endif %}
+                </div>
+
+                {# --- PANEL LATERAL (METADATOS Y ACCIONES) --- #}
+                <div class="col-md-5">
+                    <div class="card bg-light shadow-sm mb-4">
+                        <div class="card-body">
+                            <p class="mb-1 text-muted small">Estado Actual:</p>
+                            {# ESTADO CON BADGE GRANDE #}
+                            <h5 class="mb-3">
+                                {% if incidencia.estado == 'finalizada' %}
+                                    <span class="badge rounded-pill bg-success bg-opacity-75 text-white px-3 py-2"><i class="bi bi-check-circle me-1"></i> Finalizada</span>
+                                {% elif incidencia.estado == 'rechazada' %}
+                                    <span class="badge rounded-pill bg-danger bg-opacity-75 text-white px-3 py-2"><i class="bi bi-x-circle me-1"></i> Rechazada</span>
+                                {% elif incidencia.estado == 'derivada' %}
+                                    <span class="badge rounded-pill bg-primary text-white px-3 py-2"><i class="bi bi-arrow-right-circle me-1"></i> Derivada</span>
+                                {% elif incidencia.estado == 'proceso' %}
+                                    <span class="badge rounded-pill bg-warning text-dark px-3 py-2"><i class="bi bi-hourglass-split me-1"></i> En Proceso</span>
+                                {% elif incidencia.estado == 'abierta' %}
+                                    <span class="badge rounded-pill bg-info text-dark px-3 py-2"><i class="bi bi-envelope-open me-1"></i> Abierta</span>
+                                {% elif incidencia.estado == 'cerrada' %}
+                                    <span class="badge rounded-pill bg-dark text-white px-3 py-2"><i class="bi bi-lock me-1"></i> Cerrada</span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-secondary text-white px-3 py-2">{{ incidencia.get_estado_display }}</span>
+                                {% endif %}
+                            </h5>
+
+                            <hr>
+
+                            <p class="mb-1 text-muted small">Creada por Territorial:</p>
+                            <p class="mb-2 fw-semibold">
+                                <i class="bi bi-person me-1"></i>
+                                {{ incidencia.territorial.get_full_name|default:incidencia.territorial.username }}
+                            </p>
+
+                            <p class="mb-1 text-muted small">Fecha creación:</p>
+                            <p class="mb-3">{{ incidencia.created_at|date:"d M Y H:i" }}</p>
+
+                            {% if incidencia.updated_at %}
+                            <p class="mb-1 text-muted small">Última actualización:</p>
+                            <p class="mb-3">{{ incidencia.updated_at|date:"d M Y H:i" }}</p>
+                            {% endif %}
+
+                            {# --- BOTONES DE ACCIÓN (LÓGICA) --- #}
+
+                            {% with depto_encargado=incidencia.encuesta.tipo_incidencia.departamento.encargado %}
+                                {# ACCIONES DE DEPARTAMENTO: Solo si es el encargado y está ABIERTA #}
+                                {% if group_name == 'Departamento' and depto_encargado == request.user and incidencia.estado == 'abierta' %}
+                                    <a href="{% url 'derivar_incidencia' incidencia.id %}" class="btn btn-primary w-100 mb-2">
+                                        <i class="bi bi-send-fill me-1"></i> Derivar a cuadrilla
+                                    </a>
+                                    <a href="{% url 'rechazar_incidencia' incidencia.id %}" class="btn btn-danger w-100 mb-2">
+                                        <i class="bi bi-x-octagon-fill me-1"></i> Rechazar incidencia
+                                    </a>
+                                {% endif %}
+                            {% endwith %}
+
+                            {# ACCIÓN DE CUADRILLA: Finalizar (Solo si está Derivada y la cuadrilla coincide) #}
+                            {% if group_name == 'Cuadrilla' and incidencia.cuadrilla and incidencia.cuadrilla.encargado == request.user and incidencia.estado == 'derivada' %}
+                                <form action="{% url 'finalizar_incidencia' incidencia.id %}" method="post" class="d-inline w-100">
+                                    {% csrf_token %}
+                                    <button class="btn btn-success w-100 mb-2" type="submit">
+                                        <i class="bi bi-check-lg me-1"></i> Marcar como Finalizada
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                            {# ACCIÓN DE TERRITORIAL: Editar si fue Rechazada (para reenvío) #}
+                            {% if group_name == 'Territorial' and incidencia.territorial == request.user and incidencia.estado == 'rechazada' %}
+                                <a href="{% url 'editar_incidencia' incidencia.id %}" class="btn btn-info text-white w-100 mb-2">
+                                    <i class="bi bi-pencil-fill me-1"></i> Editar y Reenviar
+                                </a>
+                            {% endif %}
+
+                        </div>
+                    </div>
+
+                    {# Historial (mantener bloque original) #}
+                    {% if incidencia.logs.all|length %}
+                        <div class="card">
+                            <div class="card-header">Historial</div>
+                            <div class="card-body small">
+                                <ul class="list-unstyled mb-0">
+                                    {% for log in incidencia.logs.all %}
+                                        <li class="mb-2">
+                                            <strong>{{ log.action|capfirst }}</strong>
+                                            <div class="text-muted small">
+                                                por {{ log.user.get_full_name|default:log.user.username }} — {{ log.created_at|date:"d M Y H:i" }}
+                                                {% if log.nota %}<div class="mt-1">«{{ log.nota }}»</div>{% endif %}
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# --- RESPUESTAS A CAMPOS ADICIONALES --- #}
+            {% if campos_adicionales %}
+                <hr class="mt-4">
+                <h5 class="mb-3 text-primary">Respuestas a Campos Adicionales</h5>
+                <div class="row">
+                    {% for campo in campos_adicionales %}
+                        <div class="col-md-6 mb-3">
+                            <p class="mb-1 small fw-semibold">
+                                {{ campo.titulo }}
+                                {% if campo.es_obligatoria %}<span class="text-danger">*</span>{% endif %}
+                            </p>
+                            <div class="mt-1">
+                                {% if campo.valor %}
+                                    <div class="border rounded p-2 bg-light shadow-sm small text-dark">{{ campo.valor }}</div>
+                                {% else %}
+                                    <div class="text-muted fst-italic small p-2 border rounded bg-light">Sin respuesta registrada</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-secondary mt-4">
+                <i class="bi bi-arrow-left-circle me-1"></i> Volver a incidencias
+            </a>
+        </div>
     </div>
-  </div>
 </div>
 {% endblock %}

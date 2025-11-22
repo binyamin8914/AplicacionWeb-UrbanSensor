@@ -1,3 +1,19 @@
+:root {
+    --white: #ffffff;
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --accent: #1abc9c;
+    --light: #ecf0f1;
+    --dark: #34495e;
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --gray: #95a5a6;
+    --purple: #9b59b6;
+    --orange: #e67e22;
+    --teal: #1abc9c;
+  }
+
 html, body {
     width: 100%;
     height: 100%;
@@ -30,27 +46,17 @@ body {
 
 #logo_contenedor p {
     width: 300px;
-    font-size: 30px;
+    font-size: 25px;
     font-weight: bold;
 }
 
 #logo_contenedor img {
     align-self: center;
+    height: 40px;
 }
 
 #form_contenedor{
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 35%;
-    height: 100%;
-
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: center;
-
-    background-color: white;
+    background-color: var(--white);
 }
 
 #form_contenedor p{

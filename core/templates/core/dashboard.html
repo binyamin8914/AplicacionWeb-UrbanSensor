@@ -2,282 +2,51 @@
 {% load static %}
 {% block title %}Dashboard{% endblock %}
 
-{% block css_adicional %}
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #fff;
-      margin: 0;
-      padding: 0;
-    }
-
-    .container {
-      padding: 20px;
-    }
-
-    .cards {
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-      margin-bottom: 30px;
-    }
-
-    .card {
-      background-color: #ffd9d9;
-      border-radius: 10px;
-      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
-      text-align: center;
-      width: 250px;
-      padding: 20px;
-      margin: 10px;
-    }
-
-    .card h3 {
-      margin: 0;
-      font-size: 1.4em;
-    }
-
-    .card p {
-      font-size: 2em;
-      font-weight: bold;
-      margin: 10px 0 0 0;
-    }
-
-    .buttons {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-bottom: 40px;
-    }
-
-    .btn_base {
-      border: none;
-      padding: 10px 25px;
-      border-radius: 25px;
-      font-size: 1em;
-      cursor: pointer;
-      font-weight: bold;
-      box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .btn-green {
-      background-color: #54f08d;
-    }
-
-    .btn-red {
-      background-color: #f95b5b;
-    }
-
-    .btn-yellow {
-      background-color: #f9d85b;
-    }
-
-    .btn-blue {
-      background-color: #8c8cf9;
-      color: #fff;
-    }
-
-    /* ==== GRÁFICO SIMULADO ==== */
-    .graph-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 40px;
-    }
-
-    .graph {
-      width: 650px;
-      height: 250px;
-      background-color: #f6f6f6;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-      padding: 20px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-around;
-    }
-
-    .bar-group {
-      display: flex;
-      flex-direction: row;
-      align-items: flex-end;
-      gap: 3px;
-    }
-
-    .bar {
-      width: 10px;
-      border-radius: 3px;
-    }
-
-    .bar1 {
-      background-color: #f95b5b;
-      height: 70px;
-    }
-
-    .bar2 {
-      background-color: #8c8cf9;
-      height: 100px;
-    }
-
-    .bar3 {
-      background-color: #54f08d;
-      height: 85px;
-    }
-
-    .bar4 {
-      background-color: #f9d85b;
-      height: 60px;
-    }
-
-    /* ==== TABLA DE REPORTES ==== */
-    .reportes {
-      background-color: #ffd9d9;
-      border-radius: 10px;
-      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
-      padding: 20px;
-    }
-
-    .reportes h2 {
-      margin-top: 0;
-    }
-
-    .tabla-reportes {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-
-    .tabla-reportes td {
-      padding: 10px;
-    }
-
-    .estado-activa {
-      color: green;
-      font-weight: bold;
-    }
-
-    .estado-inactiva {
-      color: orange;
-      font-weight: bold;
-    }
-
-    .estado-proceso {
-      color: blue;
-      font-weight: bold;
-    }
-
-    .prioridad-alta {
-      color: red;
-      font-weight: bold;
-    }
-
-    .prioridad-baja {
-      color: #5bbf5b;
-      font-weight: bold;
-    }
-
-    .prioridad-normal {
-      color: #d6a90f;
-      font-weight: bold;
-    }
-
-    @media (max-width: 768px) {
-      .cards {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .graph {
-        width: 100%;
-      }
-    }
-  </style>
-{% endblock %}
-
 {% block content %}
-  <div class="container">
-    <!-- Tarjetas -->
-    <div class="cards">
-      <div class="card">
-        <h3>Usuarios activos</h3>
-        <p>200</p>
-      </div>
-      <div class="card">
-        <h3>Encuestas</h3>
-        <p>50</p>
-      </div>
-      <div class="card">
-        <h3>Solicitud pendiente</h3>
-        <p>10</p>
-      </div>
-    </div>
-
-    <!-- Botones -->
-    <div class="buttons">
-      <button class="btn_base btn-green">Crear encuesta +</button>
-      <button class="btn_base btn-red">Bloquear</button>
-      <button class="btn_base btn-yellow">Inactivo</button>
-      <button class="btn_base btn-blue">Derivar</button>
-    </div>
-
-    <!-- Gráfico simulado -->
-    <div class="graph-container">
-      <div class="graph">
-        <div class="bar-group">
-          <div class="bar bar1"></div>
-          <div class="bar bar2"></div>
-          <div class="bar bar3"></div>
-        </div>
-        <div class="bar-group">
-          <div class="bar bar2"></div>
-          <div class="bar bar3"></div>
-          <div class="bar bar4"></div>
-        </div>
-        <div class="bar-group">
-          <div class="bar bar3"></div>
-          <div class="bar bar1"></div>
-          <div class="bar bar4"></div>
-        </div>
-        <div class="bar-group">
-          <div class="bar bar1"></div>
-          <div class="bar bar2"></div>
-          <div class="bar bar3"></div>
-        </div>
-        <div class="bar-group">
-          <div class="bar bar4"></div>
-          <div class="bar bar3"></div>
-          <div class="bar bar2"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Reportes -->
-    <div class="reportes">
-      <h2>Reportes</h2>
-      <table class="tabla-reportes">
-        <tr>
-          <td>Vereda mal estado</td>
-          <td>Construcción</td>
-          <td>Cuadrilla 6</td>
-          <td class="estado-activa">ACTIVA</td>
-          <td class="prioridad-alta">ALTA</td>
-        </tr>
-        <tr>
-          <td>Caída de árbol</td>
-          <td>Forestal</td>
-          <td>Cuadrilla 5</td>
-          <td class="estado-inactiva">INACTIVA</td>
-          <td class="prioridad-baja">BAJA</td>
-        </tr>
-        <tr>
-          <td>Alcantarilla</td>
-          <td>Agua</td>
-          <td>Cuadrilla 3</td>
-          <td class="estado-proceso">PROCESO</td>
-          <td class="prioridad-normal">NORMAL</td>
-        </tr>
-      </table>
-    </div>
-  </div>
+{% if group_name == "SECPLA" %}
+    <!-- { % include "core/dashboardsecpla.html" with titulo=titulo url=url titulos=titulos filas=filas tieneAcciones=tieneAcciones descripcion=descripcion filtros=filtros % } -->
+    {% include "core/dashboardsecpla.html" %}
+{% endif %}
+{% if group_name == "Direccion" %}
+  {% include "core/dashboarddireccion.html" %}
+{% endif %}
+{% if group_name == "Departamento" %}
+  {% include "core/dashboarddepartamento.html" %}
+{% endif %}
+{% if group_name == "Territorial" %}
+  {% include "core/dashboardterritorial.html" %}
+{% endif %}
+{% if group_name == "Cuadrilla" %}
+  {% include "core/dashboardcuadrilla.html" %}
+{% endif %}
 {% endblock %}
+
+
+<!-- { % block css_adicional % } -->
+<!-- { % endblock % } -->
+
+<!-- { % block content % } -->
+
+<!-- <div class="content-header">
+  <h1 class="mb-3">Incidencias Creadas</h1>
+</div>
+
+<div class="row g-4 mt-4"> 
+
+  { % for nombre, dato, ic in datos % }
+  <div class="col-md-6 col-lg-3">
+    <a class="text-decoration-none text-dark">
+        <div class="card shadow-sm h-100"> {# Quitamos los bordes de color #}
+            <div class="card-body text-center">
+                <span class="icon mb-3 fs-1 d-block">{{ic}}</span> {# Ícono Dashboard #}
+                <h5 class="card-title">{{nombre}}</h5>
+                <p class="card-text fs-2 fw-bold">{{ dato }}</p>
+            </div>
+        </div>
+    </a>
+  </div>
+  { % endfor % }
+
+</div> -->
+
+<!-- { % endblock % } -->

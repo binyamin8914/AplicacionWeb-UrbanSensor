@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+
+{% block title %}Rechazar incidencia{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header">
+      <h3 class="mb-0">Rechazar Incidencia #{{ incidencia.id }}</h3>
+    </div>
+
+    <div class="card-body">
+      <p>¿Estás seguro que deseas <strong class="text-danger">rechazar</strong> esta incidencia?</p>
+
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Rechazar</button>
+        <a href="{% url 'gestion_incidencias' %}" class="btn btn-secondary">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

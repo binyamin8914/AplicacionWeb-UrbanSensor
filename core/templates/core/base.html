@@ -21,12 +21,6 @@
     <aside id="sidebar" class="contraido">
       <div id="title_sidebar">
         <div><button id="toggle_btn">󰮫</button></div>
-        <div class="sidebar-user-profile text-center">
-          <i class="bi bi-person-circle sidebar-user-icon"></i>
-          <span class="sidebar-user-name">
-            {{ request.user.get_full_name|default:request.user.username }}
-          </span>
-        </div>
       </div>
 
 
@@ -76,7 +70,7 @@
                 </a>
               </li>
               <li class="mb-1">
-                <a class="item_l d-flex align-items-center gap-2" href="{% url 'secpla_dashboard' %}">
+                <a class="item_l d-flex align-items-center gap-2" href="{% url 'gestion_incidencias' %}">
                   <span class="item_l_icon icon">󱉫</span>
                   <span class="item_l_texto">Ver Incidencias</span>
                 </a>
@@ -152,7 +146,20 @@
     </aside>
 
     <!-- MAIN -->
-    <main id="main-panel" class="p-3">
+    <main>
+      <div class="header">
+        <div class="logo">
+          <div class="logo-icon">M</div>
+          <div class="logo-text">Sistema Municipal</div>
+        </div>
+
+        <div class="user-info">
+          <span class="user-name">
+            {{ request.user.get_full_name|default:request.user.username }}
+          </span>
+          <i class="bi bi-person-circle user-icon"></i>
+        </div>
+      </div class="header">
 
       {# Mensajes flash #}
       {% if messages %}
@@ -169,8 +176,10 @@
           {% endfor %}
         </div>
       {% endif %}
-
-      {% block content %}{% endblock %}
+      
+      <div id="main-panel" class="p-3">
+        {% block content %}{% endblock %}
+      </div>
     </main>
   </div>
 

@@ -40,7 +40,8 @@
         </div>
         {% endif %}
     </div>
-    {% if group_name != "Direccion" %}
+    
+    {% if group_name == 'SECPLA' %}
     <a href="{% url 'departamento_crear' %}" class="btn btn-success">
         <i class="bi bi-plus-circle-fill me-2"></i>
         Nuevo Departamento
@@ -67,7 +68,12 @@
                     <td>{{ forloop.counter }}</td>
                     <td>{{ depto.nombre }}</td>
                     <td>{{ depto.encargado.get_full_name|default:depto.encargado.username|default:"N/A" }}</td>
-                    <td>{{ depto.direccion.nombre|default:"N/A" }}</td>
+                    
+                    <td>
+                        <i class="bi bi-building-up text-secondary me-1"></i>
+                        {{ depto.direccion.nombre|default:"N/A" }}
+                    </td>
+
                     <td>
                         {% if depto.esta_activo %}
                         <span class="badge bg-success">Activo</span>
@@ -85,7 +91,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="text-center text-muted fst-italic p-4">
+                    <td colspan="6" class="text-center text-muted fst-italic p-4">
                         No hay departamentos registrados. (Intenta limpiar los filtros)
                     </td>
                 </tr>

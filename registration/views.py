@@ -1,7 +1,7 @@
 from .forms import UserCreationFormWithEmail, EmailForm
-from django.views.generic import CreateView, View
+from django.views.generic import CreateView
 from django.views.generic.edit import UpdateView
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import PasswordResetView
 from django.contrib.auth.models import User, Group
 from django.utils.decorators import method_decorator
 from django.contrib import messages
@@ -15,6 +15,11 @@ from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+
+# imports necesarios para el flujo de reset
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 
 class SignUpView(CreateView):
     form_class = UserCreationFormWithEmail
@@ -101,7 +106,16 @@ def reset_password_change(request):
         return redirect("login")
     return render(request, template_name, {"email": request.GET.get("email")})
 
-
+    # def form_valid(self, form):
+    #     email = form.cleaned_data.get('email')
+    #     users = User.objects.filter(email__iexact=email, is_active=True)
+    #     if users.exists():
+    #         user = users.first()
+    #         uid = urlsafe_base64_encode(force_bytes(user.pk))
+    #         token = default_token_generator.make_token(user)
+    #         confirm_url = reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
+    #         return redirect(confirm_url)
+    #     return redirect(self.success_url)
 
 #api de login
 
