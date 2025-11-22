@@ -1,35 +1,59 @@
 {% extends "registration/base.html" %}
 {% load static %}
 {% block content %}
-    <form id="form_contenedor" action="" method="post">
-      {% csrf_token %}
-      <p id="form_titulo" class="form_texto">Iniciar sesión</p>
-      <p class="form_texto">Ingrese sus datos para ingresar a la plataforma</p>
-      <!-- Entender como funciona esto -->
-      {% if form.non_field_errors %}
-        <p style="color:red">Credenciales erroneas</p>
-      {% endif %}
-      <!-- --------------------------- -->
-      <div class="form_input_cover">
-        <p class="form_texto">Correo</p>
-        <div class="form_input_div">
-          <p class="form_texto form_icon">󰇮</p>
-          <input class="form_texto" type="text" name="username" placeholder="Ingrese su correo"/>
-        </div>
-      </div>
-      <div class="form_input_cover">
-        <p class="form_texto">Contraseña</p>
-        <div class="form_input_div">
-          <p class="form_texto form_icon"></p>
-          <input class="form_texto" type="password" name="password" placeholder="Ingrese su contraseña"/>
-        </div>
-      </div>
-      <div id="form_button_div">
-        <button type="submit"><span class="form_texto">Iniciar sesión</span></button>
-      </div>
-      <div class="text-center">
-        <!-- <a class="small" href="{% url 'password_reset' %}">¿Olvidaste tu Contraseña?</a> -->
-        <a class="small" href="{% url 'reset_password_form' %}">¿Olvidaste tu Contraseña?</a>
-      </div>
-    </form>
+<form class="position-absolute top-50 start-50 translate-middle p-3 rounded-4 shadow" id="form_contenedor" action="" method="post">
+  {% csrf_token %}
+  <p id="form_titulo" class="fs-1 form_texto">Iniciar sesión</p>
+  <p class="fs-4 form_texto mb-4">Ingrese sus datos para ingresar a la plataforma</p>
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger" role="alert">
+    Credenciales erroneas
+  </div>
+  {% endif %}
+
+  <div class="form-floating mb-3">
+    {% if form.non_field_errors %}
+    <input name="username" type="text" class="ps-4 rounded-5 form-control is-invalid" id="floatingInput" placeholder="example username">
+    {% else %}
+    <input name="username" type="text" class="ps-4 rounded-5 form-control" id="floatingInput" placeholder="example username">
+    {% endif %}
+    <label for="floatingInput" class="ps-4"><span class="form_icon">󰇮</span> Nombre de usuario</label>
+  </div>
+  <div class="form-floating">
+    {% if form.non_field_errors %}
+    <input name="password" type="password" class="ps-4 pe-4 rounded-5 form-control is-invalid" id="floatingPassword" placeholder="Password">
+    {% else %}
+    <input name="password" type="password" class="ps-4 pe-5 rounded-5 form-control" id="floatingPassword" placeholder="Password">
+    {% endif %}
+    <label for="floatingPassword" class="ps-4"><span class="form_icon"></span> Contraseña</label>
+
+    <button id="togglePassword" type="button" class="form_icon text-secondary btn btn-sm btn-link position-absolute end-0 top-50 translate-middle-y me-4 p-0" style="text-decoration: none;"></button>
+  </div>
+  <hr>
+  <div class="mt-3 d-flex justify-content-between">
+    <button type="submit" class="btn btn-success">Iniciar sesión</button>
+    <a class="small btn btn-outline-secondary" href="{% url 'reset_password_form' %}">¿Olvidaste tu Contraseña?</a>
+  </div>
+</form>
+{% endblock %}
+
+{% block script %}
+<script>
+  const togglePassword = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('floatingPassword');
+
+  togglePassword.addEventListener('click', () => {
+      const isHidden = passwordInput.type === 'password';
+
+      // Cambiar tipo del input
+      passwordInput.type = isHidden ? 'text' : 'password';
+      togglePassword.classList.toggle('text-secondary');
+
+      // Cambiar icono
+      togglePassword.innerHTML = isHidden
+          ? ''
+          : '';
+  });
+</script>
 {% endblock %}
