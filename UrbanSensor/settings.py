@@ -157,23 +157,44 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
+# Cerca del final del archivo, donde está la configuración de CORS y REST_FRAMEWORK
+
+# CORS: permitir el frontend de Vite en desarrollo
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
 # Permitir cookies (necesario si usas SessionAuthentication y axios withCredentials)
 CORS_ALLOW_CREDENTIALS = True
 
-# (Opcional) Si quieres evitar problemas puntuales en dev puedes usar temporalmente:
-# CORS_ALLOW_ALL_ORIGINS = True
+# Agregar estos headers adicionales para CORS
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
-# REST Framework - ajustes básicos
+# CSRF settings para desarrollo
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+# REST Framework - ajustes para desarrollo
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
-        # 'rest_framework.authentication.BasicAuthentication',  # opcional para tests
     ),
-    # En desarrollo si quieres permitir llamadas sin login temporalmente, usa AllowAny:
-    # 'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny',),
-    # En producción/uso normal cambia a IsAuthenticated o permisos personalizados:
+    # TEMPORALMENTE para desarrollo, usar AllowAny
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,

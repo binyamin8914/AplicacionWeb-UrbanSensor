@@ -37,4 +37,5 @@ urlpatterns = [
 
     # APIs
     path('api/administracion/', include('administracion.api.urls')),
+    path('api/direcciones/', include('direcciones.api.urls')),
 ]

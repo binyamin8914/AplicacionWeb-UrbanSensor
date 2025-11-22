@@ -1,5 +1,5 @@
 # apps/administracion/urls.py
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 urlpatterns = [
@@ -9,4 +9,7 @@ urlpatterns = [
     path('usuarios/editar/<int:user_id>/',     views.usuario_actualizar,  name='usuario_actualizar_id'),
     path('usuarios/bloquear/<int:user_id>/',   views.usuario_bloquear,    name='usuario_bloquear'),
     path('usuarios/ver/<int:user_id>/',        views.usuario_ver,         name='usuario_ver'),
+
+    # API REST
+    path('api/', include('administracion.api.urls'))
 ]
