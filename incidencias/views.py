@@ -282,35 +282,64 @@ def editar_incidencia(request, incidencia_id):
     for campo in campos_adicionales:
         campo.valor = respuestas_prefill.get(campo.id, "")
 
+    # Guardamos la encuesta actual para detectar cambios en POST
+    old_encuesta = incidencia.encuesta
+    
     if request.method == "POST":
         form = IncidenciaForm(request.POST, user=request.user)
+        
+        # Obtenemos la encuesta ID seleccionada en el POST
         encuesta_id = request.POST.get("encuesta") or (incidencia.encuesta.id if incidencia.encuesta else None)
-        # si cambio encuesta, recargar campos basados en la nueva encuesta seleccionada
+        
+        # Si la encuesta ID existe, cargamos los campos de esa encuesta para la validación POST
         if encuesta_id:
-            campos_adicionales = list(CamposAdicionales.objects.filter(encuesta_id=encuesta_id))
-            for campo in campos_adicionales:
+            campos_post = list(CamposAdicionales.objects.filter(encuesta_id=encuesta_id))
+            # Pre-llenar los valores del POST en los campos para re-render si hay errores
+            for campo in campos_post:
                 campo.valor = request.POST.get(f"campo_{campo.id}", "")
+        else:
+            campos_post = []
 
+        # Usamos campos_post para el renderizado si la validación falla
+        campos_adicionales = campos_post 
+        
         prioridad_choices = list(form.fields['prioridad'].choices) if 'prioridad' in form.fields else []
 
         if form.is_valid():
             datos = form.cleaned_data
+            
+            # --- ACTUALIZACIÓN DE DATOS DE INCIDENCIA ---
             incidencia.encuesta = datos.get("encuesta")
             incidencia.vecino = datos.get("vecino")
             incidencia.descripcion = datos.get("descripcion")
             incidencia.latitud = datos.get("latitud")
             incidencia.longitud = datos.get("longitud")
             incidencia.direccion_textual = datos.get("direccion_textual")
-
-            if group_name != "Territorial":
+            
+            # Solo el Territorial puede cambiar la prioridad
+            if group_name == "Territorial":
+                incidencia.prioridad = datos.get("prioridad")
+                incidencia.territorial = request.user
+                
+                # REGLA CLAVE: Si está rechazada, se reabre (abierta) y se limpia la cuadrilla.
+                if incidencia.estado == 'rechazada':
+                    incidencia.estado = 'abierta'
+                    incidencia.cuadrilla = None
+                    messages.info(request, "La incidencia fue reabierta y enviada al nuevo departamento asociado a la encuesta.")
+                
+                # Si la encuesta cambió, se limpian las asignaciones (sin importar el estado, excepto si está cerrada)
+                elif incidencia.encuesta != old_encuesta and incidencia.estado not in ('finalizada', 'cerrada'):
+                     incidencia.estado = 'abierta' # Volver a abrir para que el nuevo depto la gestione
+                     incidencia.cuadrilla = None
+            
+            # Si NO es Territorial (Secpla, Dirección, Depto)
+            else:
                 incidencia.cuadrilla = datos.get("cuadrilla") or None
                 incidencia.estado = datos.get("estado") or incidencia.estado
                 incidencia.territorial = datos.get("territorial") or incidencia.territorial
-            else:
-                incidencia.territorial = request.user
+                incidencia.prioridad = datos.get("prioridad") # Se guarda la prioridad si está visible/enviada
 
-            # validar campos adicionales obligatorios
-            campos_post = list(CamposAdicionales.objects.filter(encuesta_id=encuesta_id))
+            # --- VALIDACIÓN FINAL DE CAMPOS ADICIONALES ---
             missing = []
             for campo in campos_post:
                 val = (request.POST.get(f"campo_{campo.id}", "") or "").strip()
@@ -318,11 +347,13 @@ def editar_incidencia(request, incidencia_id):
                     missing.append(campo.titulo)
 
             if missing:
+                # Si faltan campos, se usa campos_adicionales (que ahora es campos_post) y los valores ya pre-llenados
                 form.add_error(None, "Faltan campos obligatorios: " + ", ".join(missing))
                 messages.error(request, "Revisa los campos adicionales obligatorios.")
             else:
-                incidencia.save()
-                # renovar respuestas
+                # --- GUARDADO ---
+                incidencia.save()                
+                # renovar respuestas: ELIMINAMOS LAS ANTIGUAS Y CREAMOS LAS NUEVAS
                 EncuestaRespuesta.objects.filter(incidencia=incidencia).delete()
                 respuestas_objs = []
                 for campo in campos_post:
@@ -338,6 +369,8 @@ def editar_incidencia(request, incidencia_id):
                 return redirect("gestion_incidencias")
         else:
             messages.error(request, "Revisa los datos del formulario.")
+            
+    # GET request o POST con errores
     else:
         try:
             cuadrilla_obj = incidencia.cuadrilla
@@ -353,19 +386,30 @@ def editar_incidencia(request, incidencia_id):
             "longitud": incidencia.longitud,
             "direccion_textual": incidencia.direccion_textual,
             "estado": incidencia.estado,
+            "prioridad": incidencia.prioridad,
         }
         form = IncidenciaForm(initial=initial, user=request.user)
         prioridad_choices = list(form.fields['prioridad'].choices) if 'prioridad' in form.fields else []
+        
+    # El diccionario respuestas_prefill solo es relevante en GET. En POST con error, se usa campo.valor
+    if request.method == "GET":
+        respuestas_prefill = {r.pregunta_id: r.valor for r in respuestas_previas_qs}
+    else:
+        # Si falló la validación, pasamos los datos del POST
+        respuestas_prefill = {}
+        for campo in campos_adicionales: # campos_adicionales ya es campos_post
+            if hasattr(campo, 'valor'):
+                 respuestas_prefill[campo.id] = campo.valor
 
     return render(request, "incidencias/formulario_incidencia.html", {
         "form": form,
         "titulo_pagina": "Editar Incidencia",
         "group_name": group_name,
         "incidencia": incidencia,
-        "campos_adicionales": campos_adicionales,
+        "campos_adicionales": campos_adicionales, # Ahora contiene los campos de la encuesta POST
         "prioridad_choices": prioridad_choices,
+        "respuestas_prefill": respuestas_prefill, # Pasamos los datos del POST para el JS
     })
-
 
 # ---------------------------------------------------------------------
 # Finalizar Incidencia (Cuadrilla)
@@ -479,6 +523,46 @@ def derivar_incidencia(request, incidencia_id):
         },
     )
 
+# ---------------------------------------------------------------------
+# Rechazar Incidencia (Departamento)
+# ---------------------------------------------------------------------
+# ---------------------------------------------------------------------
+# Rechazar Incidencia (Departamento)
+# ---------------------------------------------------------------------
+@login_required
+def rechazar_incidencia(request, incidencia_id):
+    incidencia = get_object_or_404(
+        Incidencia.objects.select_related("encuesta__tipo_incidencia__departamento"), id=incidencia_id)
+    profile = Profile.objects.get(user=request.user)
+    group_name = profile.group.name
+
+    #Determinar el departamento responsable actual:
+    try:
+        # El departamento responsable es el asignado a través del Tipo de Incidencia
+        departamento_responsable = incidencia.encuesta.tipo_incidencia.departamento
+    except AttributeError:
+        # Manejar caso si la Incidencia no está bien configurada
+        messages.error(request, "La incidencia no tiene un departamento asociado.")
+        return redirect("gestion_incidencias")
+
+    # VALIDAR PERMISOS
+    # El encargado del Departamento asociado a la Encuesta/Tipo de Incidencia es quien debe rechazar
+    if group_name != "Departamento" or departamento_responsable.encargado != request.user:
+        messages.error(request, "No tienes permisos para rechazar esta incidencia.")
+        return redirect("gestion_incidencias")
+
+    if request.method == "POST":
+        incidencia.estado = "rechazada"
+        incidencia.cuadrilla = None
+        incidencia.save()
+
+        messages.success(request, "Incidencia rechazada correctamente.")
+        return redirect("gestion_incidencias")
+
+    return render(request, "incidencias/depto_rechazar.html", {
+        "incidencia": incidencia,
+        "group_name": group_name
+    })
 
 # ---------------------------------------------------------------------
 # Endpoints JSON para dashboards

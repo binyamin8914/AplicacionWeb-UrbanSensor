@@ -109,6 +109,7 @@
                 <li><a class="dropdown-item" href="?estado=derivada">Derivada</a></li>
                 <li><a class="dropdown-item" href="?estado=finalizada">Finalizada</a></li>
                 <li><a class="dropdown-item" href="?estado=rechazada">Rechazada</a></li>
+
             </ul>
         </div>
         {% else %}
@@ -153,14 +154,27 @@
                             <td class="ps-4 fw-bold text-secondary">
                                 {{ inc.id }}
                             </td>
-                            
+
                             <td>
-                                <span class="fw-semibold text-dark d-block">
-                                    {{ inc.encuesta.tipo_incidencia.nombre }}
-                                </span>
-                                <small class="text-muted text-truncate d-block" style="max-width: 250px;">
-                                    {{ inc.encuesta.titulo|default:"Sin título" }} 
-                                </small>
+                                <div class="d-flex align-items-start">
+                                    <div class="me-2">
+                                        <span class="fw-semibold text-dark d-block">
+                                            {{ inc.encuesta.tipo_incidencia.nombre }}
+                                        </span>
+                                        <small class="text-muted text-truncate d-block" style="max-width: 250px;">
+                                            {{ inc.encuesta.titulo|default:"Sin título" }}
+                                        </small>
+                                    </div>
+
+                                    {# Icono discreto si la incidencia fue reenviada a otro departamento distinto al tipo #}
+                                    {% if inc.destinatario_departamento and inc.encuesta and inc.encuesta.tipo_incidencia and inc.encuesta.tipo_incidencia.departamento and inc.destinatario_departamento.id != inc.encuesta.tipo_incidencia.departamento.id %}
+                                        <div class="ms-auto">
+                                            <span class="text-info" title="Reenviada a {{ inc.destinatario_departamento.nombre }}">
+                                                <i class="bi bi-arrow-right-circle-fill" style="font-size:1.05rem;"></i>
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                </div>
                             </td>
 
                             <td>
@@ -179,7 +193,7 @@
                                 </span>
                             </td>
 
-                            {# BADGES DE ESTADO (Usando la versión más detallada de colores) #}
+                            {# Estado #}
                             <td>
                                 {% if inc.estado == 'finalizada' %}
                                     <span class="badge rounded-pill bg-success bg-opacity-75 text-white px-3">
@@ -224,21 +238,17 @@
                                 {% endif %}
                             </td>
 
-                            {# ACCIONES (Lógica del template nuevo) #}
+                            {# ACCIONES #}
                             <td class="text-end pe-4">
                                 <a href="{% url 'incidencia_detalle' inc.id %}" class="btn btn-sm btn-outline-primary shadow-sm" title="Ver Detalle">
                                     <i class="bi bi-eye-fill me-1"></i> Ver
                                 </a>
-                                
+
                                 {% if group_name == "Territorial" and inc.territorial == request.user %}
                                     <a href="{% url 'editar_incidencia' inc.id %}" class="btn btn-sm btn-info text-white">Editar</a>
                                     <a href="{% url 'eliminar_incidencia' inc.id %}" class="btn btn-sm btn-danger">Eliminar</a>
                                 {% endif %}
 
-                                {% if group_name == "Departamento" %}
-                                    <a href="{% url 'derivar_incidencia' inc.id %}" class="btn btn-sm btn-warning">Derivar</a>
-                                {% endif %}
-                                
                                 {% if group_name == "Cuadrilla" and inc.cuadrilla_id and inc.cuadrilla.encargado_id == request.user.id %}
                                     <form action="{% url 'finalizar_incidencia' inc.id %}" method="post" class="d-inline">
                                         {% csrf_token %}
