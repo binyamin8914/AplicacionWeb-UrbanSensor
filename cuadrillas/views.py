@@ -150,5 +150,8 @@ def api_cuadrilla_list(request):
     if profile.group.name != "SECPLA":
         return JsonResponse({"mensaje": 'No tienes permisos. Usuario incorrecto'}, status=400)
 
-    cuadrillas = Cuadrilla.objects.all().order_by('nombre').values('id', 'nombre', 'esta_activa', 'encargado__username', 'departamento__nombre')
-    return JsonResponse({'mensaje': "Exito", 'cuadrillas': list(cuadrillas)})
+    cuadrillas = Cuadrilla.objects.all().order_by('nombre').values('id', 'nombre', 'esta_activa', 'encargado__username', 'departamento__nombre', 'departamento__direccion__nombre')
+    departamentos = Departamento.objects.filter(esta_activo=True).order_by('nombre').values('nombre')
+    departamentos = list(departamentos)
+    departamentos = [dep["nombre"] for dep in departamentos]
+    return JsonResponse({'mensaje': "Exito", 'cuadrillas': list(cuadrillas), 'departamentos': list(departamentos)})
