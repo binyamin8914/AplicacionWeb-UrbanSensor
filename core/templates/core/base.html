@@ -162,21 +162,20 @@
       </div class="header">
 
       {# Mensajes flash #}
-      <!-- { % if messages %} -->
+      {% if messages %}
         <div class="messages-container mb-3 ms-4 me-4">
-          <!-- { % for message in messages %} -->
+          {% for message in messages %}
             <div class="alert
               {% if message.tags == 'success' %}alert-success
               {% elif message.tags == 'error' %}alert-danger
               {% else %}alert-info{% endif %}
               alert-dismissible fade show" role="alert">
-              <!-- { { message } } -->
-              Hola mundo
+              {{ message }}
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-          <!-- { % endfor %} -->
+          {% endfor %}
         </div>
-      <!-- { % endif %} -->
+      {% endif %}
       
       <div id="main-panel" class="p-3">
         {% block content %}{% endblock %}
