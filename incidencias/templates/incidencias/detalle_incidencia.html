@@ -107,7 +107,9 @@
                             {# ESTADO CON BADGE GRANDE #}
                             <h5 class="mb-3">
                                 {% if incidencia.estado == 'finalizada' %}
-                                    <span class="badge rounded-pill bg-success bg-opacity-75 text-white px-3 py-2"><i class="bi bi-check-circle me-1"></i> Finalizada</span>
+                                    <span class="badge rounded-pill bg-success bg-opacity-75 text-white px-3 py-2">
+                                        <i class="bi bi-check-circle me-1"></i> Finalizada (Cuadrilla)
+                                    </span>
                                 {% elif incidencia.estado == 'rechazada' %}
                                     <span class="badge rounded-pill bg-danger bg-opacity-75 text-white px-3 py-2"><i class="bi bi-x-circle me-1"></i> Rechazada</span>
                                 {% elif incidencia.estado == 'derivada' %}
@@ -163,17 +165,29 @@
                                 </form>
                             {% endif %}
 
-                            {# ACCIÓN DE TERRITORIAL: Editar si fue Rechazada (para reenvío) #}
-                            {% if group_name == 'Territorial' and incidencia.territorial == request.user and incidencia.estado == 'rechazada' %}
-                                <a href="{% url 'editar_incidencia' incidencia.id %}" class="btn btn-info text-white w-100 mb-2">
-                                    <i class="bi bi-pencil-fill me-1"></i> Editar y Reenviar
-                                </a>
+                            {# ACCIONES DE TERRITORIAL #}
+                            {% if group_name == 'Territorial' and incidencia.territorial == request.user %}
+                                {% if incidencia.estado == 'finalizada' %}
+                                    <form action="{% url 'aceptar_incidencia' incidencia.id %}" method="post" class="d-inline w-100">
+                                        {% csrf_token %}
+                                        <button class="btn btn-success w-100 mb-2" type="submit">
+                                            <i class="bi bi-check-circle me-1"></i> Aceptar incidencia
+                                        </button>
+                                    </form>
+                                    <a href="{% url 'rechazar_incidencia' incidencia.id %}" class="btn btn-danger w-100 mb-2">
+                                        <i class="bi bi-x-octagon-fill me-1"></i> Rechazar incidencia
+                                    </a>
+                                {% elif incidencia.estado == 'rechazada' %}
+                                    <a href="{% url 'editar_incidencia' incidencia.id %}" class="btn btn-info text-white w-100 mb-2">
+                                        <i class="bi bi-pencil-fill me-1"></i> Editar y Reenviar
+                                    </a>
+                                {% endif %}
                             {% endif %}
 
                         </div>
                     </div>
 
-                    {# Historial (mantener bloque original) #}
+                    {# Historial (si existe) #}
                     {% if incidencia.logs.all|length %}
                         <div class="card">
                             <div class="card-header">Historial</div>

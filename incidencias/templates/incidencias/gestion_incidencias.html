@@ -244,12 +244,29 @@
                                     <i class="bi bi-eye-fill me-1"></i> Ver
                                 </a>
 
+
+
+
+                                {% with depto_encargado=inc.encuesta.tipo_incidencia.departamento.encargado %}
+                                    {# ACCIONES DE DEPARTAMENTO: Solo si es el encargado y está ABIERTA #}
+                                    {% if group_name == 'Departamento' and depto_encargado == request.user and inc.estado == 'abierta' %}
+                                        <a href="{% url 'derivar_incidencia' inc.id %}" class="btn btn-sm btn-outline-info shadow-sm">
+                                            <i class="bi bi-send-fill me-1"></i> Derivar
+                                        </a>
+                                        <a href="{% url 'rechazar_incidencia' inc.id %}" class="btn btn-sm btn-outline-danger shadow-sm">
+                                            <i class="bi bi-x-octagon-fill me-1"></i> Rechazar
+                                        </a>
+                                    {% endif %}
+                                {% endwith %}
+
+
+
                                 {% if group_name == "Territorial" and inc.territorial == request.user %}
                                     <a href="{% url 'editar_incidencia' inc.id %}" class="btn btn-sm btn-info text-white">Editar</a>
                                     <a href="{% url 'eliminar_incidencia' inc.id %}" class="btn btn-sm btn-danger">Eliminar</a>
                                 {% endif %}
 
-                                {% if group_name == "Cuadrilla" and inc.cuadrilla_id and inc.cuadrilla.encargado_id == request.user.id %}
+                                {% if group_name == "Cuadrilla" and inc.cuadrilla_id and inc.cuadrilla.encargado_id == request.user.id and inc.estado == "derivada" %}
                                     <form action="{% url 'finalizar_incidencia' inc.id %}" method="post" class="d-inline">
                                         {% csrf_token %}
                                         <button class="btn btn-sm btn-success" type="submit">Finalizar</button>

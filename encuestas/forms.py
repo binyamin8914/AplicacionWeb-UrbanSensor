@@ -70,7 +70,7 @@ class TipoIncidenciaForm(forms.Form):
     )
     departamento = forms.ModelChoiceField(
         label="Departamento Responsable",
-        queryset=Departamento.objects.all(),
+        queryset=Departamento.objects.filter(esta_activo=True).all(),
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 

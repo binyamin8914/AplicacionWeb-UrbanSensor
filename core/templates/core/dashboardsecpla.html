@@ -148,9 +148,13 @@
     font-weight: 600;
   }
 
-  .status-active { background: rgba(46, 204, 113, 0.1); color: var(--success); }
-  .status-inactive { background: rgba(149, 165, 166, 0.1); color: var(--gray); }
-  .status-busy { background: rgba(243, 156, 18, 0.1); color: var(--warning); }
+  .status-abierta { background: rgba(46, 204, 113, 0.1); color: var(--success); }
+  .status-derivada { background: rgba(18, 187, 243, 0.1); color: var(--secondary); }
+  .status-proceso { background: rgba(18, 187, 243, 0.1); color: var(--secondary); }
+  .status-finalizada { background: rgba(209, 95, 226, 0.1); color: var(--purple); }
+  .status-cerrada { background: rgba(149, 165, 166, 0.1); color: var(--gray); }
+  .status-rechazada { background: rgba(243, 40, 18, 0.1); color: var(--danger); }
+
 </style>
 
 {% endblock %}
@@ -195,9 +199,7 @@
           <h4>{{incidencia.encuesta__titulo}}</h4>
           <div class="crew-info">
             <span>Utlima actualizacion: {{incidencia.updated_at|date:'d M Y'}}</span>
-            <!-- <span class="crew-status status-inactive">Inactiva</span>
-            <span class="crew-status status-busy">Ocupada</span> -->
-            <span class="crew-status status-active">{{incidencia.estado|capfirst}}</span>
+            <span class="crew-status status-{{incidencia.estado}}">{{incidencia.estado|capfirst}}</span>
           </div>
         </div>
         {% endfor %}
