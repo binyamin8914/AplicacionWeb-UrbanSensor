@@ -41,7 +41,7 @@
                     <th scope="col">Título</th>
                     <th scope="col">Tipo Incidencia</th>
                     <th scope="col">Estado</th>
-                    <th scope="col">Acciones</th>
+                    {% if group_name != 'Territorial' %}<th scope="col">Acciones</th>{% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -58,6 +58,7 @@
                             <span class="badge bg-secondary">Creado</span>
                         {% endif %}
                     </td>
+                    {% if group_name != 'Territorial' %}
                     <td class="text-nowrap">
                         {% if encuesta.estado == 'creado' %}
                             <a href="{% url 'cambiar_estado_encuesta' encuesta.id %}" class="btn btn-sm btn-success" title="Activar encuesta">
@@ -86,6 +87,7 @@
                             <i class="bi bi-trash-fill"></i> Eliminar
                         </a>
                     </td>
+                    {% endif %}
                 </tr>
                 {% empty %}
                 <tr>

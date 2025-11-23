@@ -1,24 +1,63 @@
 {% extends 'core/base.html' %}
 {% block title %}Ver Usuario{% endblock %}
 {% block content %}
-<h4>Ver Usuario</h4>
-<a href="{% url 'usuarios_listar' %}">Volver</a>
-<hr>
-<p><b>Usuario:</b> {{ usuario.username }}</p>
-<p><b>Nombre:</b> {{ usuario.first_name }}</p>
-<p><b>Apellido:</b> {{ usuario.last_name }}</p>
-<p><b>Correo:</b> {{ usuario.email }}</p>
-<p><b>Teléfono:</b> {{ user_profile.telefono }}</p>
-<p><b>Perfil:</b> {{ user_profile.group.name }}</p>
-{% if user_profile.group.name == "Territorial" %}
-    <p><b>Dirección a la que pertenece:</b> 
-        {% if user_profile.direccion %}
-            {{ user_profile.direccion.nombre }}
-        {% else %}
-            <span class="text-danger">SIN ASIGNAR</span>
-        {% endif %}
-    </p>
-{% endif %}
-<p><b>Estado:</b> {% if usuario.is_active %}Activo{% else %}Bloqueado{% endif %}</p>
+<div class="content-header mb-4">
+    <h1 class="mb-1">Ver Usuario</h1>
+</div>
 
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0">{{ usuario.get_full_name }}</h5>
+    </div>
+    <div class="card-body">
+
+        <p>
+            <strong>Usuario:</strong>
+            {{ usuario.username }}
+        </p>
+        <p>
+            <strong>Nombre:</strong>
+            {{ usuario.first_name }}
+        </p>
+        <p>
+            <strong>Apellido:</strong>
+            {{ usuario.last_name }}
+        </p>
+        <p>
+            <strong>Correo:</strong>
+            {{ usuario.email }}
+        </p>
+        <p>
+            <strong>Teléfono:</strong>
+            {{ user_profile.telefono }}
+        </p>
+        <p>
+            <strong>Perfil:</strong>
+            {{ user_profile.group.name }}
+        </p>
+
+        {% if user_profile.group.name == "Territorial" %}
+        <p>
+            <strong>Dirección a la que pertenece:</strong> 
+            {% if user_profile.direccion %}
+                {{ user_profile.direccion.nombre }}
+            {% else %}
+                <span class="text-danger">SIN ASIGNAR</span>
+            {% endif %}
+        </p>
+        {% endif %}
+
+        <p>
+            <strong>Estado:</strong>
+            {% if usuario.is_active %}
+                <span class="badge bg-success">Activo</span>
+            {% else %}
+                <span class="badge bg-danger">Bloqueado</span>
+            {% endif %}
+        </p>
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'usuarios_listar' %}" class="btn btn-secondary">Volver a la Lista</a>
+    </div>
+</div>
 {% endblock %}

@@ -1,10 +1,34 @@
 {% extends "core/base.html" %}
 {% block title %}Ver Dirección{% endblock %}
 {% block content %}
-<h4>Ver Dirección</h4>
-<a href="{% url 'direccion_listar' %}">Volver</a>
-<hr>
-<p><b>Nombre Dirección:</b> {{ direccion.nombre }}</p>
-<p><b>Encargado:</b> {{ direccion.encargado.get_full_name }}</p>
-<p><b>Estado:</b> {% if direccion.esta_activa %}Activa{% else %}Bloqueada{% endif %}</p>
+<div class="content-header mb-4">
+    <h1 class="mb-1">Ver Dirección</h1>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0">{{ direccion.nombre }}</h5>
+    </div>
+    <div class="card-body">
+        <p>
+            <strong>Nombre Dirección:</strong>
+            {{ direccion.nombre }}
+        </p>
+        <p>
+            <strong>Encargado:</strong>
+            {{ direccion.encargado.get_full_name }}
+        </p>
+        <p>
+            <strong>Estado:</strong>
+            {% if direccion.esta_activa %}
+                <span class="badge bg-success">Activo</span>
+            {% else %}
+                <span class="badge bg-danger">Bloqueada</span>
+            {% endif %}
+        </p>
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'direccion_listar' %}" class="btn btn-secondary">Volver a la Lista</a>
+    </div>
+</div>
 {% endblock %}

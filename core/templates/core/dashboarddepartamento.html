@@ -188,9 +188,15 @@
     font-weight: 600;
   }
 
-  .status-active { background: rgba(46, 204, 113, 0.1); color: var(--success); }
-  .status-inactive { background: rgba(149, 165, 166, 0.1); color: var(--gray); }
-  .status-busy { background: rgba(243, 156, 18, 0.1); color: var(--warning); }
+  .status-activo { background: rgba(46, 204, 113, 0.1); color: var(--success); }
+  .status-inactivo { background: rgba(243, 40, 18, 0.1); color: var(--danger); }
+
+  .status-abierta { background: rgba(46, 204, 113, 0.1); color: var(--success); }
+  .status-derivada { background: rgba(18, 187, 243, 0.1); color: var(--secondary); }
+  .status-proceso { background: rgba(18, 187, 243, 0.1); color: var(--secondary); }
+  .status-finalizada { background: rgba(209, 95, 226, 0.1); color: var(--purple); }
+  .status-cerrada { background: rgba(149, 165, 166, 0.1); color: var(--gray); }
+  .status-rechazada { background: rgba(243, 40, 18, 0.1); color: var(--danger); }
 
   /* Sección de Usuarios */
   .users-section {
@@ -340,9 +346,7 @@
           <h4>{{inc.encuesta__titulo}}</h4>
           <div class="crew-info">
             <span>Utlima actualizacion: {{inc.updated_at|date:'d M Y'}}</span>
-            <!-- <span class="crew-status status-inactive">Inactiva</span>
-            <span class="crew-status status-busy">Ocupada</span> -->
-            <span class="crew-status status-active">{{inc.estado|capfirst}}</span>
+            <span class="crew-status status-{{inc.estado}}">{{inc.estado|capfirst}}</span>
           </div>
         </div>
         {% endfor %}
@@ -362,7 +366,7 @@
           <p>{{cuadrilla.encargado__username}}</p>
         </div>
         <div class="user-stats">
-          <p class="crew-status status-active">{% if cuadrilla.esta_activa %}Activo{% else %}Inactivo {% endif %}</p>
+          <p class="crew-status status-{% if cuadrilla.esta_activa %}activo{% else %}inactivo{% endif %}">{% if cuadrilla.esta_activa %}Activo{% else %}Inactivo {% endif %}</p>
         </div>
       </div>
       {% endfor %}

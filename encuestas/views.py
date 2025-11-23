@@ -179,9 +179,13 @@ def gestion_encuestas(request):
 
     qs = (
         Encuesta.objects
+        .filter(estado="vigente")
         .select_related("tipo_incidencia")
         .order_by("-id")
     )
+
+    if profile.group.name == "Territorial" and profile.direccion:
+        qs = qs.filter(tipo_incidencia__departamento__direccion__id=profile.direccion.id)
 
     estado = request.GET.get("estado")
 

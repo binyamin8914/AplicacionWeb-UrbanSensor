@@ -205,6 +205,7 @@ def crear_incidencia(request):
                     latitud=data.get("latitud"),
                     longitud=data.get("longitud"),
                     direccion_textual=data.get("direccion_textual"),
+                    prioridad=data.get("prioridad"),
                 )
                 if group_name == "Territorial":
                     incidencia.territorial = request.user

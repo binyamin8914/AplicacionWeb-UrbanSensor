@@ -303,22 +303,23 @@
         <div class="direction-group">
           <div class="states-bars">
             <!-- widthratio x y z = (x/y)*z -->
-            <div class="state-bar bar-creada" style="height: {% widthratio 250 max_total dep.n_inc %}px;", title="Total: {{dep.n_inc}}">
+            <div class="state-bar bar-creada" style="min-height: 3px; height: {% widthratio 250 max_total dep.n_inc %}px;", title="Total: {{dep.n_inc}}">
 
             </div>
-            <div class="state-bar bar-derivada" style="height: {% widthratio 250 max_total dep.n_inc_derivada %}px;", title="Derivada: {{dep.n_inc_derivada}}">
+            <div class="state-bar bar-derivada" style="min-height: 3px; height: {% widthratio 250 max_total dep.n_inc_derivada %}px;", title="Derivada: {{dep.n_inc_derivada}}">
 
             </div>
-            <div class="state-bar bar-proceso" style="height: {% widthratio 250 max_total dep.n_inc_proceso %}px;", title="En proceso: {{dep.n_inc_proceso}}">
+            <div class="state-bar bar-proceso" style="min-height: 3px; height: {% widthratio 250 max_total dep.n_inc_proceso %}px;", title="En proceso: {{dep.n_inc_proceso}}">
 
             </div>
-            <div class="state-bar bar-rechazada" style="height: {% widthratio 250 max_total dep.n_inc_rechazada %}px;", title="Rechazada: {{dep.n_inc_rechazada}}">
+            <div class="state-bar bar-rechazada" style="min-height: 3px; height: {% widthratio 250 max_total dep.n_inc_rechazada %}px;", title="Rechazada: {{dep.n_inc_rechazada}}">
 
             </div>
-            <div class="state-bar bar-finalizada" style="height: {% widthratio 250 max_total dep.n_inc_finalizada %}px;", title="Finalizada: {{dep.n_inc_finalizada}}">
+            <div class="state-bar bar-finalizada" style="min-height: 3px; height: {% widthratio 250 max_total dep.n_inc_finalizada %}px;", title="Finalizada: {{dep.n_inc_finalizada}}">
 
             </div>
           </div>
+          <span class="fs-6">{{dep.nombre_dep}}</span>
         </div>
         {% endfor %}
 
@@ -352,7 +353,7 @@
 
   <!-- Mapa de Departamentos -->
   <div class="departments-container">
-    <h2>Distribución por Departamentos</h2>
+    <h2>Departamentos</h2>
     <div class="departments-grid" id="departments-grid">
       {% for depto in dep_inc %}
       <div class="department-card">
