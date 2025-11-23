@@ -22,10 +22,12 @@ from rest_framework.routers import DefaultRouter
 from departamentos.views import DepartamentoViewSet
 from incidencias.views import IncidenciaViewSet
 from incidencias.views import DashboardStatsView
+from cuadrillas.views import CuadrillaViewSet
 
 router = DefaultRouter()
 router.register(r'departamentos', DepartamentoViewSet)
 router.register(r'incidencias', IncidenciaViewSet)
+router.register(r'cuadrillas', CuadrillaViewSet)
 
 urlpatterns = [
     path('', include(core_urlpatterns)),

@@ -1,18 +1,32 @@
-# incidencias/serializers.py
 from rest_framework import serializers
 from .models import Incidencia
 
 class IncidenciaSerializer(serializers.ModelSerializer):
-    # Aquí le decimos: "Ve al campo 'tipo', entra y tráeme su 'nombre'"
-    tipo_nombre = serializers.CharField(source='tipo.nombre', read_only=True, default="Sin Tipo")
+    # 1. EL TIPO: Entramos a 'encuesta', luego a 'tipo_incidencia', luego sacamos el 'nombre'
+    # (Nota: Si tu modelo en Encuesta se llama distinto a 'tipo_incidencia', avísame)
+    tipo_nombre = serializers.CharField(
+        source='encuesta.tipo_incidencia.nombre', 
+        read_only=True, 
+        default="Sin Tipo"
+    )
     
-    # "Ve al campo 'direccion', entra y tráeme su 'nombre'"
-    direccion_nombre = serializers.CharField(source='direccion.nombre', read_only=True, default="Sin Dirección")
-    
-    # "Ve al campo 'departamento', entra y tráeme su 'nombre'"
-    departamento_nombre = serializers.CharField(source='departamento.nombre', read_only=True, default="Sin Depto")
+    # 2. EL DEPARTAMENTO: El departamento suele estar ligado al Tipo de Incidencia
+    departamento_nombre = serializers.CharField(
+        source='encuesta.tipo_incidencia.departamento.nombre', 
+        read_only=True, 
+        default="Sin Depto"
+    )
+
+    # 3. LA DIRECCIÓN: 
+    # Opción A: Usamos la dirección textual que guardaste en la incidencia
+    direccion_nombre = serializers.CharField(
+        source='direccion_textual', 
+        read_only=True, 
+        default="Sin Dirección"
+    )
+    # Opción B (Alternativa): Si la dirección está en la encuesta, sería:
+    # source='encuesta.direccion.nombre'
 
     class Meta:
         model = Incidencia
-        # Asegúrate de incluir los campos nuevos _nombre en la lista
         fields = ['id', 'tipo_nombre', 'direccion_nombre', 'departamento_nombre', 'estado']

@@ -5,6 +5,8 @@ from django.contrib.auth.models import User, Group # <-- ¡Añadido Group!
 from registration.models import Profile
 from departamentos.models import Departamento # <-- ¡Cambiado!
 from .models import Cuadrilla
+from rest_framework import viewsets
+from .serializers import CuadrillaSerializer
 
 # --- ¡¡IMPORTANTE: Importa el manejador de errores!! ---
 from django.db import IntegrityError 
@@ -135,3 +137,9 @@ def cuadrilla_bloquear(request, cuadrilla_id):
     estado = "activada" if cuadrilla.esta_activa else "bloqueada"
     messages.success(request, f"Cuadrilla {estado} correctamente.")
     return redirect("cuadrilla_listar")
+
+#angular
+class CuadrillaViewSet(viewsets.ModelViewSet):
+    # Solo mostramos las activas
+    queryset = Cuadrilla.objects.filter(esta_activa=True)
+    serializer_class = CuadrillaSerializer
