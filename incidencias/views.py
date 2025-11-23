@@ -404,13 +404,9 @@ def detalle_incidencia(request, incidencia_id):
 class IncidenciaViewSet(viewsets.ModelViewSet):
     queryset = Incidencia.objects.all()
     serializer_class = IncidenciaSerializer
-    
+
 class DashboardStatsView(APIView):
-    """
-    API que devuelve los conteos para el Dashboard.
-    """
     def get(self, request):
-        # Lógica idéntica a tu función original, pero sin el HTML
         all_incidencias = Incidencia.objects.all()
 
         data = {
@@ -418,7 +414,6 @@ class DashboardStatsView(APIView):
             'count_derivadas': all_incidencias.filter(estado='derivada').count(),
             'count_rechazadas': all_incidencias.filter(estado='rechazada').count(),
             'count_finalizadas': all_incidencias.filter(estado='finalizada').count(),
-            'count_abiertas': all_incidencias.filter(estado='abierta').count(), # Agregué esta por si acaso
+            'count_abiertas': all_incidencias.filter(estado='abierta').count(), 
         }
-        
         return Response(data)
