@@ -52,6 +52,7 @@
                         {% endif %}
                     </td>
                     <td class="text-nowrap">
+                        <a href="{% url 'direccion_ver' dir.id %}" class="btn btn-sm btn-secondary">Ver</a>
                         <a href="{% url 'direccion_actualizar' dir.id %}" class="btn btn-sm btn-secondary">Editar</a>
                         <a href="{% url 'direccion_bloquear' dir.id %}" class="btn btn-sm {% if dir.esta_activa %}btn-danger{% else %}btn-success{% endif %}">
                             {% if dir.esta_activa %}Desactivar{% else %}Activar{% endif %}

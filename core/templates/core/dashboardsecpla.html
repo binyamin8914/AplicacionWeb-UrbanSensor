@@ -1,0 +1,215 @@
+{% load static %}
+
+{% block css_adicional %}
+<style>
+  :root {
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --accent: #1abc9c;
+    --light: #ecf0f1;
+    --dark: #34495e;
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --gray: #95a5a6;
+    --purple: #9b59b6;
+    --orange: #e67e22;
+    --teal: #1abc9c;
+  }
+
+  .dashboard_container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .squad-header {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    border-left: 5px solid var(--teal);
+  }
+
+  .squad-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .squad-title h1 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 1.8em;
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+  }
+
+  /* Tarjetas de Incidencias por Estado */
+  .incidents-container {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  .incidents-container h2 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .incidents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .incident-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    border-left: 4px solid var(--secondary);
+  }
+
+  .incident-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 0.9em;
+    color: var(--gray);
+    font-weight: 500;
+  }
+
+  .incident-card .count {
+    font-size: 2.5em;
+    font-weight: 700;
+    margin: 0;
+    color: var(--dark);
+  }
+
+  /* Información de Cuadrillas */
+  .crews-container {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  .crews-container h2 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .crews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .crew-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    border-left: 4px solid var(--purple);
+  }
+
+  .crew-card h4 {
+    margin: 0 0 8px 0;
+    color: var(--primary);
+    font-size: 1em;
+  }
+
+  .crew-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85em;
+    color: var(--gray);
+  }
+
+  .crew-status {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+  }
+
+  .status-abierta { background: rgba(46, 204, 113, 0.1); color: var(--success); }
+  .status-derivada { background: rgba(18, 187, 243, 0.1); color: var(--secondary); }
+  .status-proceso { background: rgba(18, 187, 243, 0.1); color: var(--secondary); }
+  .status-finalizada { background: rgba(209, 95, 226, 0.1); color: var(--purple); }
+  .status-cerrada { background: rgba(149, 165, 166, 0.1); color: var(--gray); }
+  .status-rechazada { background: rgba(243, 40, 18, 0.1); color: var(--danger); }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="dashboard_container"> <!-- clase renombrada de container -->
+
+  <!-- copiado de dashboard cuadrilla -->
+  <div class="squad-header">
+    <div class="squad-title">
+      <h1>Perfil Secpla</h1>
+    </div>
+  </div>
+  <!-- -------------------------------------- -->
+
+  <!-- copiado de departamento -->
+  <div class="dashboard-grid">
+    <!-- Incidencias por Estado -->
+    <div class="incidents-container">
+      <h2>Resumen</h2>
+      <div class="incidents-grid">
+        {% for nombre, dato, ic in datos %}
+        <div class="incident-card">
+          <h3>
+            <!-- <span class="icon mb-3 fs-1 d-block">{{ic}}</span> {# Ícono Dashboard #} -->
+            {{nombre}}
+          </h3>
+          <p class="count">{{dato}}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Información de Cuadrillas -->
+    <div class="crews-container">
+      <h2>Incidencias actualizadas recientemente</h2>
+      <div class="crews-list">
+        {% for incidencia in historial_incidencias %}
+        <div class="crew-card">
+          <h4>{{incidencia.encuesta__titulo}}</h4>
+          <div class="crew-info">
+            <span>Utlima actualizacion: {{incidencia.updated_at|date:'d M Y'}}</span>
+            <span class="crew-status status-{{incidencia.estado}}">{{incidencia.estado|capfirst}}</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <!-- -------------------------------------- -->
+
+
+
+</div>
+
+{% endblock %}

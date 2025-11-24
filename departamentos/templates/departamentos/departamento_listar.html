@@ -21,6 +21,7 @@
             </ul>
         </div>
         
+        {% if group_name != 'Direccion' %}
         <div class="dropdown me-2">
             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-building me-1"></i>
@@ -37,6 +38,7 @@
                 <li><a class="dropdown-item" href="{% url 'departamento_listar' %}?estado={{ current_filtro_estado|default:'' }}">Todas las Direcciones</a></li>
             </ul>
         </div>
+        {% endif %}
     </div>
     
     {% if group_name == 'SECPLA' %}
@@ -81,10 +83,12 @@
                     </td>
                     <td class="text-nowrap">
                         <a href="{% url 'departamento_ver' depto.id %}" class="btn btn-sm btn-secondary">Ver</a>
+                        {% if group_name == 'SECPLA' %}
                         <a href="{% url 'departamento_actualizar' depto.id %}" class="btn btn-sm btn-secondary">Editar</a>
                         <a href="{% url 'departamento_bloquear' depto.id %}" class="btn btn-sm {% if depto.esta_activo %}btn-danger{% else %}btn-success{% endif %}">
                             {% if depto.esta_activo %}Desactivar{% else %}Activar{% endif %}
                         </a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}

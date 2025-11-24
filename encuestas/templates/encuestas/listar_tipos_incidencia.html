@@ -1,17 +1,42 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block title %}Gestión de Tipos de Incidencia{% endblock %}
 
 {% block content %}
 <div class="content-header">
-    <h1 class="mb-3">Gestión de Tipos de Incidencia</h1>
+    <h1 class="mb-1">Gestión de Tipos de Incidencia</h1>
+    <p class="text-muted">Permite definir las categorías de incidencias y el departamento al que se derivarán inicialmente.</p>
 </div>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-        <!-- Espacio para futuros filtros si los necesitas -->
-    </div>
     
+    {# FILTROS #}
+    <div class="d-flex">
+        
+        {# FILTRO POR DEPARTAMENTO #}
+        <div class="dropdown me-2">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-diagram-3 me-1"></i>
+                {% if filtro_depto_nombre %}Departamento: {{ filtro_depto_nombre }}{% else %}Filtrar por Departamento{% endif %}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item {% if not filtro_depto_id %}active{% endif %}" href="{% url 'listar_tipos_incidencia' %}">Todos los Departamentos</a></li>
+                <li><hr class="dropdown-divider"></li>
+                
+                {% for depto in departamentos %}
+                <li>
+                    <a class="dropdown-item" href="{% url 'listar_tipos_incidencia' %}?depto_id={{ depto.id }}">
+                        {{ depto.nombre }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+    </div>
+
+    {# BOTÓN CREAR #}
     <a href="{% url 'crear_tipo_incidencia' %}" class="btn btn-success">
         <i class="bi bi-plus-circle-fill me-2"></i>
         Crear Nuevo Tipo
@@ -20,48 +45,65 @@
 
 <div class="card shadow-sm">
     <div class="table-responsive">
-        <table class="table table-hover table-striped mb-0">
+        <table class="table table-hover table-striped mb-0 align-middle">
             <thead class="table-light">
                 <tr>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Descripción</th>
-                    <th scope="col">Departamento</th>
-                    <th scope="col">Acciones</th>
+                    <th scope="col" style="width: 5%;">#</th>
+                    <th scope="col" style="width: 20%;">Nombre</th>
+                    <th scope="col" style="width: 35%;">Descripción</th> {# COLUMNA AÑADIDA #}
+                    <th scope="col" style="width: 25%;">Departamento</th>
+                    <th scope="col" class="text-end" style="width: 15%;">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for tipo in tipos %}
                 <tr>
-                    <td>{{ tipo.nombre }}</td>
-                    <td>{{ tipo.descripcion|truncatewords:10 }}</td>
-                    <td>{{ tipo.departamento.nombre }}</td>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="fw-semibold text-dark">{{ tipo.nombre }}</td>
                     
-                    <td class="text-nowrap">
-                        <a href="{% url 'editar_tipo_incidencia' tipo.id %}" class="btn btn-sm btn-secondary" title="Editar tipo">
+                    {# DATOS DE LA DESCRIPCIÓN #}
+                    <td>
+                        <span class="text-muted text-truncate d-block" style="max-width: 300px;">
+                            {{ tipo.descripcion|default:"Sin descripción" }}
+                        </span>
+                    </td>
+                    
+                    <td>
+                        {% if tipo.departamento %}
+                            <span class="badge bg-primary bg-opacity-75 text-white">
+                                <i class="bi bi-diagram-3 me-1"></i> {{ tipo.departamento.nombre }}
+                            </span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Sin Asignar</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <a href="{% url 'editar_tipo_incidencia' tipo.id %}" class="btn btn-sm btn-secondary me-2" title="Editar">
                             <i class="bi bi-pencil-fill"></i> Editar
                         </a>
-                        <a href="{% url 'eliminar_tipo_incidencia' tipo.id %}" class="btn btn-sm btn-danger" title="Eliminar tipo">
+                        <a href="{% url 'eliminar_tipo_incidencia' tipo.id %}" class="btn btn-sm btn-danger" title="Eliminar">
                             <i class="bi bi-trash-fill"></i> Eliminar
                         </a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="text-center text-muted fst-italic p-4">
-                        No hay tipos de incidencia registrados.
+                    <td colspan="5" class="text-center text-muted fst-italic p-4"> {# colspan ajustado a 5 #}
+                        <i class="bi bi-info-circle me-1"></i> No hay tipos de incidencia registrados.
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    {% if tipos.has_other_pages %}
+        {# Lógica de paginación (si aplica) #}
+        {# ... #}
+    {% endif %}
 </div>
 
-<div class="mt-3">
-    <a href="{% url 'dashboard' %}" class="btn btn-secondary">
-        <i class="bi bi-arrow-left me-2"></i>
-        Volver al Menú Principal
-    </a>
-</div>
+<a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">
+    <i class="bi bi-arrow-left-circle me-1"></i> Volver al Menú Principal
+</a>
 
 {% endblock %}

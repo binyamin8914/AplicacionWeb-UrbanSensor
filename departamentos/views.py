@@ -24,6 +24,9 @@ def departamento_listar(request):
     filtro_direccion = request.GET.get('direccion')
     
     departamentos = Departamento.objects.select_related('direccion').all()
+    if profile.group.name == "Direccion":
+        direccion = Direccion.objects.get(encargado__id=profile.id)
+        departamentos = departamentos.filter(direccion__id=direccion.id)
 
     if filtro_estado == 'Activo':
         departamentos = departamentos.filter(esta_activo=True)

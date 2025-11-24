@@ -4,72 +4,62 @@
 
 {% block content %}
 <div class="content-header mb-4">
-    <h1 class="mb-0">Ver Departamento</h1>
+    <h1 class="mb-1">Ver Departamento</h1>
 </div>
 
-<div class="row">
-    <div class="col-lg-8">
-        <div class="card shadow-sm border-0">
-            
-            <div class="card-header bg-light border-bottom">
-                <h5 class="mb-0 text-dark">
-                    <i class="bi bi-building me-2"></i>{{ departamento.nombre }}
-                </h5>
-            </div>
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0">{{ departamento.nombre }}</h5>
+    </div>
+    <div class="card-body">
 
-            <div class="card-body p-4">
-                
-                <div class="mb-4 border-bottom pb-3">
-                    <label class="fw-bold text-secondary small text-uppercase mb-1">Encargado</label>
-                    <div class="d-flex align-items-center">
-                        <div class="avatar-circle bg-secondary text-white me-2 d-flex justify-content-center align-items-center rounded-circle" style="width: 32px; height: 32px;">
-                            <i class="bi bi-person-fill"></i>
-                        </div>
-                        <span class="fs-5">
-                            {% if departamento.encargado %}
-                                {{ departamento.encargado.get_full_name|default:departamento.encargado.username }}
-                            {% else %}
-                                <span class="text-muted fst-italic">Sin encargado asignado</span>
-                            {% endif %}
-                        </span>
-                    </div>
+
+        <div class="mb-4 border-bottom pb-3">
+            <label class="fw-bold text-secondary small text-uppercase mb-1">Encargado</label>
+            <div class="d-flex align-items-center">
+                <div class="avatar-circle bg-secondary text-white me-2 d-flex justify-content-center align-items-center rounded-circle" style="width: 32px; height: 32px;">
+                    <i class="bi bi-person-fill"></i>
                 </div>
-
-                <div class="mb-4 border-bottom pb-3">
-                    <label class="fw-bold text-secondary small text-uppercase mb-1">Dirección (Padre)</label>
-                    <div class="fs-5">
-                        {% if departamento.direccion %}
-                            <i class="bi bi-building-up text-primary me-2"></i>{{ departamento.direccion.nombre }}
-                        {% else %}
-                            <span class="text-muted">No asignada</span>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="mb-2">
-                    <label class="fw-bold text-secondary small text-uppercase mb-1">Estado</label>
-                    <div>
-                        {% if departamento.esta_activo %}
-                            <span class="badge rounded-pill bg-success px-3 py-2">
-                                <i class="bi bi-check-circle-fill me-1"></i> Activo
-                            </span>
-                        {% else %}
-                            <span class="badge rounded-pill bg-danger px-3 py-2">
-                                <i class="bi bi-x-circle-fill me-1"></i> Inactivo
-                            </span>
-                        {% endif %}
-                    </div>
-                </div>
-
+                <span class="fs-5">
+                    {% if departamento.encargado %}
+                        {{ departamento.encargado.get_full_name|default:departamento.encargado.username }}
+                    {% else %}
+                        <span class="text-muted fst-italic">Sin encargado asignado</span>
+                    {% endif %}
+                </span>
             </div>
-
-            <div class="card-footer bg-white p-3">
-                <a href="{% url 'departamento_listar' %}" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left me-1"></i> Volver a la Lista
-                </a>
-            </div>
-
         </div>
+
+        <div class="mb-4 border-bottom pb-3">
+            <label class="fw-bold text-secondary small text-uppercase mb-1">Dirección (Padre)</label>
+            <div class="fs-5">
+                {% if departamento.direccion %}
+                    <i class="bi bi-building-up text-primary me-2"></i>{{ departamento.direccion.nombre }}
+                {% else %}
+                    <span class="text-muted">No asignada</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mb-2">
+            <label class="fw-bold text-secondary small text-uppercase mb-1">Estado</label>
+            <div>
+                {% if departamento.esta_activo %}
+                    <span class="badge rounded-pill bg-success px-3 py-2">
+                        <i class="bi bi-check-circle-fill me-1"></i> Activo
+                    </span>
+                {% else %}
+                    <span class="badge rounded-pill bg-danger px-3 py-2">
+                        <i class="bi bi-x-circle-fill me-1"></i> Inactivo
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'departamento_listar' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Volver a la Lista
+        </a>
     </div>
 </div>
 {% endblock %}

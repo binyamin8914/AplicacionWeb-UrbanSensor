@@ -40,14 +40,49 @@ def is_cuadrilla(user):
 # ---------------------------------------------------------------------
 @login_required
 def listar_tipos_incidencia(request):
+    # Obtener el parámetro de filtro del GET
+    filtro_depto_id = request.GET.get("depto_id")
+
+    # Obtener el queryset base de TipoIncidencia
     tipos = (
         TipoIncidencia.objects
         .select_related("departamento")
         .all()
-        .order_by("nombre")
     )
+    # Aplicar el filtro si está presente
+    if filtro_depto_id:
+        try:
+            # Filtra por la ID del departamento seleccionado
+            tipos = tipos.filter(departamento__id=filtro_depto_id)
+        except ValueError:
+            # Manejar si el depto_id no es un entero válido
+            pass
+
+    # Aplicar el ordenamiento final
+    tipos = tipos.order_by("nombre")
+    
+    # Obtener todos los departamentos para el menú desplegable del filtro
+    try:
+        from departamentos.models import Departamento
+        departamentos_disponibles = Departamento.objects.all().order_by('nombre')
+    except ImportError:
+        # En caso de que el modelo Departamento no esté importado o disponible
+        departamentos_disponibles = []
+    
+    # Intentar obtener el nombre del departamento filtrado (para mostrar en el botón)
+    filtro_depto_nombre = None
+    if filtro_depto_id and departamentos_disponibles:
+        try:
+            depto_obj = departamentos_disponibles.get(id=filtro_depto_id)
+            filtro_depto_nombre = depto_obj.nombre
+        except Departamento.DoesNotExist:
+            pass
+
     return render(request, "encuestas/listar_tipos_incidencia.html", {
         "tipos": tipos,
+        "departamentos": departamentos_disponibles, 
+        "filtro_depto_id": filtro_depto_id,   
+        "filtro_depto_nombre": filtro_depto_nombre,  
         "group_name": get_group_name(request.user),
     })
 
@@ -144,17 +179,18 @@ def gestion_encuestas(request):
 
     qs = (
         Encuesta.objects
+        .filter(estado="vigente")
         .select_related("tipo_incidencia")
         .order_by("-id")
     )
 
+    if profile.group.name == "Territorial" and profile.direccion:
+        qs = qs.filter(tipo_incidencia__departamento__direccion__id=profile.direccion.id)
+
     estado = request.GET.get("estado")
-    prioridad = request.GET.get("prioridad")
 
     if estado:
         qs = qs.filter(estado=estado)
-    if prioridad:
-        qs = qs.filter(prioridad=prioridad)
 
     page_obj = Paginator(qs, 10).get_page(request.GET.get("page"))
 
@@ -164,7 +200,6 @@ def gestion_encuestas(request):
     return render(request, "encuestas/gestion_encuestas.html", {
         "encuestas": page_obj,
         "f_estado": estado or "",
-        "f_prioridad": prioridad or "",
         "group_name": profile.group.name,
         "es_secpla": es_secpla,  # usado para mostrar/ocultar botón Crear
     })

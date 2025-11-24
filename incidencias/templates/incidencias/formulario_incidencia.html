@@ -1,13 +1,114 @@
 {% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo_pagina }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="card">
         <div class="card-header"><h3>{{ titulo_pagina }}</h3></div>
+
+        {% if group_name == 'Territorial' and request.user.profile.direccion %}
+        <div class="alert alert-info mb-0" style="border-radius: 0;">
+            Mostrando encuestas para tu dirección: <strong>{{ request.user.profile.direccion.nombre }}</strong>
+        </div>
+        {% endif %}
+
         <div class="card-body">
             <form method="post">
                 {% csrf_token %}
-                {{ form.as_p }}
+
+                {# Errores no campo (incluye validación de campos adicionales) #}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                {% endif %}
+
+                {# Campos hidden (importante para HiddenInput en el form) #}
+                {% for hidden in form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+
+                {# Encuesta #}
+                <div class="mb-3">
+                    <label for="{{ form.encuesta.id_for_label }}" class="form-label">{{ form.encuesta.label }}</label>
+                    {{ form.encuesta }}
+                    {% if form.encuesta.errors %}<div class="text-danger small">{{ form.encuesta.errors }}</div>{% endif %}
+                </div>
+
+                {# Prioridad (render manual para evitar problemas con widget oculto) #}
+                {% if prioridad_choices %}
+                <div class="mb-3">
+                    <label for="id_prioridad" class="form-label">Prioridad:</label>
+                    <select name="prioridad" id="id_prioridad" class="form-select">
+                        {% for val,label in prioridad_choices %}
+                            {% if form.data.prioridad == val or form.initial.prioridad == val or form.prioridad.value == val %}
+                                <option value="{{ val }}" selected>{{ label }}</option>
+                            {% else %}
+                                <option value="{{ val }}">{{ label }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.prioridad.errors %}<div class="text-danger small">{{ form.prioridad.errors }}</div>{% endif %}
+                </div>
+                {% endif %}
+
+                {# Contenedor de Campos Adicionales (server-side render si la vista pasó datos) #}
+                <div id="campos-adicionales-container">
+                    {% for campo in campos_adicionales %}
+                        <div class="mb-3" data-campo-id="{{ campo.id }}">
+                            <label class="form-label">
+                                {{ campo.titulo }}{% if campo.es_obligatoria %} <span class="text-danger">*</span>{% endif %}
+                            </label>
+                            <input type="text" name="campo_{{ campo.id }}" id="campo_{{ campo.id }}" class="form-control"
+                                   value="{{ campo.valor|default:'' }}">
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {# Inyectar prefill JSON para que el JS pueda reutilizarlo (opcional) #}
+                {% if respuestas_prefill %}
+                    {{ respuestas_prefill|json_script:"prefill-data" }}
+                {% endif %}
+
+                {# Descripción #}
+                <div class="mb-3">
+                    <label for="{{ form.descripcion.id_for_label }}" class="form-label">{{ form.descripcion.label }}</label>
+                    {{ form.descripcion }}
+                    {% if form.descripcion.errors %}<div class="text-danger small">{{ form.descripcion.errors }}</div>{% endif %}
+                </div>
+
+                {# Latitud / Longitud #}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.latitud.id_for_label }}" class="form-label">{{ form.latitud.label }}</label>
+                        {{ form.latitud }}
+                        {% if form.latitud.errors %}<div class="text-danger small">{{ form.latitud.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.longitud.id_for_label }}" class="form-label">{{ form.longitud.label }}</label>
+                        {{ form.longitud }}
+                        {% if form.longitud.errors %}<div class="text-danger small">{{ form.longitud.errors }}</div>{% endif %}
+                    </div>
+                </div>
+
+                {# Dirección textual #}
+                <div class="mb-3">
+                    <label for="{{ form.direccion_textual.id_for_label }}" class="form-label">{{ form.direccion_textual.label }}</label>
+                    {{ form.direccion_textual }}
+                    {% if form.direccion_textual.errors %}<div class="text-danger small">{{ form.direccion_textual.errors }}</div>{% endif %}
+                </div>
+
+                {# Campos opcionales (vecino, territorial, cuadrilla, estado) renderizados a partir de form.visible_fields #}
+                {% for bf in form.visible_fields %}
+                    {% if bf.name in optional_fields %}
+                        <div class="mb-3">
+                            <label for="{{ bf.id_for_label }}" class="form-label">{{ bf.label }}</label>
+                            {{ bf }}
+                            {% if bf.errors %}<div class="text-danger small">{{ bf.errors }}</div>{% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
                 <hr>
                 <button type="submit" class="btn btn-primary">Guardar</button>
                 <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-secondary">Cancelar</a>
@@ -15,4 +116,15 @@
         </div>
     </div>
 </div>
+
+{# Incluir el JS estático (archivo en static/includes/js/incidencias_camposA.js) #}
+<script
+  src="{% static 'includes/js/incidencias_camposA.js' %}"
+  defer
+  data-api-template="{% url 'api_campos_encuesta' 0 %}"
+  data-prefill-id="{% if respuestas_prefill %}prefill-data{% endif %}"
+  data-encuesta-selector="select[name='encuesta']"
+  data-container-selector="#campos-adicionales-container"
+></script>
+
 {% endblock %}
