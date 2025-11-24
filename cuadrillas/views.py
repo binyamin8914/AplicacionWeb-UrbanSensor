@@ -142,16 +142,264 @@ def cuadrilla_bloquear(request, cuadrilla_id):
     return redirect("cuadrilla_listar")
 
 # funciones para la api
-@login_required
+# @login_required
 @csrf_exempt
 # @api_view(['GET'])
 def api_cuadrilla_list(request):
-    profile = Profile.objects.get(user=request.user)
-    if profile.group.name != "SECPLA":
-        return JsonResponse({"mensaje": 'No tienes permisos. Usuario incorrecto'}, status=400)
+    # profile = Profile.objects.get(user=request.user)
+    # if profile.group.name != "SECPLA":
+    #     return JsonResponse({"mensaje": 'No tienes permisos. Usuario incorrecto'}, status=400)
 
     cuadrillas = Cuadrilla.objects.all().order_by('nombre').values('id', 'nombre', 'esta_activa', 'encargado__username', 'departamento__nombre', 'departamento__direccion__nombre')
     departamentos = Departamento.objects.filter(esta_activo=True).order_by('nombre').values('nombre')
     departamentos = list(departamentos)
     departamentos = [dep["nombre"] for dep in departamentos]
     return JsonResponse({'mensaje': "Exito", 'cuadrillas': list(cuadrillas), 'departamentos': list(departamentos)})
+
+# @login_required
+@csrf_exempt
+def api_cuadrilla_bloquear(request):
+    # profile = Profile.objects.get(user=request.user)
+    # if profile.group.name != "SECPLA":
+    #     return JsonResponse({"mensaje": 'No tienes permisos. Usuario incorrecto'}, status=400)
+
+    if request.method == "POST":
+        data = json.loads(request.body)
+        cuadrilla_id = data.get("cuadrilla_id")
+        cuadrilla = get_object_or_404(Cuadrilla, pk=cuadrilla_id)
+        cuadrilla.esta_activa = not cuadrilla.esta_activa
+        cuadrilla.save()
+        estado = "activada" if cuadrilla.esta_activa else "bloqueada"
+        return JsonResponse({"mensaje": f"Cuadrilla {estado} correctamente."})
+    else:
+        return JsonResponse({"mensaje": "Método no permitido."}, status=400)
+
+
+# -------------------------------------------------------------------
+# API PARA REACT
+# -------------------------------------------------------------------
+
+@login_required
+@csrf_exempt
+def api_cuadrilla_list(request):
+    profile = Profile.objects.get(user=request.user)
+    if profile.group.name != "SECPLA":
+        return JsonResponse(
+            {"mensaje": "No tienes permisos. Usuario incorrecto"}, status=400
+        )
+
+    if request.method != "GET":
+        return JsonResponse({"detail": "Método no permitido"}, status=405)
+
+    cuadrillas = (
+        Cuadrilla.objects
+        .select_related("encargado", "departamento", "departamento__direccion")
+        .order_by("nombre")
+        .values(
+            "id",
+            "nombre",
+            "esta_activa",
+            "encargado__username",
+            "departamento__nombre",
+            "departamento__direccion__nombre",
+        )
+    )
+
+    departamentos = (
+        Departamento.objects.filter(esta_activo=True)
+        .order_by("nombre")
+        .values_list("nombre", flat=True)
+    )
+
+    return JsonResponse(
+        {
+            "mensaje": "Exito",
+            "cuadrillas": list(cuadrillas),
+            "departamentos": list(departamentos),
+        },
+        status=200,
+    )
+
+
+@csrf_exempt
+def api_cuadrilla_list_public(request):
+    if request.method != "GET":
+        return JsonResponse({"detail": "Método no permitido"}, status=405)
+
+    cuadrillas = (
+        Cuadrilla.objects
+        .select_related("encargado", "departamento", "departamento__direccion")
+        .order_by("nombre")
+        .values(
+            "id",
+            "nombre",
+            "esta_activa",
+            "encargado__username",
+            "departamento__nombre",
+            "departamento__direccion__nombre",
+        )
+    )
+
+    return JsonResponse(
+        {"mensaje": "Exito", "cuadrillas": list(cuadrillas)},
+        status=200,
+    )
+
+
+@login_required
+@csrf_exempt
+def api_form_data(request):
+    """Datos para los selects (encargados y departamentos)."""
+    profile = Profile.objects.get(user=request.user)
+    if profile.group.name != "SECPLA":
+        return JsonResponse(
+            {"mensaje": "No tienes permisos. Usuario incorrecto"}, status=400
+        )
+
+    if request.method != "GET":
+        return JsonResponse({"detail": "Método no permitido"}, status=405)
+
+    try:
+        grupo_cuadrilla = Group.objects.get(name="Cuadrilla")
+        encargados = User.objects.filter(groups=grupo_cuadrilla)
+    except Group.DoesNotExist:
+        encargados = User.objects.all()
+
+    encargados_data = list(
+        encargados.order_by("username").values("id", "username")
+    )
+    departamentos_data = list(
+        Departamento.objects.filter(esta_activo=True)
+        .order_by("nombre")
+        .values("id", "nombre")
+    )
+
+    return JsonResponse(
+        {
+            "encargados": encargados_data,
+            "departamentos": departamentos_data,
+        },
+        status=200,
+    )
+
+
+@login_required
+@csrf_exempt
+def api_cuadrilla_detail(request, cuadrilla_id):
+    """GET detalle de cuadrilla / PUT actualizar cuadrilla."""
+    profile = Profile.objects.get(user=request.user)
+    if profile.group.name != "SECPLA":
+        return JsonResponse(
+            {"mensaje": "No tienes permisos. Usuario incorrecto"}, status=400
+        )
+
+    cuadrilla = get_object_or_404(Cuadrilla, pk=cuadrilla_id)
+
+    if request.method == "GET":
+        return JsonResponse(
+            {
+                "id": cuadrilla.id,
+                "nombre": cuadrilla.nombre,
+                "esta_activa": cuadrilla.esta_activa,
+                "encargado": cuadrilla.encargado_id,
+                "departamento": cuadrilla.departamento_id,
+            },
+            status=200,
+        )
+
+    if request.method == "PUT":
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+        except json.JSONDecodeError:
+            return JsonResponse(
+                {"mensaje": "JSON inválido"}, status=400
+            )
+
+        nombre = data.get("nombre")
+        encargado_id = data.get("encargado")
+        departamento_id = data.get("departamento")
+        esta_activa = data.get("esta_activa", True)
+
+        if not all([nombre, encargado_id, departamento_id]):
+            return JsonResponse(
+                {"mensaje": "Nombre, Encargado y Departamento son obligatorios."},
+                status=400,
+            )
+
+        # Validar que el encargado no esté en otra cuadrilla
+        if (
+            Cuadrilla.objects
+            .filter(encargado_id=encargado_id)
+            .exclude(id=cuadrilla.id)
+            .exists()
+        ):
+            return JsonResponse(
+                {
+                    "mensaje": "El usuario seleccionado ya es encargado de otra cuadrilla."
+                },
+                status=400,
+            )
+
+        cuadrilla.nombre = nombre
+        cuadrilla.encargado_id = encargado_id
+        cuadrilla.departamento_id = departamento_id
+        cuadrilla.esta_activa = bool(esta_activa)
+        cuadrilla.save()
+
+        return JsonResponse({"mensaje": "Cuadrilla actualizada correctamente"}, status=200)
+
+    return JsonResponse({"detail": "Método no permitido"}, status=405)
+
+
+@login_required
+@csrf_exempt
+def api_cuadrilla_create(request):
+    """POST crear cuadrilla."""
+    profile = Profile.objects.get(user=request.user)
+    if profile.group.name != "SECPLA":
+        return JsonResponse(
+            {"mensaje": "No tienes permisos. Usuario incorrecto"}, status=400
+        )
+
+    if request.method != "POST":
+        return JsonResponse({"detail": "Método no permitido"}, status=405)
+
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except json.JSONDecodeError:
+        return JsonResponse({"mensaje": "JSON inválido"}, status=400)
+
+    nombre = data.get("nombre")
+    encargado_id = data.get("encargado")
+    departamento_id = data.get("departamento")
+    esta_activa = data.get("esta_activa", True)
+
+    if not all([nombre, encargado_id, departamento_id]):
+        return JsonResponse(
+            {"mensaje": "Nombre, Encargado y Departamento son obligatorios."},
+            status=400,
+        )
+
+    if Cuadrilla.objects.filter(encargado_id=encargado_id).exists():
+        return JsonResponse(
+            {"mensaje": "El usuario seleccionado ya es encargado de otra cuadrilla."},
+            status=400,
+        )
+
+    try:
+        cuadrilla = Cuadrilla.objects.create(
+            nombre=nombre,
+            encargado_id=encargado_id,
+            departamento_id=departamento_id,
+            esta_activa=bool(esta_activa),
+        )
+    except IntegrityError:
+        return JsonResponse(
+            {"mensaje": "Error al crear la cuadrilla (restricción de integridad)."},
+            status=400,
+        )
+
+    return JsonResponse(
+        {"mensaje": "Cuadrilla creada correctamente", "id": cuadrilla.id},
+        status=201,
+    )
