@@ -13,7 +13,7 @@ core_urlpatterns = [
     path('check_profile', views.check_profile, name='check_profile'),
     path('dashboard', views.dashboard, name='dashboard'),
 
-    # === NUEVA RUTA PARA TERRITORIAL: CREAR SOLICITUD / INCIDENCIA ===
+   
     path(
         'territorial/incidencias/nueva/',
         views.territorial_crear_incidencia,

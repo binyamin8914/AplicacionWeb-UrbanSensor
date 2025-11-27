@@ -18,24 +18,24 @@
             <form method="post">
                 {% csrf_token %}
 
-                {# Errores no campo (incluye validación de campos adicionales) #}
+                
                 {% if form.non_field_errors %}
                     <div class="alert alert-danger">{{ form.non_field_errors }}</div>
                 {% endif %}
 
-                {# Campos hidden (importante para HiddenInput en el form) #}
+                
                 {% for hidden in form.hidden_fields %}
                     {{ hidden }}
                 {% endfor %}
 
-                {# Encuesta #}
+                
                 <div class="mb-3">
                     <label for="{{ form.encuesta.id_for_label }}" class="form-label">{{ form.encuesta.label }}</label>
                     {{ form.encuesta }}
                     {% if form.encuesta.errors %}<div class="text-danger small">{{ form.encuesta.errors }}</div>{% endif %}
                 </div>
 
-                {# Prioridad (render manual para evitar problemas con widget oculto) #}
+                
                 {% if prioridad_choices %}
                 <div class="mb-3">
                     <label for="id_prioridad" class="form-label">Prioridad:</label>
@@ -52,8 +52,7 @@
                 </div>
                 {% endif %}
 
-                {# Contenedor de Campos Adicionales (server-side render si la vista pasó datos) #}
-                <div id="campos-adicionales-container">
+                
                     {% for campo in campos_adicionales %}
                         <div class="mb-3" data-campo-id="{{ campo.id }}">
                             <label class="form-label">
@@ -65,19 +64,19 @@
                     {% endfor %}
                 </div>
 
-                {# Inyectar prefill JSON para que el JS pueda reutilizarlo (opcional) #}
+                
                 {% if respuestas_prefill %}
                     {{ respuestas_prefill|json_script:"prefill-data" }}
                 {% endif %}
 
-                {# Descripción #}
+                
                 <div class="mb-3">
                     <label for="{{ form.descripcion.id_for_label }}" class="form-label">{{ form.descripcion.label }}</label>
                     {{ form.descripcion }}
                     {% if form.descripcion.errors %}<div class="text-danger small">{{ form.descripcion.errors }}</div>{% endif %}
                 </div>
 
-                {# Latitud / Longitud #}
+                
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="{{ form.latitud.id_for_label }}" class="form-label">{{ form.latitud.label }}</label>
@@ -91,14 +90,14 @@
                     </div>
                 </div>
 
-                {# Dirección textual #}
+                
                 <div class="mb-3">
                     <label for="{{ form.direccion_textual.id_for_label }}" class="form-label">{{ form.direccion_textual.label }}</label>
                     {{ form.direccion_textual }}
                     {% if form.direccion_textual.errors %}<div class="text-danger small">{{ form.direccion_textual.errors }}</div>{% endif %}
                 </div>
 
-                {# Campos opcionales (vecino, territorial, cuadrilla, estado) renderizados a partir de form.visible_fields #}
+                
                 {% for bf in form.visible_fields %}
                     {% if bf.name in optional_fields %}
                         <div class="mb-3">
@@ -117,7 +116,7 @@
     </div>
 </div>
 
-{# Incluir el JS estático (archivo en static/includes/js/incidencias_camposA.js) #}
+
 <script
   src="{% static 'includes/js/incidencias_camposA.js' %}"
   defer

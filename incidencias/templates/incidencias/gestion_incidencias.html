@@ -6,7 +6,7 @@
 {% block content %}
 <div class="container-fluid mt-4">
 
-    {# TÍTULO ADAPTADO AL PERFIL #}
+    
     <h1 class="mb-3">
         {% if group_name == "Territorial" %}
             Mis Incidencias
@@ -21,10 +21,10 @@
         {% endif %}
     </h1>
 
-    {# CARDS DE RESUMEN - (Lógica del template nuevo) #}
+    
     {% if group_name in "SECPLA,Direccion,Departamento" %}
     <div class="row g-3 mb-4">
-        {# ... (Mantener todas las CARDS de resumen aquí) ... #}
+        
         <div class="col-md-2">
             <a href="?estado=" class="text-decoration-none">
                 <div class="card text-center shadow-sm {% if not estado_filtrado %}border-primary{% endif %}">
@@ -88,10 +88,10 @@
     </div>
     {% endif %}
 
-    {# BARRA DE ACCIONES Y FILTROS (Mantenemos la lógica de botón) #}
+    
     <div class="d-flex justify-content-between align-items-center mb-3">
         
-        {# FILTRO POR ESTADO (Dropdown - para Territorial y Cuadrilla) #}
+        
         {% if group_name in "Territorial,Cuadrilla" %}
         <div class="dropdown">
             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -113,7 +113,7 @@
             </ul>
         </div>
         {% else %}
-        {# ESTADO ACTUAL PARA ROLES ADMINISTRATIVOS (MÁS DETALLADO) #}
+       
         <div class="mb-0">
             <p class="text-muted small mb-0">
                 Listado completo | Estado actual: 
@@ -122,7 +122,7 @@
         </div>
         {% endif %}
 
-        {# BOTÓN CREAR (solo Territorial) #}
+       
         {% if group_name == "Territorial" %}
         <a href="{% url 'crear_incidencia' %}" class="btn btn-primary">
             <i class="bi bi-plus-circle-fill me-2"></i>Crear Nueva Incidencia
@@ -130,7 +130,7 @@
         {% endif %}
     </div>
 
-    {# TABLA DE INCIDENCIAS #}
+    
     <div class="card shadow border-0 mb-5">
         <div class="card-body p-0">
             
@@ -166,7 +166,7 @@
                                         </small>
                                     </div>
 
-                                    {# Icono discreto si la incidencia fue reenviada a otro departamento distinto al tipo #}
+                                    
                                     {% if inc.destinatario_departamento and inc.encuesta and inc.encuesta.tipo_incidencia and inc.encuesta.tipo_incidencia.departamento and inc.destinatario_departamento.id != inc.encuesta.tipo_incidencia.departamento.id %}
                                         <div class="ms-auto">
                                             <span class="text-info" title="Reenviada a {{ inc.destinatario_departamento.nombre }}">
@@ -193,7 +193,7 @@
                                 </span>
                             </td>
 
-                            {# Estado #}
+                            
                             <td>
                                 {% if inc.estado == 'finalizada' %}
                                     <span class="badge rounded-pill bg-success bg-opacity-75 text-white px-3">
@@ -238,7 +238,7 @@
                                 {% endif %}
                             </td>
 
-                            {# ACCIONES #}
+                            
                             <td class="text-end pe-4">
                                 <a href="{% url 'incidencia_detalle' inc.id %}" class="btn btn-sm btn-outline-primary shadow-sm" title="Ver Detalle">
                                     <i class="bi bi-eye-fill me-1"></i> Ver
@@ -248,7 +248,7 @@
 
 
                                 {% with depto_encargado=inc.encuesta.tipo_incidencia.departamento.encargado %}
-                                    {# ACCIONES DE DEPARTAMENTO: Solo si es el encargado y está ABIERTA #}
+                                    
                                     {% if group_name == 'Departamento' and depto_encargado == request.user and inc.estado == 'abierta' %}
                                         <a href="{% url 'derivar_incidencia' inc.id %}" class="btn btn-sm btn-outline-info shadow-sm">
                                             <i class="bi bi-send-fill me-1"></i> Derivar

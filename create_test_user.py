@@ -1,7 +1,7 @@
 import django
 import os
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'UrbanSensor.settings')  # Cambia por el nombre al de tu proyecto x.settings
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'UrbanSensor.settings')  
 django.setup()
 
 from django.contrib.auth.models import User, Group
@@ -12,7 +12,7 @@ def build_usuarios():
     usuarios = []
     direcciones = list(Direccion.objects.all())
 
-    # SECPLA: secpla_user1..secpla_user2..secpla_user3
+    
     for i in range(1, 4):
         usuarios.append({
             'username': f'secpla_user{i}',
@@ -34,11 +34,11 @@ def build_usuarios():
             'first_name': f'TerritorialName{i}',
             'last_name': f'TerritorialSurname{i}',
 
-            # ➤ AGREGAMOS la dirección
+            
             'direccion': direcciones[(i - 1) % len(direcciones)] if direcciones else None
         })
 
-    # Direccion: direccion_user1..direccion_user9 (suficientes para varias direcciones)
+    
     for i in range(1, 10):
         usuarios.append({
             'username': f'direccion_user{i}',
@@ -50,7 +50,7 @@ def build_usuarios():
             'last_name': f'DireccionSurname{i}'
         })
 
-    # Departamento: departamento_user1..departamento_user11
+    
     for i in range(1, 12):
         usuarios.append({
             'username': f'departamento_user{i}',
@@ -62,7 +62,7 @@ def build_usuarios():
             'last_name': f'DepartamentoSurname{i}'
         })
 
-    # Cuadrilla: cuadrilla_user1..cuadrilla_user21
+    
     for i in range(1, 22):
         usuarios.append({
             'username': f'cuadrilla_user{i}',
@@ -80,7 +80,7 @@ def create_test_users():
     usuarios = build_usuarios()
 
     for user_data in usuarios:
-        # Crea usuario base o lo recupera
+        
         user, created = User.objects.get_or_create(username=user_data['username'], defaults={
             'email': user_data['email'],
             'first_name': user_data.get('first_name', ''),
@@ -92,7 +92,7 @@ def create_test_users():
             user.save()
             print(f"Usuario '{user.username}' creado.")
         else:
-            # Actualiza datos básicos si cambiaron
+            
             updated = False
             if user.email != user_data['email']:
                 user.email = user_data['email']
@@ -109,11 +109,11 @@ def create_test_users():
             else:
                 print(f"Usuario '{user.username}' ya existe.")
 
-        # Asigna grupo (asume que el Group ya existe)
+        
         try:
             group = Group.objects.get(name=user_data['group'])
         except Group.DoesNotExist:
-            # Si el grupo no existe, lo creamos para evitar errores
+            
             group = Group.objects.create(name=user_data['group'])
             print(f"Grupo '{group.name}' creado automáticamente.")
 
@@ -121,7 +121,7 @@ def create_test_users():
         user.groups.add(group)
         user.save()
 
-        # Crea o actualiza perfil extendido
+        
         profile, prof_created = Profile.objects.get_or_create(user=user, defaults={
             'group': group,
             'telefono': user_data['telefono']

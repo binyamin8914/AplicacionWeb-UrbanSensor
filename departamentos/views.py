@@ -151,10 +151,6 @@ def departamento_bloquear(request, departamento_id):
     return redirect("departamento_listar")
 
 
-# =======================================================
-# VISTAS PARA EL DASHBOARD Y GESTIÓN DE INCIDENCIAS
-# =======================================================
-
 @login_required
 def departamento_dashboard(request):
 

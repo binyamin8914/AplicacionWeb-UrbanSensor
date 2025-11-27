@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect
 from django import forms
 from .models import Profile
 
-# imports necesarios para el flujo de reset
+
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
@@ -25,7 +25,7 @@ class SignUpView(CreateView):
     
     def get_form(self, form_class=None):
         form = super(SignUpView,self).get_form()
-        #modificamos en tiempo real
+   
         form.fields['username'].widget = forms.TextInput(attrs={'class':'form-control mb-2','placeholder':'Nombre de usuario'})
         form.fields['email'].widget = forms.EmailInput(attrs={'class':'form-control mb-2','placeholder':'Dirección de correo'})
         form.fields['password1'].widget = forms.PasswordInput(attrs={'class':'form-control mb-2','placeholder':'Ingrese su contraseña'})
@@ -39,7 +39,7 @@ class ProfileUpdate(UpdateView):
     template_name = 'registration/profiles_form.html'
 
     def get_object(self):
-        #recuperasmo el objeto a editar
+        
         profile, created = Profile.objects.get_or_create(user=self.request.user)
         return profile
 
@@ -50,12 +50,12 @@ class EmailUpdate(UpdateView):
     template_name = 'registration/profile_email_form.html'
 
     def get_object(self):
-        #recuperasmo el objeto a editar
+        
         return self.request.user
     
     def get_form(self, form_class=None):
         form = super(EmailUpdate,self).get_form()
-        #modificamos en tiempo real
+        
         form.fields['email'].widget = forms.EmailInput(attrs={'class':'form-control mb-2','placeholder':'Dirección de correo'})
         return form
 @login_required
@@ -101,13 +101,3 @@ def reset_password_change(request):
         return redirect("login")
     return render(request, template_name, {"email": request.GET.get("email")})
 
-    def form_valid(self, form):
-        email = form.cleaned_data.get('email')
-        users = User.objects.filter(email__iexact=email, is_active=True)
-        if users.exists():
-            user = users.first()
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            token = default_token_generator.make_token(user)
-            confirm_url = reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
-            return redirect(confirm_url)
-        return redirect(self.success_url)

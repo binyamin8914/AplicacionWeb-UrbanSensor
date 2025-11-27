@@ -24,11 +24,9 @@ class EncuestaForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
 
-# --- FORMULARIO PARA LOS CAMPOS ADICIONALES ---
 class CampoAdicionalForm(forms.ModelForm):
     
-    # --- ¡¡CAMBIO!! Hacemos 'orden' opcional y oculto ---
-    # El 'required=False' es la clave para que formset.is_valid() funcione.
+ 
     orden = forms.IntegerField(required=False, widget=forms.HiddenInput())
 
     class Meta:
@@ -42,7 +40,7 @@ class CampoAdicionalForm(forms.ModelForm):
             'es_obligatoria': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
             }),
-            # 'orden' ya está definido arriba como HiddenInput
+    
         }
         labels = {
             'titulo': 'Etiqueta del Campo',
@@ -75,12 +73,12 @@ class TipoIncidenciaForm(forms.Form):
     )
 
 
-# --- EL "CONJUNTO DE FORMULARIOS" (FORMSET) ---
+
 CamposAdicionalesFormSet = inlineformset_factory(
     Encuesta,
     CamposAdicionales,
     form=CampoAdicionalForm,
     extra=1,
     can_delete=True,
-    can_order=False, # Le decimos a Django que no se preocupe por el orden
+    can_order=False, 
 )

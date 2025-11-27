@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from cuadrillas.models import Cuadrilla
 from encuestas.models import Encuesta
 from .models import Incidencia, Vecino
-from registration.models import Profile  # <-- AGREGAR ESTE IMPORT
+from registration.models import Profile  
 
 class IncidenciaForm(forms.ModelForm):
     class Meta:
@@ -37,13 +37,13 @@ class IncidenciaForm(forms.ModelForm):
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Force choices (evita problemas por import/carga o sobrescrituras)
+        
         self.fields['prioridad'].choices = list(Incidencia.PRIORIDAD_CHOICES)
-        # default initial
+        
         if not self.fields['prioridad'].initial:
             self.fields['prioridad'].initial = 'normal'
 
-        # Querysets base
+        
         self.fields['encuesta'].queryset = Encuesta.objects.all().order_by('-id')
         self.fields['cuadrilla'].queryset = Cuadrilla.objects.filter(esta_activa=True)
         self.fields['vecino'].queryset = Vecino.objects.all().order_by('id')
@@ -52,14 +52,14 @@ class IncidenciaForm(forms.ModelForm):
         if user is None:
             return
 
-        # Determinar rol de forma robusta
+        
         try:
             is_territorial = user.groups.filter(name__iexact='territorial').exists()
         except Exception:
             is_territorial = False
 
         if is_territorial:
-            # Si el territorial tiene direccion, filtrar encuestas vigentes
+            
             try:
                 profile = Profile.objects.get(user=user)
             except Profile.DoesNotExist:
@@ -73,25 +73,25 @@ class IncidenciaForm(forms.ModelForm):
             else:
                 self.fields['encuesta'].queryset = Encuesta.objects.none()
 
-            # Ocultar campos que el Territorial no debe manipular
+            
             self.fields['cuadrilla'].widget = forms.HiddenInput()
             self.fields['estado'].widget = forms.HiddenInput()
             self.fields['territorial'].widget = forms.HiddenInput()
             self.fields['vecino'].widget = forms.HiddenInput()
 
-            # <-- LÍNEAS AÑADIR: marcar como no requeridos si los ocultamos -->
+            
             self.fields['cuadrilla'].required = False
             self.fields['estado'].required = False
             self.fields['territorial'].required = False
             self.fields['vecino'].required = False
-            # <-- fin de líneas añadidas -->
+           
 
-            # Asegurar widget y requerido para prioridad
+            
             self.fields['prioridad'].widget = forms.Select(attrs={'class': 'form-select'})
             self.fields['prioridad'].required = True
 
         else:
-            # Para otros roles ocultar prioridad
+            
             self.fields['prioridad'].widget = forms.HiddenInput()
             self.fields['prioridad'].required = False
 

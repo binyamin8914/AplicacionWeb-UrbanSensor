@@ -1,9 +1,9 @@
-# apps/administracion/urls.py
+
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Usuarios
+    
     path('usuarios/',                          views.usuarios_listar,     name='usuarios_listar'),
     path('usuarios/nuevo/',                    views.usuario_actualizar,  name='usuario_actualizar'),
     path('usuarios/editar/<int:user_id>/',     views.usuario_actualizar,  name='usuario_actualizar_id'),

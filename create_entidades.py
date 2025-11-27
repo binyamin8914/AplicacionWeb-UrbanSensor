@@ -2,7 +2,7 @@ import os
 import django
 from django.db import transaction
 
-# Ajusta el settings module si tu proyecto tiene otro nombre
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'UrbanSensor.settings')
 django.setup()
 
@@ -11,7 +11,7 @@ from direcciones.models import Direccion
 from departamentos.models import Departamento
 from cuadrillas.models import Cuadrilla
 
-# (sustituye las funciones correspondientes en tu archivo)
+
 
 from django.db import transaction, IntegrityError
 
@@ -26,7 +26,7 @@ def find_alternative_user(prefix, model_check, start=1, max_try=200):
         u = User.objects.filter(username=uname).first()
         if not u:
             continue
-        # comprobar si ya está asignado en model_check
+       
         if not model_check.objects.filter(encargado=u).exists():
             return u
     return None
@@ -40,7 +40,7 @@ def create_direcciones(direcciones):
             if not encargado:
                 print(f"[SKIP] Direccion '{d['nombre']}': usuario encargado '{username}' no existe.")
                 continue
-            # Si ya existe una Direccion con ese encargado -> buscar alternativa o saltar
+            
             if Direccion.objects.filter(encargado=encargado).exists():
                 alt = find_alternative_user('direccion_user', Direccion, start=1)
                 if alt:
@@ -80,10 +80,10 @@ def create_departamentos(departamentos):
                 print(f"[SKIP] Departamento '{dep['nombre']}': usuario encargado '{username}' no existe.")
                 continue
 
-            # comprobar si ese usuario ya es encargado de otro Departamento
+            
             existing = Departamento.objects.filter(encargado=encargado).exclude(nombre=dep['nombre']).first()
             if existing:
-                # intentamos encontrar otro usuario libre con prefijo 'departamento_user'
+                
                 alt = find_alternative_user('departamento_user', Departamento, start=1)
                 if alt:
                     print(f"[WARN] Usuario '{username}' ya está encargado de '{existing.nombre}'. Usando '{alt.username}' como encargado para '{dep['nombre']}'.")
@@ -123,7 +123,7 @@ def create_cuadrillas(cuadrillas):
                 print(f"[SKIP] Cuadrilla '{c['nombre']}': usuario encargado '{username}' no existe.")
                 continue
 
-            # comprobar si ese usuario ya es encargado de otra Cuadrilla
+            
             existing = Cuadrilla.objects.filter(encargado=encargado).exclude(nombre=c['nombre']).first()
             if existing:
                 alt = find_alternative_user('cuadrilla_user', Cuadrilla, start=1)
@@ -149,7 +149,7 @@ def create_cuadrillas(cuadrillas):
             print(f"[ERROR] Al crear/actualizar Cuadrilla '{c['nombre']}': {e}")
 
 def create_all():
-    # Datos de ejemplo ampliados: adapta nombres/email/usuarios según necesites
+    
     direcciones = [
         {'nombre': 'Direccion de Obras', 'encargado_username': 'direccion_user1', 'esta_activa': True},
         {'nombre': 'Direccion de Medio Ambiente', 'encargado_username': 'direccion_user2', 'esta_activa': True},
@@ -197,7 +197,7 @@ def create_all():
         {'nombre': 'Cuadrilla 20 - Servicios Generales', 'encargado_username': 'cuadrilla_user20', 'departamento_nombre': 'Departamento de Limpieza', 'esta_activa': True},
     ]
 
-    # Ejecuta en transacción para evitar estados parciales (ejemplo: usa transaction.atomic() en tu script)
+    
     with transaction.atomic():
         create_direcciones(direcciones)
         create_departamentos(departamentos)

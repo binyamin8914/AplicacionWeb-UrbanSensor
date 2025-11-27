@@ -12,7 +12,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-7">
-                    {# --- TIPO DE INCIDENCIA --- #}
+                    
                     <p class="mb-1 text-muted small">Tipo de Incidencia:</p>
                     <h5 class="fw-bold text-dark">
                         {% if incidencia.encuesta and incidencia.encuesta.tipo_incidencia %}
@@ -22,7 +22,7 @@
                         {% endif %}
                     </h5>
 
-                    {# --- PRIORIDAD --- #}
+                    
                     <p class="mb-1 text-muted small mt-3">Prioridad:</p>
                     <p>
                         {% if incidencia.prioridad == 'alta' %}
@@ -36,13 +36,13 @@
                         {% endif %}
                     </p>
 
-                    {# --- DESCRIPCIÓN --- #}
+                    
                     <p class="mt-4 mb-2 text-muted small">Descripción:</p>
                     <div class="border rounded p-3 mb-4 bg-light shadow-sm">
                         {{ incidencia.descripcion }}
                     </div>
 
-                    {# --- UBICACIÓN --- #}
+                    
                     <p class="mb-1 text-muted small">Ubicación y Dirección:</p>
                     <div class="row">
                         <div class="col-12 mb-2">
@@ -56,7 +56,7 @@
 
                     <hr class="my-4">
 
-                    {# --- DESTINO Y ASIGNACIONES --- #}
+                    
                     <p class="mb-1 text-muted small">Dirección (Entidad Principal):</p>
                     <p class="fw-semibold">
                         {% if incidencia.encuesta and incidencia.encuesta.tipo_incidencia and incidencia.encuesta.tipo_incidencia.departamento and incidencia.encuesta.tipo_incidencia.departamento.direccion %}
@@ -79,7 +79,7 @@
                         {% endif %}
                     </p>
 
-                    {# Mostrar cuadrilla si existe #}
+                    
                     <p class="mb-1 text-muted small mt-3">Asignación a Cuadrilla:</p>
                     {% if incidencia.cuadrilla %}
                         <div class="alert alert-success p-2 small d-inline-block">
@@ -99,12 +99,12 @@
                     {% endif %}
                 </div>
 
-                {# --- PANEL LATERAL (METADATOS Y ACCIONES) --- #}
+               
                 <div class="col-md-5">
                     <div class="card bg-light shadow-sm mb-4">
                         <div class="card-body">
                             <p class="mb-1 text-muted small">Estado Actual:</p>
-                            {# ESTADO CON BADGE GRANDE #}
+                            
                             <h5 class="mb-3">
                                 {% if incidencia.estado == 'finalizada' %}
                                     <span class="badge rounded-pill bg-success bg-opacity-75 text-white px-3 py-2">
@@ -141,10 +141,10 @@
                             <p class="mb-3">{{ incidencia.updated_at|date:"d M Y H:i" }}</p>
                             {% endif %}
 
-                            {# --- BOTONES DE ACCIÓN (LÓGICA) --- #}
+                            
 
                             {% with depto_encargado=incidencia.encuesta.tipo_incidencia.departamento.encargado %}
-                                {# ACCIONES DE DEPARTAMENTO: Solo si es el encargado y está ABIERTA #}
+                                
                                 {% if group_name == 'Departamento' and depto_encargado == request.user and incidencia.estado == 'abierta' %}
                                     <a href="{% url 'derivar_incidencia' incidencia.id %}" class="btn btn-primary w-100 mb-2">
                                         <i class="bi bi-send-fill me-1"></i> Derivar a cuadrilla
@@ -155,7 +155,7 @@
                                 {% endif %}
                             {% endwith %}
 
-                            {# ACCIÓN DE CUADRILLA: Finalizar (Solo si está Derivada y la cuadrilla coincide) #}
+                            
                             {% if group_name == 'Cuadrilla' and incidencia.cuadrilla and incidencia.cuadrilla.encargado == request.user and incidencia.estado == 'derivada' %}
                                 <form action="{% url 'finalizar_incidencia' incidencia.id %}" method="post" class="d-inline w-100">
                                     {% csrf_token %}
@@ -165,7 +165,7 @@
                                 </form>
                             {% endif %}
 
-                            {# ACCIONES DE TERRITORIAL #}
+                            
                             {% if group_name == 'Territorial' and incidencia.territorial == request.user %}
                                 {% if incidencia.estado == 'finalizada' %}
                                     <form action="{% url 'aceptar_incidencia' incidencia.id %}" method="post" class="d-inline w-100">
@@ -187,7 +187,7 @@
                         </div>
                     </div>
 
-                    {# Historial (si existe) #}
+                 
                     {% if incidencia.logs.all|length %}
                         <div class="card">
                             <div class="card-header">Historial</div>
@@ -209,7 +209,6 @@
                 </div>
             </div>
 
-            {# --- RESPUESTAS A CAMPOS ADICIONALES --- #}
             {% if campos_adicionales %}
                 <hr class="mt-4">
                 <h5 class="mb-3 text-primary">Respuestas a Campos Adicionales</h5>

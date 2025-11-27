@@ -10,7 +10,7 @@ from django.core.paginator import Paginator
 
 @login_required
 def usuarios_listar(request):
-    # Lista de usuarios con filtros por estado y perfil
+   
     try:
         profile = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
@@ -75,14 +75,10 @@ def usuarios_listar(request):
         is_target_secpla = (target_group_name == "SECPLA")
         is_same_user = (usuario == request.user)
 
-        # EDITAR: permitir editar si:
-        # - el objetivo NO es SECPLA (cualquier SECPLA puede editarlo), OR
-        # - el objetivo es SECPLA pero el actual es superusuario, OR
-        # - es el mismo usuario (editar tu propia cuenta)
+       
         permitir_editar = (not is_target_secpla) or is_current_super or is_same_user
 
-        # BLOQUEAR: permitir bloquear/activar si:
-        # - no es auto-bloqueo (no permitir bloquearse a sí mismo)
+        
         permitir_bloquear = (not is_same_user) and ((not is_target_secpla) or is_current_super)
 
         if permitir_editar:
@@ -107,7 +103,7 @@ def usuarios_listar(request):
 
 @login_required
 def usuario_actualizar(request, user_id=None):
-    # Crear o editar un usuario
+    
     try:
         profile = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
@@ -145,12 +141,12 @@ def usuario_actualizar(request, user_id=None):
             except Profile.DoesNotExist:
                 target_group_name = None
 
-            # RESTRICCIÓN: si el objetivo es usuario SECPLA y quien edita NO es superuser y NO es el mismo -> denegar
+            
             if target_group_name == "SECPLA" and (not request.user.is_superuser) and request.user != user:
                 messages.add_message(request, messages.INFO, "No puedes editar a otro SECPLA.")
                 return redirect("usuarios_listar")
 
-            # Edición
+            
             user.first_name = first_name or ''
             user.last_name = last_name or ''
             user.email = email or ''
@@ -239,7 +235,7 @@ def usuario_actualizar(request, user_id=None):
 
 @login_required
 def usuario_bloquear(request, user_id):
-    # Activar/desactivar usuario
+    
     try:
         profile = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
@@ -256,7 +252,7 @@ def usuario_bloquear(request, user_id):
         messages.add_message(request, messages.INFO, "Usuario no encontrado.")
         return redirect("usuarios_listar")
 
-    # impedir auto-bloqueo
+    
     if request.user == user:
         messages.add_message(request, messages.INFO, "No puedes bloquear/activar tu propia cuenta.")
         return redirect("usuarios_listar")
@@ -267,7 +263,7 @@ def usuario_bloquear(request, user_id):
     except Profile.DoesNotExist:
         target_group_name = None
 
-    # Si el objetivo es un usuario SECPLA solo superuser puede bloquear/activar
+    
     if target_group_name == "SECPLA" and not request.user.is_superuser:
         messages.add_message(request, messages.INFO, "Solo un superusuario puede bloquear/activar a un usuario SECPLA.")
         return redirect("usuarios_listar")

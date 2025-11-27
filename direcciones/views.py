@@ -9,7 +9,7 @@ from registration.models import Profile
 from .models import Direccion
 
 
-# --- CRUD Direccion ---
+
 
 @login_required
 def direccion_listar(request):
@@ -93,7 +93,7 @@ def direccion_actualizar(request, direccion_id=None):
                     "Por favor, seleccione un usuario diferente."
                 )
 
-    # GET o POST inválido: preparar datos para el formulario
+    
     try:
         grupo_direccion = Group.objects.get(name="Direccion")
         encargados = User.objects.filter(groups=grupo_direccion)

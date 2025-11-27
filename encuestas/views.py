@@ -10,9 +10,7 @@ from .models import Encuesta, TipoIncidencia
 from .forms import EncuestaForm, CamposAdicionalesFormSet, TipoIncidenciaForm
 
 
-# ---------------------------------------------------------------------
-# Helpers de rol / permiso
-# ---------------------------------------------------------------------
+
 def get_group_name(user):
     try:
         return user.profile.group.name
@@ -35,41 +33,37 @@ def is_cuadrilla(user):
     return get_group_name(user) == "Cuadrilla"
 
 
-# ---------------------------------------------------------------------
-# Tipos de Incidencia (SECPLA y Direccion pueden crear/editar/eliminar)
-# ---------------------------------------------------------------------
+
 @login_required
 def listar_tipos_incidencia(request):
-    # Obtener el parámetro de filtro del GET
+    
     filtro_depto_id = request.GET.get("depto_id")
 
-    # Obtener el queryset base de TipoIncidencia
     tipos = (
         TipoIncidencia.objects
         .select_related("departamento")
         .all()
     )
-    # Aplicar el filtro si está presente
+
     if filtro_depto_id:
         try:
-            # Filtra por la ID del departamento seleccionado
+
             tipos = tipos.filter(departamento__id=filtro_depto_id)
         except ValueError:
-            # Manejar si el depto_id no es un entero válido
+
             pass
 
-    # Aplicar el ordenamiento final
     tipos = tipos.order_by("nombre")
     
-    # Obtener todos los departamentos para el menú desplegable del filtro
+
     try:
         from departamentos.models import Departamento
         departamentos_disponibles = Departamento.objects.all().order_by('nombre')
     except ImportError:
-        # En caso de que el modelo Departamento no esté importado o disponible
+
         departamentos_disponibles = []
     
-    # Intentar obtener el nombre del departamento filtrado (para mostrar en el botón)
+
     filtro_depto_nombre = None
     if filtro_depto_id and departamentos_disponibles:
         try:
@@ -166,9 +160,7 @@ def eliminar_tipo_incidencia(request, tipo_id):
     })
 
 
-# ---------------------------------------------------------------------
-# Gestión de Encuestas
-# ---------------------------------------------------------------------
+
 @login_required
 def gestion_encuestas(request):
     """
