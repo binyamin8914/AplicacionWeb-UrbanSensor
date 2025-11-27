@@ -178,7 +178,7 @@ def usuario_actualizar(request, user_id=None):
             user_profile.save()
             messages.add_message(request, messages.INFO, "Usuario actualizado correctamente.")
         else:
-            # Creación
+            
             if not (username and email and password and group_name):
                 messages.add_message(request, messages.INFO, "Faltan datos obligatorios.")
                 return redirect("usuario_actualizar")

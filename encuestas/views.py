@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db import transaction  # Protegemos la BD
+from django.db import transaction
 from django.db import IntegrityError
 
 from registration.models import Profile
@@ -186,14 +186,13 @@ def gestion_encuestas(request):
 
     page_obj = Paginator(qs, 10).get_page(request.GET.get("page"))
 
-    # Flag para el template: ¿este usuario es SECPLA?
     es_secpla = is_secpla(request.user)
 
     return render(request, "encuestas/gestion_encuestas.html", {
         "encuestas": page_obj,
         "f_estado": estado or "",
         "group_name": profile.group.name,
-        "es_secpla": es_secpla,  # usado para mostrar/ocultar botón Crear
+        "es_secpla": es_secpla,
     })
 
 
@@ -206,7 +205,6 @@ def crear_encuesta(request):
     """
     profile = Profile.objects.get(user=request.user)
 
-    # Bloquear a cualquiera que no sea SECPLA
     if not is_secpla(request.user):
         messages.error(request, "No tienes permisos para crear encuestas.")
         return redirect("gestion_encuestas")
@@ -216,19 +214,14 @@ def crear_encuesta(request):
         formset = CamposAdicionalesFormSet(request.POST, prefix="campos")
 
         if form.is_valid():
-            # 1. Guardamos el padre en memoria
             encuesta = form.save(commit=False)
 
-            # 2. Conectamos el formset con el padre
             formset.instance = encuesta
 
-            # 3. Validamos formset
             if formset.is_valid():
 
-                # 4. Guardamos el padre en la BD
                 encuesta.save()
 
-                # 5. Guardamos los campos adicionales, asignando orden
                 campos = formset.save(commit=False)
                 orden_count = 1
                 for campo in campos:
@@ -243,7 +236,7 @@ def crear_encuesta(request):
         else:
             messages.error(request, "Revisa los campos principales, hay errores.")
 
-    else:  # GET
+    else:
         form = EncuestaForm()
         formset = CamposAdicionalesFormSet(prefix="campos")
 
@@ -266,7 +259,6 @@ def editar_encuesta(request, encuesta_id: int):
     profile = Profile.objects.get(user=request.user)
     encuesta_obj = get_object_or_404(Encuesta, id=encuesta_id)
 
-    # Permitir edición solo si está creado o bloqueado
     if encuesta_obj.estado not in ["creado", "bloqueado"]:
         messages.warning(
             request,

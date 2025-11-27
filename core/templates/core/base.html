@@ -134,7 +134,6 @@
         {% endif %}
       </ul>
 
-      {# Cerrar sesión: usar POST para evitar 405 #}
       <form id="logout-form" method="post" action="{% url 'logout' %}" class="w-100">
         {% csrf_token %}
         <button type="submit" class="btn btn-outline-danger w-100">
@@ -161,7 +160,6 @@
         </div>
       </div class="header">
 
-      {# Mensajes flash #}
       {% if messages %}
         <div class="messages-container mb-3 ms-4 me-4">
           {% for message in messages %}

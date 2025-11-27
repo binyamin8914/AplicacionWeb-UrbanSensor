@@ -1,17 +1,17 @@
 from django.shortcuts import render
-from django.conf import settings #importa el archivo settings
-from django.contrib import messages #habilita la mesajería entre vistas
-from django.contrib.auth.decorators import login_required #habilita el decorador que se niega el acceso a una función si no se esta logeado
-from django.contrib.auth.models import Group, User # importa los models de usuarios y grupos
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator #permite la paqinación
-from django.db.models import Prefetch, Avg, Count, Q #agrega funcionalidades de agregación a nuestros QuerySets
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group, User
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Prefetch, Avg, Count, Q
 from django.http import (HttpResponse, HttpResponseBadRequest,
-                         HttpResponseNotFound, HttpResponseRedirect) #Salidas alternativas al flujo de la aplicación se explicará mas adelante
-from django.shortcuts import redirect, render #permite renderizar vistas basadas en funciones o redireccionar a otras funciones
-from django.template import RequestContext # contexto del sistema
-from django.views.decorators.csrf import csrf_exempt #decorador que nos permitira realizar conexiones csrf
+                         HttpResponseNotFound, HttpResponseRedirect)
+from django.shortcuts import redirect, render
+from django.template import RequestContext
+from django.views.decorators.csrf import csrf_exempt
 
-from registration.models import Profile #importa el modelo profile, el que usaremos para los perfiles de usuarios
+from registration.models import Profile
 from incidencias.models import Incidencia
 from direcciones.models import Direccion
 from departamentos.models import Departamento
@@ -25,7 +25,6 @@ def home(request):
 
 @login_required
 def pre_check_profile(request):
-    #por ahora solo esta creada pero aún no la implementaremos
     pass
 
 @login_required
@@ -35,7 +34,6 @@ def check_profile(request):
     except:
         messages.add_message(request, messages.INFO, 'Hubo un error con su usuario, por favor contactese con los administradores')
         return redirect('login')
-    # Para pruebas: deja pasar a cualquier usuario logueado
     return redirect('dashboard')
 
 @login_required
@@ -55,7 +53,6 @@ def dashboard(request):
 
     if group_name == "SECPLA":
         n_usuarios = User.objects.count()
-        #incidencias
         n_inc = Incidencia.objects.count()
         n_inc_abierta = Incidencia.objects.filter(estado="abierta").count()
         n_inc_derivadas = Incidencia.objects.filter(estado="derivada").count()
@@ -65,7 +62,6 @@ def dashboard(request):
         n_inc_rechazada = Incidencia.objects.filter(estado="rechazada").count()
 
         historial_incidencias = Incidencia.objects.order_by('-updated_at').values('encuesta__titulo', 'prioridad', 'estado', 'updated_at')[:5]
-        # --- Carga por direccion (medido en el numero de incidencias) ---
         data["datos"] = [
             ("Total de usuarios", n_usuarios, ""),
             ("Total de incidencias", n_inc, "󱉫"),
@@ -82,7 +78,6 @@ def dashboard(request):
         direccion = Direccion.objects.get(encargado=request.user.id)
         departamentos = Departamento.objects.filter(direccion__id=direccion.id)
         n_dep = departamentos.count()
-        #incidencias
         incidencias_direccion = Incidencia.objects.filter(encuesta__tipo_incidencia__departamento__direccion__id=direccion.id)
         list_incidencias = list(incidencias_direccion.values('encuesta__tipo_incidencia__departamento__nombre', 'estado'))
         departamento_incidencias = {}
@@ -225,5 +220,4 @@ def dashboard(request):
     return render(request, template_name, data)
 
 def territorial_crear_incidencia(request):
-    # Redirige a la vista real de crear incidencia que ya tienes en la app incidencias
     return redirect('crear_incidencia')

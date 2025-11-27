@@ -3,7 +3,6 @@ from .models import Encuesta, CamposAdicionales, TipoIncidencia
 from departamentos.models import Departamento
 from django.forms import inlineformset_factory
 
-# --- FORMULARIO PRINCIPAL DE LA ENCUESTA ---
 class EncuestaForm(forms.ModelForm):
     
     tipo_incidencia = forms.ModelChoiceField(

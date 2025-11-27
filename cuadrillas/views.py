@@ -1,15 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.contrib.auth.models import User, Group # <-- ¡Añadido Group!
+from django.contrib.auth.models import User, Group 
 from registration.models import Profile
-from departamentos.models import Departamento # <-- ¡Cambiado!
+from departamentos.models import Departamento 
 from .models import Cuadrilla
 
-# --- ¡¡IMPORTANTE: Importa el manejador de errores!! ---
 from django.db import IntegrityError 
 
-# --- CRUD Cuadrilla ---
 
 @login_required
 def cuadrilla_listar(request):
@@ -18,7 +16,6 @@ def cuadrilla_listar(request):
         messages.add_message(request, messages.INFO, "No tienes permisos.")
         return redirect("logout")
 
-    # --- Lógica de Filtro AÑADIDA ---
     filtro_estado = request.GET.get('estado')
     filtro_depto = request.GET.get('departamento')
 
@@ -34,11 +31,10 @@ def cuadrilla_listar(request):
 
     cuadrillas = cuadrillas.order_by('nombre')
     
-    # Contexto para la plantilla Bootstrap
     context = {
         'titulo': 'Gestión de Cuadrillas',
-        'cuadrillas': cuadrillas, # Pasamos la queryset
-        'departamentos_filtro': Departamento.objects.filter(esta_activo=True), # Para el dropdown
+        'cuadrillas': cuadrillas,
+        'departamentos_filtro': Departamento.objects.filter(esta_activo=True),
         'current_filtro_estado': filtro_estado,
         'current_filtro_depto': filtro_depto,
         "group_name": profile.group.name,
@@ -54,7 +50,7 @@ def cuadrilla_actualizar(request, cuadrilla_id=None):
         return redirect("logout")
 
     if cuadrilla_id:
-        cuadrilla = get_object_or_404(Cuadrilla, pk=cuadrilla_id) # Usamos get_object_or_404
+        cuadrilla = get_object_or_404(Cuadrilla, pk=cuadrilla_id)
         titulo_pagina = "Editar Cuadrilla"
     else:
         cuadrilla = None
@@ -71,15 +67,14 @@ def cuadrilla_actualizar(request, cuadrilla_id=None):
             encargado = get_object_or_404(User, pk=encargado_id)
             departamento = get_object_or_404(Departamento, pk=departamento_id)
             
-            # --- ¡¡AQUÍ ESTÁ EL BLOQUE TRY/EXCEPT!! ---
             try:
-                if cuadrilla:  # Edición
+                if cuadrilla:
                     cuadrilla.nombre = nombre
                     cuadrilla.encargado = encargado
                     cuadrilla.departamento = departamento
                     cuadrilla.save()
                     messages.success(request, "Cuadrilla actualizada correctamente.")
-                else:  # Creación
+                else:
                     Cuadrilla.objects.create(
                         nombre=nombre, 
                         encargado=encargado, 
@@ -88,21 +83,18 @@ def cuadrilla_actualizar(request, cuadrilla_id=None):
                     )
                     messages.success(request, "Cuadrilla creada correctamente.")
                 
-                return redirect("cuadrilla_listar") # Redirige solo si todo va bien
+                return redirect("cuadrilla_listar")
 
             except IntegrityError:
-                # ¡Atrapamos el error de llave duplicada!
                 messages.error(request, f"Error: El usuario '{encargado.username}' ya es encargado de otra cuadrilla. Por favor, seleccione un usuario diferente.")
-                # No redirigimos
 
-    # --- Lógica GET (o si el POST falló) ---
     try:
         grupo_cuadrilla = Group.objects.get(name="Cuadrilla")
         encargados = User.objects.filter(groups=grupo_cuadrilla)
     except Group.DoesNotExist:
-        encargados = User.objects.all() # Plan B
+        encargados = User.objects.all()
     
-    departamentos = Departamento.objects.filter(esta_activo=True) # Para el desplegable
+    departamentos = Departamento.objects.filter(esta_activo=True)
 
     context = {
         "titulo_pagina": titulo_pagina,

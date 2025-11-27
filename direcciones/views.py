@@ -18,7 +18,6 @@ def direccion_listar(request):
         messages.info(request, "No tienes permisos.")
         return redirect("logout")
 
-    # Filtros
     filtro_estado = request.GET.get("estado")
     direcciones = Direccion.objects.all()
     if filtro_estado == "Activo":
@@ -59,7 +58,6 @@ def direccion_actualizar(request, direccion_id=None):
     if request.method == "POST":
         nombre = request.POST.get("nombre")
         encargado_id = request.POST.get("encargado")
-        # correo_encargado = request.POST.get("correo_encargado")
 
         if not nombre or not encargado_id:
             messages.error(request, "Nombre y Encargado son obligatorios.")
@@ -67,18 +65,14 @@ def direccion_actualizar(request, direccion_id=None):
             encargado = get_object_or_404(User, pk=encargado_id)
             try:
                 if direccion:
-                    # Actualizar
                     direccion.nombre = nombre
                     direccion.encargado = encargado
-                    # direccion.correo_encargado = correo_encargado
                     direccion.save()
                     messages.success(request, "¡Dirección actualizada con éxito!")
                 else:
-                    # Crear
                     Direccion.objects.create(
                         nombre=nombre,
                         encargado=encargado,
-                        # correo_encargado=correo_encargado,
                         esta_activa=True,
                     )
                     messages.success(request, "¡Dirección creada con éxito!")
@@ -86,7 +80,6 @@ def direccion_actualizar(request, direccion_id=None):
                 return redirect("direccion_listar")
 
             except IntegrityError:
-                # Ej. única por encargado (si tienes constraint único)
                 messages.error(
                     request,
                     f"Error: El usuario '{encargado.username}' ya es encargado de otra dirección. "

@@ -498,7 +498,6 @@ def rechazar_incidencia(request, incidencia_id):
     profile = Profile.objects.get(user=request.user)
     group_name = profile.group.name
 
-    # --- Rechazo desde DEPARTAMENTO ---
     if group_name == "Departamento":
         try:
             departamento_responsable = incidencia.encuesta.tipo_incidencia.departamento

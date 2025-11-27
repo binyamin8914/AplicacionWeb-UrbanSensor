@@ -162,26 +162,21 @@
 
 {% block content %}
 
-<div class="dashboard_container"> <!-- clase renombrada de container -->
+<div class="dashboard_container">
 
-  <!-- copiado de dashboard cuadrilla -->
   <div class="squad-header">
     <div class="squad-title">
       <h1>Perfil Secpla</h1>
     </div>
   </div>
-  <!-- -------------------------------------- -->
 
-  <!-- copiado de departamento -->
   <div class="dashboard-grid">
-    <!-- Incidencias por Estado -->
     <div class="incidents-container">
       <h2>Resumen</h2>
       <div class="incidents-grid">
         {% for nombre, dato, ic in datos %}
         <div class="incident-card">
           <h3>
-            <!-- <span class="icon mb-3 fs-1 d-block">{{ic}}</span> {# Ícono Dashboard #} -->
             {{nombre}}
           </h3>
           <p class="count">{{dato}}</p>
@@ -190,7 +185,6 @@
       </div>
     </div>
 
-    <!-- Información de Cuadrillas -->
     <div class="crews-container">
       <h2>Incidencias actualizadas recientemente</h2>
       <div class="crews-list">
@@ -206,7 +200,6 @@
       </div>
     </div>
   </div>
-  <!-- -------------------------------------- -->
 
 
 
